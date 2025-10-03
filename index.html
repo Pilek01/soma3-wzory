@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTREX SOMA 3 - Wzory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #ff6b35;
+            --accent-hover: #ff8555;
+            --cyan: #00bfff;
+            --magenta: #ff1493;
+            --yellow: #ffff00;
+            --border: #404040;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+
+        body.light-mode {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--accent);
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .title:hover {
+            color: var(--accent-hover);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .search-bar {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid var(--accent);
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255,107,53,0.4);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .card-body {
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            font-size: 1.1rem;
+        }
+
+        .breadcrumb span {
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb span:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            overflow-y: auto;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .sections-container {
+            margin-top: 2rem;
+        }
+
+        .section-form {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border);
+        }
+
+        .section-form h4 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .section-card {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .section-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .section-card.empty {
+            opacity: 0.4;
+            border-style: dashed;
+        }
+
+        .section-card h4 {
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .section-card p {
+            margin: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .section-card strong {
+            color: var(--text-primary);
+        }
+
+        .comments-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .comment {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .comment-header strong {
+            color: var(--accent);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .pattern-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .error-message {
+            background: var(--danger);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo" onclick="showClients()" title="Powrót do strony głównej">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGHaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49J++7vycgaWQ9J1c1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCc/Pg0KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyI+PHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIj48dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCjw/eHBhY2tldCBlbmQ9J3cnPz4slJgLAADXuGNhQlgAANe4anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOmFjOWE0M2I1LTQ4OGEtNDcyZi1hOTlkLTVhYWYxNTRhYjc5NAAAAAHVanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAA+Wp1bWIAAAApanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5hY3Rpb25zLnYyAAAAAMhjYm9yomdhY3Rpb25zgqNmYWN0aW9ubGMycGEuY3JlYXRlZG1zb2Z0d2FyZUFnZW50v2RuYW1lZkdQVC00b/9xZGlnaXRhbFNvdXJjZVR5cGV4Rmh0dHA6Ly9jdi5pcHRjLm9yZy9uZXdzY29kZXMvZGlnaXRhbHNvdXJjZXR5cGUvdHJhaW5lZEFsZ29yaXRobWljTWVkaWGhZmFjdGlvbm5jMnBhLmNvbnZlcnRlZHJhbGxBY3Rpb25zSW5jbHVkZWT1AAAAq2p1bWIAAAAoanVtZGNib3IAEQAQgAAAqgA4m3EDYzJwYS5oYXNoLmRhdGEAAAAAe2Nib3KlamV4Y2x1c2lvbnOBomVzdGFydBghZmxlbmd0aBk3QWRuYW1lbmp1bWJmIG1hbmlmZXN0Y2FsZ2ZzaGEyNTZkaGFzaFggDeDHkrYYmJLej6vHLxfINSeRgOn8PbthqJVQt14geQtjcGFkSAAAAAAAAAAAAAAB7mp1bWIAAAAnanVtZGMyY2wAEQAQgAAAqgA4m3EDYzJwYS5jbGFpbS52MgAAAAG/Y2JvcqZqaW5zdGFuY2VJRHgseG1wOmlpZDo3MDdjM2FmMi04NWE0LTQ0N2QtYWZiNS0zMjMxZTc0MWIxZjF0Y2xhaW1fZ2VuZXJhdG9yX2luZm+/ZG5hbWVnQ2hhdEdQVHdvcmcuY29udGVudGF1dGguYzJwYV9yc2YwLjY0LjD/aXNpZ25hdHVyZXhNc2VsZiNqdW1iZj0vYzJwYS91cm46YzJwYTphYzlhNDNiNS00ODhhLTQ3MmYtYTk5ZC01YWFmMTU0YWI3OTQvYzJwYS5zaWduYXR1cmVyY3JlYXRlZF9hc3NlcnRpb25zgqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggunMbFQiP5kP9dxXSSsW1/BmCPZKIwgpWB2BE+a236qSiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggE+xlQURiVMXy9df7RcetihCRGtvm/0G046d3EFmw1DBoZGM6dGl0bGVpaW1hZ2UucG5nY2FsZ2ZzaGEyNTYAADL9anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAADLNY2JvctKEWQfBogEmGCGCWQM3MIIDMzCCAhugAwIBAgIUbq4oo+7FuOQqNvod5kEVrmIWGzswDQYJKoZIhvcNAQEMBQAwSjEaMBgGA1UEAwwRV2ViQ2xhaW1TaWduaW5nQ0ExDTALBgNVBAsMBExlbnMxEDAOBgNVBAoMB1RydWVwaWMxCzAJBgNVBAYTAlVTMB4XDTI1MDExMzIwMzY0NloXDTI2MDExMzIwMzY0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" alt="SENTREX Logo" class="logo-img">
+                </div>
+                <div class="title" onclick="showClients()">SOMA 3 - Wzory</div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
+                <button class="btn" onclick="showAddClientModal()">+ Klient</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj klientów lub wzorów..." oninput="handleSearch()">
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb"></div>
+
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                Ładowanie danych z Google Sheets...
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
+        const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
+        const ADMIN_PASSWORD = 'admin123';
+
+        let clients = [];
+        let patterns = [];
+        let sections = [];
+        let comments = [];
+        let history = [];
+        let aniloxy = [];
+        let currentView = 'clients';
+        let currentClient = null;
+        let currentPattern = null;
+
+        // Funkcja do odczytu danych z arkusza przez Apps Script
+        async function fetchSheetData(sheetName) {
+            try {
+                const url = `${APPS_SCRIPT_URL}?action=read&sheet=${encodeURIComponent(sheetName)}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data || [];
+            } catch (error) {
+                console.error(`Błąd pobierania danych z ${sheetName}:`, error);
+                return [];
+            }
+        }
+
+        // Funkcja do dodawania wiersza do arkusza przez Apps Script (używa GET zamiast POST)
+        async function appendToSheet(sheetName, values) {
+            try {
+                // Buduj URL z parametrami
+                const params = new URLSearchParams();
+                params.append('action', 'append');
+                params.append('sheet', sheetName);
+                
+                // Dodaj każdą wartość jako col0, col1, col2, etc.
+                values.forEach((value, index) => {
+                    params.append(`col${index}`, value || '');
+                });
+                
+                const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
+                const response = await fetch(url, {
+                    method: 'GET'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                return result;
+            } catch (error) {
+                console.error(`Błąd zapisywania do ${sheetName}:`, error);
+                throw error;
+            }
+        }
+
+        // Ładowanie wszystkich danych
+        async function loadAllData() {
+            try {
+                const [clientsData, patternsData, sectionsData, commentsData, historyData, aniloxyData] = await Promise.all([
+                    fetchSheetData('Klienci'),
+                    fetchSheetData('Wzory'),
+                    fetchSheetData('Sekcje'),
+                    fetchSheetData('Uwagi'),
+                    fetchSheetData('Historia'),
+                    fetchSheetData('Aniloxy')
+                ]);
+
+                clients = clientsData.slice(1).filter(row => row[0]).map(row => ({
+                    numer: String(row[0] || '').trim(),
+                    nazwa: String(row[1] || '').trim()
+                }));
+
+                patterns = patternsData.slice(1).filter(row => row[0]).map(row => ({
+                    id: String(row[0] || '').trim(),
+                    numer: String(row[1] || '').trim(),
+                    nazwa: String(row[2] || '').trim(),
+                    klient_numer: String(row[3] || '').trim(),
+                    zdjecie_url: String(row[4] || '').trim(),
+                    status: String(row[5] || 'aktywny').trim() // domyślnie "aktywny"
+                })).filter(p => p.status !== 'archiwum'); // Ukryj wzory archiwalne
+
+                sections = sectionsData.slice(1).filter(row => row[0]).map(row => ({
+                    wzor_id: String(row[0] || '').trim(),
+                    nr_sekcji: parseInt(row[1]) || 0,
+                    kolor: String(row[2] || '').trim(),
+                    anilox: String(row[3] || '').trim()
+                }));
+
+                comments = commentsData.slice(1).filter(row => row[0]).map(row => ({
+                    wzor_id: String(row[0] || '').trim(),
+                    autor: String(row[1] || '').trim(),
+                    data: String(row[2] || '').trim(),
+                    tresc: String(row[3] || '').trim()
+                }));
+
+                history = historyData.slice(1).filter(row => row[0]).map(row => ({
+                    data: row[0] || '',
+                    kto: row[1] || '',
+                    akcja: row[2] || '',
+                    szczegoly: row[3] || ''
+                }));
+
+                aniloxy = aniloxyData.slice(1).filter(row => row[0]).map(row => row[0]);
+
+                console.log('Załadowano dane:', {
+                    klienci: clients.length,
+                    wzory: patterns.length,
+                    sekcje: sections.length,
+                    uwagi: comments.length,
+                    historia: history.length,
+                    aniloxy: aniloxy.length
+                });
+
+                renderView();
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="error-message">
+                        <strong>Błąd połączenia z Google Sheets</strong><br>
+                        ${error.message}<br><br>
+                        Sprawdź czy:
+                        <ul>
+                            <li>Arkusz jest udostępniony publicznie</li>
+                            <li>Wszystkie zakładki istnieją (Klienci, Wzory, Sekcje, Uwagi, Historia, Aniloxy)</li>
+                            <li>Apps Script jest poprawnie wdrożony</li>
+                        </ul>
+                    </div>
+                `;
+                console.error('Błąd ładowania danych:', error);
+            }
+        }
+
+        // Renderowanie widoków
+        function renderView() {
+            if (currentView === 'clients') {
+                renderBreadcrumb(['Klienci']);
+                renderClients();
+            } else if (currentView === 'patterns') {
+                renderBreadcrumb(['Klienci', currentClient.nazwa]);
+                renderPatterns();
+            } else if (currentView === 'pattern-detail') {
+                renderBreadcrumb(['Klienci', currentClient.nazwa, currentPattern.nazwa]);
+                renderPatternDetail();
+            }
+        }
+
+        function renderBreadcrumb(items) {
+            const breadcrumb = document.getElementById('breadcrumb');
+            breadcrumb.innerHTML = items.map((item, index) => {
+                if (index === 0) {
+                    return `<span onclick="showClients()" ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
+                } else if (index === 1 && currentClient) {
+                    return `<span> / </span><span onclick="showPatterns('${currentClient.numer}')" ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
+                } else {
+                    return `<span> / </span><span ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
+                }
+            }).join('');
+        }
+
+        function renderClients() {
+            const content = document.getElementById('content');
+            const filteredClients = filterData(clients, ['nazwa', 'numer']);
+            
+            // Sortowanie po numerze
+            filteredClients.sort((a, b) => {
+                const numA = parseInt(a.numer) || 0;
+                const numB = parseInt(b.numer) || 0;
+                return numA - numB;
+            });
+
+            if (filteredClients.length === 0) {
+                content.innerHTML = '<div class="card"><div class="card-body">Brak klientów. Kliknij "+ Klient" aby dodać pierwszego klienta.</div></div>';
+                return;
+            }
+
+            content.innerHTML = filteredClients.map(client => {
+                const clientPatterns = patterns.filter(p => p.klient_numer === client.numer);
+                return `
+                    <div class="card" onclick="showPatterns('${client.numer}')">
+                        <div class="card-header">${client.numer} | ${client.nazwa}</div>
+                        <div class="card-body">${clientPatterns.length} wzorów</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPatterns() {
+            const content = document.getElementById('content');
+            const clientPatterns = patterns.filter(p => String(p.klient_numer) === String(currentClient.numer));
+            const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']);
+            
+            console.log('Filtrowanie wzorów dla klienta:', currentClient.numer);
+            console.log('Znalezione wzory:', clientPatterns);
+            
+            // Sortowanie po numerze
+            filteredPatterns.sort((a, b) => {
+                const numA = parseInt(a.numer) || 0;
+                const numB = parseInt(b.numer) || 0;
+                return numA - numB;
+            });
+
+            let html = `
+                <div class="button-group">
+                    <button class="btn" onclick="showAddPatternModal()">+ Dodaj Wzór</button>
+                </div>
+            `;
+
+            if (filteredPatterns.length === 0) {
+                html += '<div class="card"><div class="card-body">Brak wzorów dla tego klienta. Kliknij "+ Dodaj Wzór" aby dodać pierwszy wzór.</div></div>';
+            } else {
+                html += filteredPatterns.map(pattern => `
+                    <div class="card" onclick="showPatternDetail('${pattern.id}')">
+                        <div class="card-header">${pattern.numer} | ${pattern.nazwa}</div>
+                        ${pattern.zdjecie_url ? '<div class="card-body">📷 Ze zdjęciem</div>' : ''}
+                    </div>
+                `).join('');
+            }
+
+            content.innerHTML = html;
+        }
+
+        function renderPatternDetail() {
+            const content = document.getElementById('content');
+            const patternSections = [];
+            
+            // Zawsze pokazujemy 10 sekcji
+            for (let i = 1; i <= 10; i++) {
+                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+                patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+            }
+
+            const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
+
+            let html = `
+                <div class="card" style="cursor: default;">
+                    <div class="card-header">${currentPattern.numer} | ${currentPattern.nazwa}</div>
+                    <div class="card-body">
+                        <p><strong>Klient:</strong> ${currentClient.nazwa}</p>
+                        ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" class="pattern-image" alt="Wzór">` : ''}
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
+                    <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+                    <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
+                    <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
+                </div>
+
+                <h3 style="margin-top: 2rem; color: var(--accent); font-size: 1.5rem;">Sekcje (1-10)</h3>
+                <div class="sections-grid">
+                    ${patternSections.map(section => `
+                        <div class="section-card ${!section.kolor && !section.anilox ? 'empty' : ''}">
+                            <h4>Sekcja ${section.nr_sekcji}</h4>
+                            <p><strong>Kolor:</strong> ${section.kolor || '—'}</p>
+                            <p><strong>Anilox:</strong> ${section.anilox || '—'}</p>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="comments-section">
+                    <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">💬 Uwagi</h3>
+                    <button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>
+                    <div style="margin-top: 1.5rem">
+                        ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
+                            patternComments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-header">
+                                        <span><strong>${comment.autor}</strong></span>
+                                        <span>${comment.data}</span>
+                                    </div>
+                                    <div>${comment.tresc}</div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        // Nawigacja
+        function showClients() {
+            currentView = 'clients';
+            currentClient = null;
+            currentPattern = null;
+            renderView();
+        }
+
+        function showPatterns(clientNumer) {
+            console.log('showPatterns wywołane dla numeru:', clientNumer, 'typ:', typeof clientNumer);
+            console.log('Dostępni klienci:', clients);
+            
+            // Konwertuj na string dla bezpiecznego porównania
+            const numerStr = String(clientNumer);
+            currentClient = clients.find(c => String(c.numer) === numerStr);
+            
+            if (!currentClient) {
+                console.error('Nie znaleziono klienta o numerze:', clientNumer);
+                alert('Nie znaleziono klienta. Spróbuj odświeżyć stronę (F5).');
+                return;
+            }
+            
+            currentView = 'patterns';
+            currentPattern = null;
+            renderView();
+        }
+
+        function showPatternDetail(patternId) {
+            console.log('showPatternDetail wywołane dla ID:', patternId);
+            console.log('Dostępne wzory:', patterns);
+            
+            currentPattern = patterns.find(p => p.id === patternId);
+            
+            if (!currentPattern) {
+                console.error('Nie znaleziono wzoru o ID:', patternId);
+                alert('Nie znaleziono wzoru. Spróbuj odświeżyć stronę (F5).');
+                return;
+            }
+            
+            currentView = 'pattern-detail';
+            renderView();
+        }
+
+        // Filtrowanie
+        function filterData(data, fields) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!searchTerm) return data;
+            
+            return data.filter(item => 
+                fields.some(field => 
+                    item[field] && item[field].toString().toLowerCase().includes(searchTerm)
+                )
+            );
+        }
+
+        function handleSearch() {
+            renderView();
+        }
+
+        // Modalne
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Dodawanie klienta
+        function showAddClientModal() {
+            showModal(`
+                <div class="modal-header">Dodaj Klienta</div>
+                <form id="addClientForm" onsubmit="addClient(event)">
+                    <div class="form-group">
+                        <label>Numer Klienta *</label>
+                        <input type="text" name="numer" required placeholder="np. 1, 245">
+                    </div>
+                    <div class="form-group">
+                        <label>Nazwa Klienta *</label>
+                        <input type="text" name="nazwa" required placeholder="np. Pfeifer & Lange">
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        async function addClient(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const numer = formData.get('numer').trim();
+            const nazwa = formData.get('nazwa').trim();
+
+            // Sprawdź czy klient o takiej NAZWIE już istnieje
+            const existingClient = clients.find(c => c.nazwa.toLowerCase() === nazwa.toLowerCase());
+            if (existingClient) {
+                const confirm = window.confirm(
+                    `⚠️ Klient "${existingClient.nazwa}" już istnieje (numer: ${existingClient.numer}).\n\n` +
+                    `Czy na pewno chcesz dodać kolejnego klienta o tej samej nazwie?\n` +
+                    `(Możliwe że to ten sam klient w innej lokalizacji)`
+                );
+                if (!confirm) return;
+            }
+
+            // Wyłącz przycisk i pokaż status
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                // Dodaj do arkusza Klienci
+                await appendToSheet('Klienci', [numer, nazwa]);
+                
+                // Dodaj do historii
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    'System',
+                    'Dodano klienta',
+                    `${nazwa} (${numer})`
+                ]);
+
+                closeModal();
+                showSuccessMessage('Klient dodany pomyślnie!');
+                await loadAllData();
+            } catch (error) {
+                alert('Błąd podczas dodawania klienta: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Dodawanie wzoru
+        function showAddPatternModal() {
+            const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+            const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
+            const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+
+            showModal(`
+                <div class="modal-header">Dodaj Wzór dla: ${currentClient.nazwa}</div>
+                <form id="addPatternForm" onsubmit="addPattern(event)">
+                    <div class="form-group">
+                        <label>Numer Wzoru *</label>
+                        <input type="text" name="numer" required placeholder="np. 1, 003">
+                    </div>
+                    <div class="form-group">
+                        <label>Nazwa Wzoru *</label>
+                        <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Uwagi (opcjonalne)</label>
+                        <textarea name="uwagi_tresc" placeholder="Dodaj uwagi do tego wzoru..."></textarea>
+                    </div>
+                    
+                    <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        💡 Zacznij pisać i wybierz z listy. Możesz też wpisać własną wartość.
+                    </p>
+                    
+                    <div class="sections-container">
+                        ${Array.from({length: 10}, (_, i) => `
+                            <div class="section-form">
+                                <h4>Sekcja ${i + 1}</h4>
+                                <div class="section-inputs">
+                                    <div class="form-group">
+                                        <label>Kolor</label>
+                                        <input type="text" 
+                                               list="colors-list" 
+                                               name="kolor_${i + 1}" 
+                                               placeholder="np. Yellow, Cyan, Magenta"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Wałek Rastrowy (Anilox)</label>
+                                        <input type="text" 
+                                               list="anilox-list" 
+                                               name="anilox_${i + 1}" 
+                                               placeholder="np. 280/5.5"
+                                               autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <datalist id="colors-list">
+                        ${usedColors.map(c => `<option value="${c}">`).join('')}
+                    </datalist>
+                    
+                    <datalist id="anilox-list">
+                        ${allAnilox.map(a => `<option value="${a}">`).join('')}
+                    </datalist>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj Wzór</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        async function addPattern(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const patternId = Date.now().toString();
+            const numer = formData.get('numer').trim();
+            const nazwa = formData.get('nazwa').trim();
+            const uwagiTresc = formData.get('uwagi_tresc')?.trim() || '';
+
+            // Walidacja sekcji
+            const validationErrors = [];
+            for (let i = 1; i <= 10; i++) {
+                const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+                const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+                
+                if (kolor && !anilox) {
+                    validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
+                }
+            }
+
+            if (validationErrors.length > 0) {
+                alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                // Dodaj wzór (bez zdjęcia)
+                await appendToSheet('Wzory', [
+                    patternId,
+                    numer,
+                    nazwa,
+                    currentClient.numer,
+                    '' // puste zdjecie_url
+                ]);
+
+                // Dodaj wszystkie 10 sekcji
+                for (let i = 1; i <= 10; i++) {
+                    const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+                    const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+                    await appendToSheet('Sekcje', [patternId, i, kolor, anilox]);
+                }
+
+                // Historia
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    'System',
+                    'Dodano wzór',
+                    `${nazwa} (${numer}) dla ${currentClient.nazwa}`
+                ]);
+
+                // Dodaj uwagę jeśli została wpisana
+                if (uwagiTresc) {
+                    await appendToSheet('Uwagi', [
+                        patternId,
+                        'System',
+                        new Date().toLocaleString('pl-PL'),
+                        uwagiTresc
+                    ]);
+                }
+
+                closeModal();
+                showSuccessMessage('Wzór dodany pomyślnie!');
+                await loadAllData();
+                showPatterns(currentClient.numer);
+                
+            } catch (error) {
+                alert('Błąd podczas dodawania wzoru: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Edycja wzoru
+        function showEditPatternModal() {
+            const patternSections = [];
+            for (let i = 1; i <= 10; i++) {
+                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+                patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+            }
+
+            showModal(`
+                <div class="modal-header">Edytuj Wzór: ${currentPattern.nazwa}</div>
+                <div class="error-message">
+                    <strong>⚠️ Uwaga:</strong> Edycja wymaga dodatkowych uprawnień API.<br>
+                    Aby edytować wzór, możesz go usunąć i dodać ponownie, lub edytować bezpośrednio w Google Sheets.
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
+                    <button class="btn" onclick="window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}', '_blank')">Otwórz w Google Sheets</button>
+                </div>
+            `);
+        }
+
+        // Dodawanie uwagi
+        function showAddCommentModal() {
+            showModal(`
+                <div class="modal-header">Dodaj Uwagę do: ${currentPattern.nazwa}</div>
+                <form onsubmit="addComment(event)">
+                    <div class="form-group">
+                        <label>Twoje Imię *</label>
+                        <input type="text" name="autor" required placeholder="np. Paweł">
+                    </div>
+                    <div class="form-group">
+                        <label>Uwaga *</label>
+                        <textarea name="tresc" required placeholder="Wpisz uwagę dotyczącą tego wzoru..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        async function addComment(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const autor = formData.get('autor').trim();
+            const tresc = formData.get('tresc').trim();
+
+            // Wyłącz przycisk
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                await appendToSheet('Uwagi', [
+                    currentPattern.id,
+                    autor,
+                    new Date().toLocaleString('pl-PL'),
+                    tresc
+                ]);
+
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    autor,
+                    'Dodano uwagę',
+                    `Wzór: ${currentPattern.nazwa}`
+                ]);
+
+                closeModal();
+                showSuccessMessage('Uwaga dodana!');
+                await loadAllData();
+            } catch (error) {
+                alert('Błąd podczas dodawania uwagi: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Kopiowanie wzoru
+        function showCopyPatternModal() {
+            const otherClients = clients.filter(c => c.numer !== currentClient.numer);
+            
+            if (otherClients.length === 0) {
+                showModal(`
+                    <div class="modal-header">Kopiuj Wzór</div>
+                    <div class="error-message">Brak innych klientów do skopiowania wzoru.</div>
+                    <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
+                `);
+                return;
+            }
+
+            showModal(`
+                <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
+                <form onsubmit="copyPattern(event)">
+                    <div class="form-group">
+                        <label>Wybierz klienta docelowego *</label>
+                        <select name="target_client" required>
+                            <option value="">-- Wybierz --</option>
+                            ${otherClients.map(c => 
+                                `<option value="${c.numer}">${c.numer} | ${c.nazwa}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn">📋 Kopiuj</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        async function copyPattern(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const targetClientNumer = formData.get('target_client');
+            const newPatternId = Date.now().toString();
+            
+            try {
+                const targetClient = clients.find(c => c.numer === targetClientNumer);
+                
+                // Kopiuj wzór
+                await appendToSheet('Wzory', [
+                    newPatternId,
+                    currentPattern.numer,
+                    currentPattern.nazwa,
+                    targetClientNumer,
+                    currentPattern.zdjecie_url
+                ]);
+
+                // Kopiuj wszystkie 10 sekcji
+                const patternSections = sections.filter(s => s.wzor_id === currentPattern.id);
+                for (let i = 1; i <= 10; i++) {
+                    const section = patternSections.find(s => s.nr_sekcji === i);
+                    await appendToSheet('Sekcje', [
+                        newPatternId,
+                        i,
+                        section?.kolor || '',
+                        section?.anilox || ''
+                    ]);
+                }
+
+                // Historia
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    'System',
+                    'Skopiowano wzór',
+                    `${currentPattern.nazwa} z ${currentClient.nazwa} do ${targetClient.nazwa}`
+                ]);
+
+                closeModal();
+                showSuccessMessage('Wzór został skopiowany!');
+                await loadAllData();
+            } catch (error) {
+                alert('Błąd podczas kopiowania wzoru: ' + error.message);
+            }
+        }
+
+        // Usuwanie wzoru
+        async function deletePattern() {
+            const password = prompt('🔒 Wprowadź hasło admina:');
+            if (password !== ADMIN_PASSWORD) {
+                alert('❌ Nieprawidłowe hasło!');
+                return;
+            }
+
+            if (!confirm(`Czy na pewno chcesz usunąć wzór "${currentPattern.nazwa}"?\n\nTa operacja jest nieodwracalna!`)) {
+                return;
+            }
+
+            alert('⚠️ Usuwanie wymaga dodatkowych uprawnień API.\n\nMożesz usunąć wzór ręcznie w Google Sheets:\n1. Otwórz arkusz\n2. Usuń wiersz z wzoru w zakładce "Wzory"\n3. Usuń powiązane sekcje w zakładce "Sekcje"');
+        }
+
+        // Eksport do PDF
+        function exportToPDF() {
+            const patternSections = [];
+            for (let i = 1; i <= 10; i++) {
+                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+                patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
+            }
+
+            let pdfContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Wzór: ${currentPattern.nazwa}</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            padding: 40px; 
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        h1 { color: #ff6b35; border-bottom: 3px solid #ff6b35; padding-bottom: 10px; }
+                        h2 { color: #333; margin-top: 30px; }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 20px; 
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        }
+                        th, td { 
+                            border: 2px solid #ddd; 
+                            padding: 15px; 
+                            text-align: left; 
+                        }
+                        th { 
+                            background-color: #ff6b35; 
+                            color: white; 
+                            font-weight: bold;
+                        }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .empty { color: #999; font-style: italic; }
+                        .header-info { 
+                            background: #f5f5f5; 
+                            padding: 20px; 
+                            border-radius: 8px;
+                            margin-bottom: 30px; 
+                        }
+                        .header-info p { margin: 8px 0; font-size: 16px; }
+                        .logo { text-align: center; margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="logo">
+                        <h1>🖨️ SENTREX SOMA 3 - Receptura Wzoru</h1>
+                    </div>
+                    <div class="header-info">
+                        <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
+                        <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+                        <p><strong>Data eksportu:</strong> ${new Date().toLocaleString('pl-PL')}</p>
+                    </div>
+                    ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 20px 0; border-radius: 8px;">` : ''}
+                    <h2>Sekcje SOMA 3 (1-10)</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Sekcja</th>
+                                <th style="width: 40%;">Kolor</th>
+                                <th style="width: 40%;">Anilox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${patternSections.map(section => `
+                                <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
+                                    <td><strong>${section.nr_sekcji}</strong></td>
+                                    <td>${section.kolor || '—'}</td>
+                                    <td>${section.anilox || '—'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 40px; padding: 20px; background: #fff3cd; border-left: 4px solid #ff6b35; border-radius: 4px;">
+                        <p style="margin: 0;"><strong>💡 Uwaga:</strong> Puste sekcje (oznaczone "—") nie są używane w tym wzorze.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([pdfContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SENTREX_SOMA3_${currentPattern.numer}_${currentPattern.nazwa.replace(/[^a-z0-9]/gi, '_')}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showSuccessMessage('Plik HTML został pobrany! Możesz go otworzyć i wydrukować jako PDF.');
+        }
+
+        // Zmiana motywu
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        // Ładowanie zapisanego motywu
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        // Komunikaty
+        function showSuccessMessage(message) {
+            const existingMsg = document.querySelector('.success-message');
+            if (existingMsg) existingMsg.remove();
+
+            const msg = document.createElement('div');
+            msg.className = 'success-message';
+            msg.textContent = '✅ ' + message;
+            msg.style.position = 'fixed';
+            msg.style.top = '100px';
+            msg.style.right = '20px';
+            msg.style.zIndex = '1000';
+            msg.style.animation = 'slideIn 0.3s';
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => msg.remove(), 300);
+            }, 3000);
+        }
+
+        // Zamykanie modalu po kliknięciu w tło
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Inicjalizacja
+        loadTheme();
+        loadAllData();
+    </script>
+</body>
+</html>
