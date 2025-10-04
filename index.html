@@ -1492,52 +1492,52 @@
         }
 
         async function addComment(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const tresc = formData.get('tresc').trim();
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const tresc = formData.get('tresc').trim();
 
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Zapisywanie...';
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Zapisywanie...';
 
-            try {
-                // Pobierz aktualną datę i czas w polskiej strefie czasowej
-                const now = new Date();
-                const polishDate = now.toLocaleString('pl-PL', {
-                    timeZone: 'Europe/Warsaw',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+    try {
+        // Pobierz aktualną datę i czas w polskiej strefie czasowej
+        const now = new Date();
+        const polishDate = now.toLocaleString('pl-PL', {
+            timeZone: 'Europe/Warsaw',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
 
-                await appendToSheet('Uwagi', [
-                    currentPattern.id,
-                    currentUser || 'System',
-                    polishDate,
-                    tresc
-                ]);
+        await appendToSheet('Uwagi', [
+            currentPattern.id,
+            currentUser || 'System',
+            polishDate,  // ← TUTAJ używamy polishDate zamiast new Date().toLocaleString('pl-PL')
+            tresc
+        ]);
 
-                await appendToSheet('Historia', [
-                    polishDate,
-                    currentUser || 'System',
-                    'Dodano uwagę',
-                    `Wzór: ${currentPattern.nazwa}`
-                ]);
+        await appendToSheet('Historia', [
+            polishDate,  // ← I TUTAJ też
+            currentUser || 'System',
+            'Dodano uwagę',
+            `Wzór: ${currentPattern.nazwa}`
+        ]);
 
-                closeModal();
-                showSuccessMessage('Uwaga dodana!');
-                await loadAllData();
-            } catch (error) {
-                alert('Błąd podczas dodawania uwagi: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        }
+        closeModal();
+        showSuccessMessage('Uwaga dodana!');
+        await loadAllData();
+    } catch (error) {
+        alert('Błąd podczas dodawania uwagi: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
 
         // Kopiowanie wzoru
         function showCopyPatternModal() {
