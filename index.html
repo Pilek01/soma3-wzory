@@ -1267,56 +1267,205 @@ function showPatternDetailFromSearch(patternId, clientId) {
 
         // Kopiowanie wzoru
         function showCopyPatternModal() {
-            const otherClients = clients.filter(c => c.numer !== currentClient.numer);
-            
-            if (otherClients.length === 0) {
-                showModal(`
-                    <div class="modal-header">Kopiuj Wzór</div>
-                    <div class="error-message">Brak innych klientów do skopiowania wzoru.</div>
-                    <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
-                `);
-                return;
-            }
+    // Sortuj klientów po numerze
+    const sortedClients = [...clients].sort((a, b) => {
+        return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
+    });
 
-            showModal(`
-                <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
-                <form onsubmit="copyPattern(event)">
-                    <div class="form-group">
-                        <label>Wybierz klienta docelowego *</label>
-                        <select name="target_client" required>
-                            <option value="">-- Wybierz --</option>
-                            ${otherClients.map(c => 
-                                `<option value="${c.numer}">${c.numer} | ${c.nazwa}</option>`
-                            ).join('')}
-                        </select>
+    showModal(`
+        <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            💡 Wybierz klienta, dla którego chcesz stworzyć kopię tego wzoru.<br>
+            Następnie będziesz mógł edytować dane przed zapisaniem.
+        </p>
+        <form onsubmit="startCopyPattern(event)">
+            <div class="form-group">
+                <label>Wybierz klienta docelowego *</label>
+                <select name="target_client" required>
+                    <option value="">-- Wybierz --</option>
+                    ${sortedClients.map(c => 
+                        `<option value="${c.id}" ${c.id === currentClient.id ? 'selected' : ''}>${c.numer} | ${c.nazwa}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn">➡️ Dalej</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+            </div>
+        </form>
+    `);
+}
+
+
+function startCopyPattern(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const targetClientId = formData.get('target_client');
+    
+    // Znajdź klienta docelowego
+    const targetClient = clients.find(c => c.id === targetClientId);
+    if (!targetClient) {
+        alert('Nie znaleziono klienta');
+        return;
+    }
+    
+    // Zbierz dane sekcji
+    const patternSections = [];
+    for (let i = 1; i <= 10; i++) {
+        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+        patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+    }
+    
+    // Ustaw tymczasowo klienta docelowego
+    const originalClient = currentClient;
+    currentClient = targetClient;
+    
+    // Pokaż formularz z wypełnionymi danymi
+    showCopyPatternForm(patternSections, originalClient);
+}
+
+function showCopyPatternForm(patternSections, originalClient) {
+    const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+    const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
+    const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+
+    showModal(`
+        <div class="modal-header">Nowy wzór na podstawie: ${currentPattern.nazwa}</div>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+            🎯 Klient docelowy: <strong>${currentClient.numer} | ${currentClient.nazwa}</strong><br>
+            📋 Kopiujesz z: ${originalClient.numer} | ${originalClient.nazwa}
+        </p>
+        <form id="copyPatternForm" onsubmit="saveCopiedPattern(event)">
+            <div class="form-group">
+                <label>Numer Wzoru *</label>
+                <input type="text" name="numer" required placeholder="np. 1, 003" value="${currentPattern.numer}">
+            </div>
+            <div class="form-group">
+                <label>Nazwa Wzoru *</label>
+                <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${currentPattern.nazwa}">
+            </div>
+            
+            <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                💡 Edytuj co potrzeba przed zapisaniem.
+            </p>
+            
+            <div class="sections-container">
+                ${Array.from({length: 10}, (_, i) => {
+                    const section = patternSections[i];
+                    return `
+                    <div class="section-form">
+                        <h4>Sekcja ${i + 1}</h4>
+                        <div class="section-inputs">
+                            <div class="form-group">
+                                <label>Kolor</label>
+                                <input type="text" 
+                                       list="colors-list" 
+                                       name="kolor_${i + 1}" 
+                                       placeholder="np. Yellow, Cyan, Magenta"
+                                       autocomplete="off"
+                                       value="${section.kolor || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>Wałek Rastrowy (Anilox)</label>
+                                <input type="text" 
+                                       list="anilox-list" 
+                                       name="anilox_${i + 1}" 
+                                       placeholder="np. 280/5.5"
+                                       autocomplete="off"
+                                       value="${section.anilox || ''}">
+                            </div>
+                        </div>
                     </div>
-                    <div class="button-group">
-                        <button type="submit" class="btn">📋 Kopiuj</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
-                    </div>
-                </form>
-            `);
+                `}).join('')}
+            </div>
+            
+            <datalist id="colors-list">
+                ${usedColors.map(c => `<option value="${c}">`).join('')}
+            </datalist>
+            
+            <datalist id="anilox-list">
+                ${allAnilox.map(a => `<option value="${a}">`).join('')}
+            </datalist>
+            
+            <div class="button-group">
+                <button type="submit" class="btn">✅ Zapisz Wzór</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+            </div>
+        </form>
+    `);
+}
+
+async function saveCopiedPattern(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const newPatternId = Date.now().toString();
+    const numer = formData.get('numer').trim();
+    const nazwa = formData.get('nazwa').trim();
+
+    // Walidacja sekcji
+    const validationErrors = [];
+    for (let i = 1; i <= 10; i++) {
+        const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+        const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+        
+        if (kolor && !anilox) {
+            validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
+        }
+    }
+
+    if (validationErrors.length > 0) {
+        alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
+        return;
+    }
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+    try {
+        // Dodaj wzór
+        await appendToSheet('Wzory', [
+            newPatternId,
+            numer,
+            nazwa,
+            currentClient.id,
+            currentPattern.zdjecie_url || '',
+            ''
+        ]);
+
+        // Dodaj wszystkie 10 sekcji
+        for (let i = 1; i <= 10; i++) {
+            const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+            const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+            await appendToSheet('Sekcje', [newPatternId, i, kolor, anilox]);
         }
 
-        async function copyPattern(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const targetClientNumer = formData.get('target_client');
-            const newPatternId = Date.now().toString();
-            
-            try {
-                const targetClient = clients.find(c => c.numer === targetClientNumer);
-                
-                // Kopiuj wzór
+        // Historia
+        await appendToSheet('Historia', [
+            new Date().toLocaleString('pl-PL'),
+            'System',
+            'Skopiowano wzór',
+            `${nazwa} (${numer}) dla ${currentClient.nazwa}`
+        ]);
 
-                await appendToSheet('Wzory', [
-    newPatternId,
-    currentPattern.numer,
-    currentPattern.nazwa,
-    targetClient.id,     // ✅ Użyj ID zamiast numeru
-    currentPattern.zdjecie_url || '',
-    ''  // pusty parent_id
-]);
+        closeModal();
+        showSuccessMessage('Wzór został skopiowany i zapisany!');
+        await loadAllData();
+        
+        // Przejdź do nowo utworzonego wzoru
+        showPatternDetail(newPatternId);
+        
+    } catch (error) {
+        alert('Błąd podczas kopiowania wzoru: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
+        
+        
                 
 
                 // Kopiuj wszystkie 10 sekcji
