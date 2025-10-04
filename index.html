@@ -1468,34 +1468,6 @@ async function saveCopiedPattern(event) {
         
                 
 
-                // Kopiuj wszystkie 10 sekcji
-                const patternSections = sections.filter(s => s.wzor_id === currentPattern.id);
-                for (let i = 1; i <= 10; i++) {
-                    const section = patternSections.find(s => s.nr_sekcji === i);
-                    await appendToSheet('Sekcje', [
-                        newPatternId,
-                        i,
-                        section?.kolor || '',
-                        section?.anilox || ''
-                    ]);
-                }
-
-                // Historia
-                await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
-                    'System',
-                    'Skopiowano wzór',
-                    `${currentPattern.nazwa} z ${currentClient.nazwa} do ${targetClient.nazwa}`
-                ]);
-
-                closeModal();
-                showSuccessMessage('Wzór został skopiowany!');
-                await loadAllData();
-            } catch (error) {
-                alert('Błąd podczas kopiowania wzoru: ' + error.message);
-            }
-        }
-
         // Usuwanie wzoru
         async function deletePattern() {
             const password = prompt('🔒 Wprowadź hasło admina:');
