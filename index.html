@@ -739,10 +739,11 @@
                 <div class="title" onclick="showClients()">SOMA 3 - Wzory</div>
             </div>
             <div class="header-controls">
-                <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
-                <button class="btn logout-btn" onclick="logout()" id="logoutBtn" style="display: none;">🚪 Wyloguj</button>
-                <button class="btn" onclick="showAddClientModal()">+ Klient</button>
-            </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
+    <button class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID, '_blank')" id="googleSheetsBtn" style="display: none;">📊 Google Sheets</button>
+    <button class="btn logout-btn" onclick="logout()" id="logoutBtn" style="display: none;">🚪 Wyloguj</button>
+    <button class="btn" onclick="showAddClientModal()">+ Klient</button>
+</div>
         </div>
     </div>
 
@@ -833,9 +834,14 @@
         }
 
         function hideLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
-        }
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'block';
+    
+    // Pokaż przycisk Google Sheets tylko dla Kamila
+    if (currentUser === 'Kamil') {
+        document.getElementById('googleSheetsBtn').style.display = 'block';
+    }
+}
 
         async function attemptLogin(userName) {
             const user = users.find(u => u.name === userName);
@@ -1620,82 +1626,93 @@
 
         // Zapisywanie edytowanego wzoru (tworzy nową wersję)
         async function saveEditedPattern(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const newPatternId = Date.now().toString();
-            // Numer i nazwa pozostają bez zmian
-            const numer = currentPattern.numer;
-            const nazwa = currentPattern.nazwa;
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const newPatternId = Date.now().toString();
+    const numer = currentPattern.numer;
+    const nazwa = currentPattern.nazwa;
 
-            // Walidacja sekcji
-            const validationErrors = [];
-            for (let i = 1; i <= 10; i++) {
-                const kolor = formData.get(`kolor_${i}`)?.trim() || '';
-                const anilox = formData.get(`anilox_${i}`)?.trim() || '';
-                
-                if (kolor && !anilox) {
-                    validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
-                }
-            }
-
-            if (validationErrors.length > 0) {
-                alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
-                return;
-            }
-
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Zapisywanie...';
-
-            try {
-                // Utwórz nowy wzór z parent_id wskazującym na stary
-                await appendToSheet('Wzory', [
-                    newPatternId,
-                    numer,
-                    nazwa,
-                    currentClient.id,
-                    currentPattern.zdjecie_url || '',
-                    currentPattern.id  // parent_id - stara wersja
-                ]);
-
-                // Dodaj wszystkie 10 sekcji
-                for (let i = 1; i <= 10; i++) {
-                    const kolor = formData.get(`kolor_${i}`)?.trim() || '';
-                    const anilox = formData.get(`anilox_${i}`)?.trim() || '';
-                    await appendToSheet('Sekcje', [newPatternId, i, kolor, anilox]);
-                }
-
-                // Historia
-                await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL', {
-                        timeZone: 'Europe/Warsaw',
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    }),
-                    currentUser || 'System',
-                    'Edytowano wzór',
-                    `${nazwa} (${numer}) - stara wersja: ${currentPattern.id}, nowa: ${newPatternId}`
-                ]);
-
-                closeModal();
-                showSuccessMessage('Wzór został zaktualizowany!');
-                
-                // Poczekaj na przeładowanie danych, POTEM przejdź do nowej wersji
-                await loadAllData();
-                showPatternDetail(newPatternId);
-                
-            } catch (error) {
-                alert('Błąd podczas edycji wzoru: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
+    // Walidacja sekcji
+    const validationErrors = [];
+    for (let i = 1; i <= 10; i++) {
+        const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+        const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+        
+        if (kolor && !anilox) {
+            validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
         }
+    }
+
+    if (validationErrors.length > 0) {
+        alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
+        return;
+    }
+
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+    try {
+        await appendToSheet('Wzory', [
+            newPatternId,
+            numer,
+            nazwa,
+            currentClient.id,
+            currentPattern.zdjecie_url || '',
+            currentPattern.id
+        ]);
+
+        for (let i = 1; i <= 10; i++) {
+            const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+            const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+            await appendToSheet('Sekcje', [newPatternId, i, kolor, anilox]);
+        }
+
+        await appendToSheet('Historia', [
+            new Date().toLocaleString('pl-PL', {
+                timeZone: 'Europe/Warsaw',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }),
+            currentUser || 'System',
+            'Edytowano wzór',
+            `${nazwa} (${numer}) - stara: ${currentPattern.id}, nowa: ${newPatternId}`
+        ]);
+
+        closeModal();
+        showSuccessMessage('Wzór został zaktualizowany! Odświeżanie...');
+        
+        // NOWY KOD - czekaj 2 sekundy aby Google Sheets zapisał dane
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Przeładuj dane z serwera
+        await loadAllData();
+        
+        // Znajdź nowy wzór i wyświetl go
+        const updatedPattern = patterns.find(p => p.id === newPatternId);
+        
+        if (updatedPattern) {
+            currentPattern = updatedPattern;
+            currentView = 'pattern-detail';
+            renderView();
+            console.log('✅ Załadowano nowy wzór:', newPatternId);
+        } else {
+            console.error('❌ Nie znaleziono nowego wzoru, odświeżam stronę...');
+            location.reload();
+        }
+        
+    } catch (error) {
+        alert('Błąd podczas edycji wzoru: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
         // Dodawanie uwagi
         function showAddCommentModal() {
             showModal(`
