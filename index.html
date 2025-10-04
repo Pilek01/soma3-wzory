@@ -1088,7 +1088,7 @@
                                         <span><strong>${comment.autor}</strong></span>
                                         <span>${comment.data}</span>
                                     </div>
-                                    <div>${comment.tresc}</div>
+                                    <div style="white-space: pre-wrap;">${comment.tresc}</div>
                                 </div>
                             `).join('')
                         }
@@ -1270,7 +1270,15 @@
                 await appendToSheet('Klienci', [clientId, num, name]);
                 
                 await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
+                    new Date().toLocaleString('pl-PL', {
+    timeZone: 'Europe/Warsaw',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+}),
                     currentUser || 'System',
                     'Dodano klienta',
                     `${name} (${num})`
@@ -1402,7 +1410,15 @@
                 }
 
                 await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
+                    new Date().toLocaleString('pl-PL', {
+    timeZone: 'Europe/Warsaw',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+}),
                     currentUser || 'System',
                     'Dodano wzór',
                     `${nazwa} (${numer}) dla ${currentClient.nazwa}`
@@ -1412,7 +1428,15 @@
                     await appendToSheet('Uwagi', [
                         patternId,
                         currentUser || 'System',
-                        new Date().toLocaleString('pl-PL'),
+                        new Date().toLocaleString('pl-PL', {
+    timeZone: 'Europe/Warsaw',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+}),
                         uwagiTresc
                     ]);
                 }
@@ -1479,15 +1503,27 @@
             submitBtn.innerHTML = '⏳ Zapisywanie...';
 
             try {
+                // Pobierz aktualną datę i czas w polskiej strefie czasowej
+                const now = new Date();
+                const polishDate = now.toLocaleString('pl-PL', {
+                    timeZone: 'Europe/Warsaw',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
                 await appendToSheet('Uwagi', [
                     currentPattern.id,
                     currentUser || 'System',
-                    new Date().toLocaleString('pl-PL'),
+                    polishDate,
                     tresc
                 ]);
 
                 await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
+                    polishDate,
                     currentUser || 'System',
                     'Dodano uwagę',
                     `Wzór: ${currentPattern.nazwa}`
@@ -1673,7 +1709,15 @@
                 }
 
                 await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
+                   new Date().toLocaleString('pl-PL', {
+    timeZone: 'Europe/Warsaw',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+}),
                     currentUser || 'System',
                     'Skopiowano wzór',
                     `${nazwa} (${numer}) dla ${currentClient.nazwa}`
