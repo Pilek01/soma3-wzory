@@ -627,18 +627,19 @@
                 ]);
 
                 clients = clientsData.slice(1).filter(row => row[0]).map(row => ({
-                    numer: String(row[0] || '').trim(),
-                    nazwa: String(row[1] || '').trim()
-                }));
+    id: String(row[0] || '').trim(),      // NOWE
+    numer: String(row[1] || '').trim(),
+    nazwa: String(row[2] || '').trim()
+}));
 
                 patterns = patternsData.slice(1).filter(row => row[0]).map(row => ({
-                    id: String(row[0] || '').trim(),
-                    numer: String(row[1] || '').trim(),
-                    nazwa: String(row[2] || '').trim(),
-                    klient_numer: String(row[3] || '').trim(),
-                    zdjecie_url: String(row[4] || '').trim(),
-                    status: String(row[5] || 'aktywny').trim() // domyślnie "aktywny"
-                })).filter(p => p.status !== 'archiwum'); // Ukryj wzory archiwalne
+    id: String(row[0] || '').trim(),
+    numer: String(row[1] || '').trim(),
+    nazwa: String(row[2] || '').trim(),
+    klient_id: String(row[3] || '').trim(),     // ✅ NOWE
+    zdjecie_url: String(row[4] || '').trim(),
+    parent_id: String(row[5] || '').trim()      // ✅ NOWE (zamiast status)
+})).filter(p => !p.parent_id);                   // ✅ Ukryj stare wersje
 
                 sections = sectionsData.slice(1).filter(row => row[0]).map(row => ({
                     wzor_id: String(row[0] || '').trim(),
@@ -710,7 +711,7 @@
                 if (index === 0) {
                     return `<span onclick="showClients()" ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
                 } else if (index === 1 && currentClient) {
-                    return `<span> / </span><span onclick="showPatterns('${currentClient.numer}')" ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
+                    return `<span> / </span><span onclick="showPatterns('${currentClient.id}')" ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
                 } else {
                     return `<span> / </span><span ${index === items.length - 1 ? 'class="active"' : ''}>${item}</span>`;
                 }
@@ -734,9 +735,9 @@
             }
 
             content.innerHTML = filteredClients.map(client => {
-                const clientPatterns = patterns.filter(p => p.klient_numer === client.numer);
+                const clientPatterns = patterns.filter(p => p.klient_id === client.id);
                 return `
-                    <div class="card" onclick="showPatterns('${client.numer}')">
+                    <div class="card" onclick="showPatterns('${client.id}')">
                         <div class="card-header">${client.numer} | ${client.nazwa}</div>
                         <div class="card-body">${clientPatterns.length} wzorów</div>
                     </div>
@@ -746,7 +747,7 @@
 
         function renderPatterns() {
             const content = document.getElementById('content');
-            const clientPatterns = patterns.filter(p => String(p.klient_numer) === String(currentClient.numer));
+            const clientPatterns = patterns.filter(p => p.klient_id === currentClient.id);
             const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']);
             
             console.log('Filtrowanie wzorów dla klienta:', currentClient.numer);
@@ -848,24 +849,18 @@
             renderView();
         }
 
-        function showPatterns(clientNumer) {
-            console.log('showPatterns wywołane dla numeru:', clientNumer, 'typ:', typeof clientNumer);
-            console.log('Dostępni klienci:', clients);
-            
-            // Konwertuj na string dla bezpiecznego porównania
-            const numerStr = String(clientNumer);
-            currentClient = clients.find(c => String(c.numer) === numerStr);
-            
-            if (!currentClient) {
-                console.error('Nie znaleziono klienta o numerze:', clientNumer);
-                alert('Nie znaleziono klienta. Spróbuj odświeżyć stronę (F5).');
-                return;
-            }
-            
-            currentView = 'patterns';
-            currentPattern = null;
-            renderView();
-        }
+        function showPatterns(clientId) {
+    currentClient = clients.find(c => c.id === clientId);
+    
+    if (!currentClient) {
+        alert('Nie znaleziono klienta. Odśwież stronę (F5).');
+        return;
+    }
+    
+    currentView = 'patterns';
+    currentPattern = null;
+    renderView();
+}
 
         function showPatternDetail(patternId) {
             console.log('showPatternDetail wywołane dla ID:', patternId);
@@ -930,51 +925,38 @@
             `);
         }
 
-        async function addClient(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const numer = formData.get('numer').trim();
-            const nazwa = formData.get('nazwa').trim();
+        async function addClient(e) {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const num = fd.get('numer').trim();
+    const name = fd.get('nazwa').trim();
+    
+    const clientId = 'CL' + Date.now();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Zapisywanie...';
 
-            // Sprawdź czy klient o takiej NAZWIE już istnieje
-            const existingClient = clients.find(c => c.nazwa.toLowerCase() === nazwa.toLowerCase());
-            if (existingClient) {
-                const confirm = window.confirm(
-                    `⚠️ Klient "${existingClient.nazwa}" już istnieje (numer: ${existingClient.numer}).\n\n` +
-                    `Czy na pewno chcesz dodać kolejnego klienta o tej samej nazwie?\n` +
-                    `(Możliwe że to ten sam klient w innej lokalizacji)`
-                );
-                if (!confirm) return;
-            }
+    try {
+        await appendToSheet('Klienci', [clientId, num, name]);
+        
+        await appendToSheet('Historia', [
+            new Date().toLocaleString('pl-PL'),
+            'System',
+            'Dodano klienta',
+            `${name} (${num})`
+        ]);
 
-            // Wyłącz przycisk i pokaż status
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Zapisywanie...';
-
-            try {
-                // Dodaj do arkusza Klienci
-                await appendToSheet('Klienci', [numer, nazwa]);
-                
-                // Dodaj do historii
-                await appendToSheet('Historia', [
-                    new Date().toLocaleString('pl-PL'),
-                    'System',
-                    'Dodano klienta',
-                    `${nazwa} (${numer})`
-                ]);
-
-                closeModal();
-                showSuccessMessage('Klient dodany pomyślnie!');
-                await loadAllData();
-            } catch (error) {
-                alert('Błąd podczas dodawania klienta: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        }
+        closeModal();
+        showSuccessMessage('Klient dodany pomyślnie!');
+        await loadAllData();
+    } catch (error) {
+        alert('Błąd podczas dodawania klienta: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
 
         // Dodawanie wzoru
         function showAddPatternModal() {
@@ -1079,12 +1061,13 @@
             try {
                 // Dodaj wzór (bez zdjęcia)
                 await appendToSheet('Wzory', [
-                    patternId,
-                    numer,
-                    nazwa,
-                    currentClient.numer,
-                    '' // puste zdjecie_url
-                ]);
+    patternId,
+    numer,
+    nazwa,
+    currentClient.id,     // NOWE
+    '',
+    ''
+]);
 
                 // Dodaj wszystkie 10 sekcji
                 for (let i = 1; i <= 10; i++) {
@@ -1114,7 +1097,7 @@
                 closeModal();
                 showSuccessMessage('Wzór dodany pomyślnie!');
                 await loadAllData();
-                showPatterns(currentClient.numer);
+                showPatterns(currentClient.id);
                 
             } catch (error) {
                 alert('Błąd podczas dodawania wzoru: ' + error.message);
@@ -1246,13 +1229,16 @@
                 const targetClient = clients.find(c => c.numer === targetClientNumer);
                 
                 // Kopiuj wzór
+
                 await appendToSheet('Wzory', [
-                    newPatternId,
-                    currentPattern.numer,
-                    currentPattern.nazwa,
-                    targetClientNumer,
-                    currentPattern.zdjecie_url
-                ]);
+    newPatternId,
+    currentPattern.numer,
+    currentPattern.nazwa,
+    targetClient.id,     // ✅ Użyj ID zamiast numeru
+    currentPattern.zdjecie_url || '',
+    ''  // pusty parent_id
+]);
+                
 
                 // Kopiuj wszystkie 10 sekcji
                 const patternSections = sections.filter(s => s.wzor_id === currentPattern.id);
