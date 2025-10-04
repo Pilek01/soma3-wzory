@@ -958,14 +958,33 @@
                     nazwa: String(row[2] || '').trim()
                 }));
 
-                patterns = patternsData.slice(1).filter(row => row[0]).map(row => ({
-                    id: String(row[0] || '').trim(),
-                    numer: String(row[1] || '').trim(),
-                    nazwa: String(row[2] || '').trim(),
-                    klient_id: String(row[3] || '').trim(),
-                    zdjecie_url: String(row[4] || '').trim(),
-                    parent_id: String(row[5] || '').trim()
-                })).filter(p => !p.parent_id);
+                // Wczytaj WSZYSTKIE wzory (także z parent_id)
+const allPatterns = patternsData.slice(1).filter(row => row[0]).map(row => ({
+    id: String(row[0] || '').trim(),
+    numer: String(row[1] || '').trim(),
+    nazwa: String(row[2] || '').trim(),
+    klient_id: String(row[3] || '').trim(),
+    zdjecie_url: String(row[4] || '').trim(),
+    parent_id: String(row[5] || '').trim()
+}));
+
+// Zgrupuj wzory po numerze i kliencie, zostaw tylko najnowszy
+const patternGroups = {};
+allPatterns.forEach(pattern => {
+    const key = `${pattern.klient_id}_${pattern.numer}`;
+    
+    if (!patternGroups[key]) {
+        patternGroups[key] = pattern;
+    } else {
+        // Porównaj ID (większe = nowsze, bo używamy timestamp)
+        if (parseInt(pattern.id) > parseInt(patternGroups[key].id)) {
+            patternGroups[key] = pattern;
+        }
+    }
+});
+
+// Wyciągnij tylko najnowsze wzory
+patterns = Object.values(patternGroups);
 
                 sections = sectionsData.slice(1).filter(row => row[0]).map(row => ({
                     wzor_id: String(row[0] || '').trim(),
