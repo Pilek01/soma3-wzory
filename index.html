@@ -1534,6 +1534,7 @@
             }
         }
 
+        
         // Edycja wzoru
         function showEditPatternModal() {
             const patternSections = [];
@@ -1548,26 +1549,26 @@
 
             // Przycisk do Google Sheets tylko dla Kamila
             const googleSheetsButton = currentUser === 'Kamil' ? 
-                `<button class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}', '_blank')">📊 Otwórz w Google Sheets</button>` : '';
+                `<button type="button" class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}', '_blank')">📊 Otwórz w Google Sheets</button>` : '';
 
             showModal(`
                 <div class="modal-header">Edytuj Wzór: ${currentPattern.nazwa}</div>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    ℹ️ Edycja utworzy nową wersję wzoru. Stara wersja zostanie zachowana w historii.
+                    ℹ️ Edycja utworzy nową wersję wzoru. Numer i nazwa pozostaną bez zmian.
                 </p>
                 <form id="editPatternForm" onsubmit="saveEditedPattern(event)">
                     <div class="form-group">
-                        <label>Numer Wzoru *</label>
-                        <input type="text" name="numer" required placeholder="np. 1, 003" value="${currentPattern.numer}">
+                        <label>Numer Wzoru</label>
+                        <input type="text" value="${currentPattern.numer}" readonly style="opacity: 0.6; cursor: not-allowed;">
                     </div>
                     <div class="form-group">
-                        <label>Nazwa Wzoru *</label>
-                        <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${currentPattern.nazwa}">
+                        <label>Nazwa Wzoru</label>
+                        <input type="text" value="${currentPattern.nazwa}" readonly style="opacity: 0.6; cursor: not-allowed;">
                     </div>
                     
                     <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        💡 Edytuj sekcje według potrzeb.
+                        💡 Edytuj kolory i wałki rastrowe według potrzeb.
                     </p>
                     
                     <div class="sections-container">
@@ -1623,8 +1624,9 @@
             
             const formData = new FormData(event.target);
             const newPatternId = Date.now().toString();
-            const numer = formData.get('numer').trim();
-            const nazwa = formData.get('nazwa').trim();
+            // Numer i nazwa pozostają bez zmian
+            const numer = currentPattern.numer;
+            const nazwa = currentPattern.nazwa;
 
             // Walidacja sekcji
             const validationErrors = [];
@@ -1678,14 +1680,14 @@
                     }),
                     currentUser || 'System',
                     'Edytowano wzór',
-                    `${nazwa} (${numer}) - stara wersja: ${currentPattern.id}, nowa wersja: ${newPatternId}`
+                    `${nazwa} (${numer}) - stara wersja: ${currentPattern.id}, nowa: ${newPatternId}`
                 ]);
 
                 closeModal();
-                showSuccessMessage('Wzór został zaktualizowany! Stara wersja zachowana w archiwum.');
-                await loadAllData();
+                showSuccessMessage('Wzór został zaktualizowany!');
                 
-                // Przejdź do nowej wersji wzoru
+                // Poczekaj na przeładowanie danych, POTEM przejdź do nowej wersji
+                await loadAllData();
                 showPatternDetail(newPatternId);
                 
             } catch (error) {
