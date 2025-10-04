@@ -931,7 +931,20 @@
     const num = fd.get('numer').trim();
     const name = fd.get('nazwa').trim();
     
-    const clientId = 'CL' + Date.now();
+    // Znajdź najwyższy numer ID
+    let maxNum = 0;
+    clients.forEach(c => {
+        const match = c.id.match(/^CL(\d+)$/);
+        if (match) {
+            const currentNum = parseInt(match[1]);
+            if (currentNum > maxNum) {
+                maxNum = currentNum;
+            }
+        }
+    });
+    
+    // Nowy ID = najwyższy + 1, z paddingiem do 3 cyfr
+    const clientId = 'CL' + String(maxNum + 1).padStart(3, '0');
     
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
