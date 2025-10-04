@@ -1484,6 +1484,145 @@ async function saveCopiedPattern(event) {
             alert('⚠️ Usuwanie wymaga dodatkowych uprawnień API.\n\nMożesz usunąć wzór ręcznie w Google Sheets:\n1. Otwórz arkusz\n2. Usuń wiersz z wzoru w zakładce "Wzory"\n3. Usuń powiązane sekcje w zakładce "Sekcje"');
         }
 
+        // Drukowanie wzoru
+        function printPattern() {
+            const patternSections = [];
+            for (let i = 1; i <= 10; i++) {
+                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+                patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
+            }
+
+            // Utwórz tymczasowy iframe dla druku
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'absolute';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = 'none';
+            document.body.appendChild(printFrame);
+
+            const printDocument = printFrame.contentWindow.document;
+            printDocument.open();
+            printDocument.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Wzór: ${currentPattern.nazwa}</title>
+                    <style>
+                        @media print {
+                            @page {
+                                margin: 2cm;
+                            }
+                        }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            padding: 20px;
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        h1 { 
+                            color: #ff6b35; 
+                            border-bottom: 3px solid #ff6b35; 
+                            padding-bottom: 10px;
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                        .header-info { 
+                            background: #f5f5f5; 
+                            padding: 20px; 
+                            border-radius: 8px;
+                            margin-bottom: 30px; 
+                        }
+                        .header-info p { 
+                            margin: 8px 0; 
+                            font-size: 16px; 
+                        }
+                        h2 { 
+                            color: #333; 
+                            margin-top: 30px;
+                            margin-bottom: 15px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 20px; 
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        }
+                        th, td { 
+                            border: 2px solid #ddd; 
+                            padding: 15px; 
+                            text-align: left; 
+                        }
+                        th { 
+                            background-color: #ff6b35; 
+                            color: white; 
+                            font-weight: bold;
+                        }
+                        tr:nth-child(even) { 
+                            background-color: #f9f9f9; 
+                        }
+                        .empty { 
+                            color: #999; 
+                            font-style: italic; 
+                        }
+                        .note { 
+                            margin-top: 40px; 
+                            padding: 20px; 
+                            background: #fff3cd; 
+                            border-left: 4px solid #ff6b35; 
+                            border-radius: 4px;
+                        }
+                        .note p { 
+                            margin: 0; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>🖨️ SENTREX SOMA 3 - Receptura Wzoru</h1>
+                    <div class="header-info">
+                        <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
+                        <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+                    </div>
+                    ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 20px 0; border-radius: 8px;">` : ''}
+                    <h2>Sekcje SOMA 3 (1-10)</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Sekcja</th>
+                                <th style="width: 40%;">Kolor</th>
+                                <th style="width: 40%;">Anilox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${patternSections.map(section => `
+                                <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
+                                    <td><strong>${section.nr_sekcji}</strong></td>
+                                    <td>${section.kolor || '—'}</td>
+                                    <td>${section.anilox || '—'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="note">
+                        <p><strong>💡 Uwaga:</strong> Puste sekcje (oznaczone "—") nie są używane w tym wzorze.</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            printDocument.close();
+
+            // Czekaj na załadowanie i drukuj
+            printFrame.contentWindow.onload = function() {
+                setTimeout(() => {
+                    printFrame.contentWindow.print();
+                    // Usuń iframe po wydrukowaniu
+                    setTimeout(() => {
+                        document.body.removeChild(printFrame);
+                    }, 100);
+                }, 100);
+            };
+        }
+
         // Eksport do PDF
         function exportToPDF() {
             const patternSections = [];
