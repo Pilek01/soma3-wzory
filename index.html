@@ -863,20 +863,20 @@
 }
 
         function showPatternDetail(patternId) {
-            console.log('showPatternDetail wywołane dla ID:', patternId);
-            console.log('Dostępne wzory:', patterns);
-            
-            currentPattern = patterns.find(p => p.id === patternId);
-            
-            if (!currentPattern) {
-                console.error('Nie znaleziono wzoru o ID:', patternId);
-                alert('Nie znaleziono wzoru. Spróbuj odświeżyć stronę (F5).');
-                return;
-            }
-            
-            currentView = 'pattern-detail';
-            renderView();
-        }
+    console.log('showPatternDetail wywołane dla ID:', patternId);
+    console.log('Dostępne wzory:', patterns);
+    
+    currentPattern = patterns.find(p => p.id === patternId);
+    
+    if (!currentPattern) {
+        console.error('Nie znaleziono wzoru o ID:', patternId);
+        alert('Nie znaleziono wzoru. Spróbuj odświeżyć stronę (F5).');
+        return;
+    }
+    
+    currentView = 'pattern-detail';
+    renderView();
+}
 
         // Filtrowanie
         function filterData(data, fields) {
