@@ -1082,15 +1082,36 @@
                     <button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>
                     <div style="margin-top: 1.5rem">
                         ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
-                            patternComments.map(comment => `
+                            patternComments.map(comment => {
+                                // Formatuj datę przy wyświetlaniu
+                                let displayDate = comment.data;
+                                try {
+                                    // Spróbuj przekonwertować jeśli to ISO format
+                                    const parsedDate = new Date(comment.data);
+                                    if (!isNaN(parsedDate.getTime())) {
+                                        displayDate = parsedDate.toLocaleString('pl-PL', {
+                                            timeZone: 'Europe/Warsaw',
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit'
+                                        });
+                                    }
+                                } catch (e) {
+                                    // Jeśli błąd parsowania, zostaw oryginalny string
+                                }
+                                
+                                return `
                                 <div class="comment">
                                     <div class="comment-header">
                                         <span><strong>${comment.autor}</strong></span>
-                                        <span>${comment.data}</span>
+                                        <span>${displayDate}</span>
                                     </div>
                                     <div style="white-space: pre-wrap;">${comment.tresc}</div>
                                 </div>
-                            `).join('')
+                            `}).join('')
                         }
                     </div>
                 </div>
