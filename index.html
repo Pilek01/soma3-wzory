@@ -88,8 +88,8 @@
         }
 
         .logo-img {
-            width: 130%;
-            height: 130%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
         }
 
@@ -891,8 +891,74 @@
         }
 
         function handleSearch() {
-            renderView();
-        }
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    
+    // Jeśli puste, renderuj normalnie
+    if (!searchTerm) {
+        renderView();
+        return;
+    }
+    
+    // Jeśli jesteśmy na stronie głównej (klienci), szukaj globalnie po wzorach
+    if (currentView === 'clients') {
+        searchGlobalPatterns(searchTerm);
+    } else {
+        // W innych widokach filtruj normalnie
+        renderView();
+    }
+}
+
+function searchGlobalPatterns(searchTerm) {
+    // Znajdź wszystkie wzory pasujące do wyszukiwania
+    const matchingPatterns = patterns.filter(p => 
+        p.nazwa.toLowerCase().includes(searchTerm) || 
+        p.numer.toLowerCase().includes(searchTerm)
+    );
+    
+    if (matchingPatterns.length === 0) {
+        document.getElementById('content').innerHTML = '<div class="card"><div class="card-body">Nie znaleziono wzorów pasujących do: "' + searchTerm + '"</div></div>';
+        return;
+    }
+    
+    // Sortuj po nazwie klienta, potem po numerze wzoru
+    matchingPatterns.sort((a, b) => {
+        const clientA = clients.find(c => c.id === a.klient_id);
+        const clientB = clients.find(c => c.id === b.klient_id);
+        const nameCompare = (clientA?.nazwa || '').localeCompare(clientB?.nazwa || '');
+        if (nameCompare !== 0) return nameCompare;
+        return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
+    });
+    
+    // Wyświetl wyniki
+    const content = document.getElementById('content');
+    let html = '<h3 style="color: var(--accent); margin-bottom: 1rem;">Wyniki wyszukiwania: "' + searchTerm + '" (' + matchingPatterns.length + ')</h3>';
+    
+    matchingPatterns.forEach(pattern => {
+        const client = clients.find(c => c.id === pattern.klient_id);
+        if (!client) return;
+        
+        html += '<div class="card" onclick="showPatternDetailFromSearch(\'' + pattern.id + '\', \'' + client.id + '\')">';
+        html += '<div class="card-header">' + pattern.numer + ' | ' + pattern.nazwa + '</div>';
+        html += '<div class="card-body">Klient: ' + client.numer + ' | ' + client.nazwa + '</div>';
+        html += '</div>';
+    });
+    
+    content.innerHTML = html;
+}
+
+function showPatternDetailFromSearch(patternId, clientId) {
+    // Ustaw klienta i wzór
+    currentClient = clients.find(c => c.id === clientId);
+    currentPattern = patterns.find(p => p.id === patternId);
+    
+    if (!currentClient || !currentPattern) {
+        alert('Błąd - odśwież stronę (F5).');
+        return;
+    }
+    
+    currentView = 'pattern-detail';
+    renderView();
+}
 
         // Modalne
         function showModal(content) {
