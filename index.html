@@ -555,6 +555,7 @@
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
         const ADMIN_PASSWORD = 'admin123';
+        const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
 
         let clients = [];
         let patterns = [];
@@ -562,9 +563,105 @@
         let comments = [];
         let history = [];
         let aniloxy = [];
+        let users = [];
         let currentView = 'clients';
         let currentClient = null;
         let currentPattern = null;
+        let currentUser = null;
+
+        // System logowania
+        async function initApp() {
+            await loadUsers();
+            if (checkSession()) {
+                hideLoginScreen();
+                loadTheme();
+                loadAllData();
+            } else {
+                showLoginScreen();
+            }
+        }
+
+        async function loadUsers() {
+            const usersData = await fetchSheetData('Użytkownicy');
+            users = usersData.slice(1).filter(row => row[0]).map(row => ({
+                name: String(row[0] || '').trim(),
+                password: String(row[1] || '').trim()
+            }));
+        }
+
+        function showLoginScreen() {
+            const loginScreen = document.getElementById('loginScreen');
+            const usersGrid = document.getElementById('usersGrid');
+            
+            const colors = ['cyan', 'magenta', 'yellow', 'black'];
+            const icons = ['👤', '👤', '👤', '👤'];
+            
+            usersGrid.innerHTML = users.map((user, index) => `
+                <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
+                    <div class="user-icon">${icons[index]}</div>
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-role">Operator</div>
+                </div>
+            `).join('');
+            
+            loginScreen.style.display = 'flex';
+        }
+
+        function hideLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+
+        async function attemptLogin(userName) {
+            const user = users.find(u => u.name === userName);
+            if (!user) {
+                alert('Błąd - użytkownik nie znaleziony');
+                return;
+            }
+            
+            const password = prompt(`🔒 Hasło dla ${userName}:`);
+            if (!password) return;
+            
+            if (password === user.password) {
+                currentUser = userName;
+                const loginTime = Date.now();
+                sessionStorage.setItem('soma3_user', userName);
+                sessionStorage.setItem('soma3_login_time', loginTime.toString());
+                
+                hideLoginScreen();
+                loadTheme();
+                loadAllData();
+                showSuccessMessage(`Witaj ${userName}!`);
+            } else {
+                alert('❌ Nieprawidłowe hasło!');
+            }
+        }
+
+        function checkSession() {
+            const savedUser = sessionStorage.getItem('soma3_user');
+            const loginTime = sessionStorage.getItem('soma3_login_time');
+            
+            if (!savedUser || !loginTime) return false;
+            
+            const elapsed = Date.now() - parseInt(loginTime);
+            if (elapsed > SESSION_DURATION) {
+                sessionStorage.removeItem('soma3_user');
+                sessionStorage.removeItem('soma3_login_time');
+                return false;
+            }
+            
+            currentUser = savedUser;
+            return true;
+        }
+
+        function logout() {
+            if (confirm('Czy na pewno chcesz się wylogować?')) {
+                sessionStorage.removeItem('soma3_user');
+                sessionStorage.removeItem('soma3_login_time');
+                currentUser = null;
+                location.reload();
+            }
+        }
 
         // Funkcja do odczytu danych z arkusza przez Apps Script
         async function fetchSheetData(sheetName) {
@@ -583,12 +680,10 @@
         // Funkcja do dodawania wiersza do arkusza przez Apps Script (używa GET zamiast POST)
         async function appendToSheet(sheetName, values) {
             try {
-                // Buduj URL z parametrami
                 const params = new URLSearchParams();
                 params.append('action', 'append');
                 params.append('sheet', sheetName);
                 
-                // Dodaj każdą wartość jako col0, col1, col2, etc.
                 values.forEach((value, index) => {
                     params.append(`col${index}`, value || '');
                 });
@@ -627,19 +722,19 @@
                 ]);
 
                 clients = clientsData.slice(1).filter(row => row[0]).map(row => ({
-    id: String(row[0] || '').trim(),      // NOWE
-    numer: String(row[1] || '').trim(),
-    nazwa: String(row[2] || '').trim()
-}));
+                    id: String(row[0] || '').trim(),
+                    numer: String(row[1] || '').trim(),
+                    nazwa: String(row[2] || '').trim()
+                }));
 
                 patterns = patternsData.slice(1).filter(row => row[0]).map(row => ({
-    id: String(row[0] || '').trim(),
-    numer: String(row[1] || '').trim(),
-    nazwa: String(row[2] || '').trim(),
-    klient_id: String(row[3] || '').trim(),     // ✅ NOWE
-    zdjecie_url: String(row[4] || '').trim(),
-    parent_id: String(row[5] || '').trim()      // ✅ NOWE (zamiast status)
-})).filter(p => !p.parent_id);                   // ✅ Ukryj stare wersje
+                    id: String(row[0] || '').trim(),
+                    numer: String(row[1] || '').trim(),
+                    nazwa: String(row[2] || '').trim(),
+                    klient_id: String(row[3] || '').trim(),
+                    zdjecie_url: String(row[4] || '').trim(),
+                    parent_id: String(row[5] || '').trim()
+                })).filter(p => !p.parent_id);
 
                 sections = sectionsData.slice(1).filter(row => row[0]).map(row => ({
                     wzor_id: String(row[0] || '').trim(),
@@ -722,7 +817,6 @@
             const content = document.getElementById('content');
             const filteredClients = filterData(clients, ['nazwa', 'numer']);
             
-            // Sortowanie po numerze
             filteredClients.sort((a, b) => {
                 const numA = parseInt(a.numer) || 0;
                 const numB = parseInt(b.numer) || 0;
@@ -753,7 +847,6 @@
             console.log('Filtrowanie wzorów dla klienta:', currentClient.numer);
             console.log('Znalezione wzory:', clientPatterns);
             
-            // Sortowanie po numerze
             filteredPatterns.sort((a, b) => {
                 const numA = parseInt(a.numer) || 0;
                 const numB = parseInt(b.numer) || 0;
@@ -784,7 +877,6 @@
             const content = document.getElementById('content');
             const patternSections = [];
             
-            // Zawsze pokazujemy 10 sekcji
             for (let i = 1; i <= 10; i++) {
                 const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
                 patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
@@ -851,33 +943,33 @@
         }
 
         function showPatterns(clientId) {
-    currentClient = clients.find(c => c.id === clientId);
-    
-    if (!currentClient) {
-        alert('Nie znaleziono klienta. Odśwież stronę (F5).');
-        return;
-    }
-    
-    currentView = 'patterns';
-    currentPattern = null;
-    renderView();
-}
+            currentClient = clients.find(c => c.id === clientId);
+            
+            if (!currentClient) {
+                alert('Nie znaleziono klienta. Odśwież stronę (F5).');
+                return;
+            }
+            
+            currentView = 'patterns';
+            currentPattern = null;
+            renderView();
+        }
 
         function showPatternDetail(patternId) {
-    console.log('showPatternDetail wywołane dla ID:', patternId);
-    console.log('Dostępne wzory:', patterns);
-    
-    currentPattern = patterns.find(p => p.id === patternId);
-    
-    if (!currentPattern) {
-        console.error('Nie znaleziono wzoru o ID:', patternId);
-        alert('Nie znaleziono wzoru. Spróbuj odświeżyć stronę (F5).');
-        return;
-    }
-    
-    currentView = 'pattern-detail';
-    renderView();
-}
+            console.log('showPatternDetail wywołane dla ID:', patternId);
+            console.log('Dostępne wzory:', patterns);
+            
+            currentPattern = patterns.find(p => p.id === patternId);
+            
+            if (!currentPattern) {
+                console.error('Nie znaleziono wzoru o ID:', patternId);
+                alert('Nie znaleziono wzoru. Spróbuj odświeżyć stronę (F5).');
+                return;
+            }
+            
+            currentView = 'pattern-detail';
+            renderView();
+        }
 
         // Filtrowanie
         function filterData(data, fields) {
@@ -892,74 +984,67 @@
         }
 
         function handleSearch() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    // Jeśli puste, renderuj normalnie
-    if (!searchTerm) {
-        renderView();
-        return;
-    }
-    
-    // Jeśli jesteśmy na stronie głównej (klienci), szukaj globalnie po wzorach
-    if (currentView === 'clients') {
-        searchGlobalPatterns(searchTerm);
-    } else {
-        // W innych widokach filtruj normalnie
-        renderView();
-    }
-}
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                renderView();
+                return;
+            }
+            
+            if (currentView === 'clients') {
+                searchGlobalPatterns(searchTerm);
+            } else {
+                renderView();
+            }
+        }
 
-function searchGlobalPatterns(searchTerm) {
-    // Znajdź wszystkie wzory pasujące do wyszukiwania
-    const matchingPatterns = patterns.filter(p => 
-        p.nazwa.toLowerCase().includes(searchTerm) || 
-        p.numer.toLowerCase().includes(searchTerm)
-    );
-    
-    if (matchingPatterns.length === 0) {
-        document.getElementById('content').innerHTML = '<div class="card"><div class="card-body">Nie znaleziono wzorów pasujących do: "' + searchTerm + '"</div></div>';
-        return;
-    }
-    
-    // Sortuj po nazwie klienta, potem po numerze wzoru
-    matchingPatterns.sort((a, b) => {
-        const clientA = clients.find(c => c.id === a.klient_id);
-        const clientB = clients.find(c => c.id === b.klient_id);
-        const nameCompare = (clientA?.nazwa || '').localeCompare(clientB?.nazwa || '');
-        if (nameCompare !== 0) return nameCompare;
-        return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
-    });
-    
-    // Wyświetl wyniki
-    const content = document.getElementById('content');
-    let html = '<h3 style="color: var(--accent); margin-bottom: 1rem;">Wyniki wyszukiwania: "' + searchTerm + '" (' + matchingPatterns.length + ')</h3>';
-    
-    matchingPatterns.forEach(pattern => {
-        const client = clients.find(c => c.id === pattern.klient_id);
-        if (!client) return;
-        
-        html += '<div class="card" onclick="showPatternDetailFromSearch(\'' + pattern.id + '\', \'' + client.id + '\')">';
-        html += '<div class="card-header">' + pattern.numer + ' | ' + pattern.nazwa + '</div>';
-        html += '<div class="card-body">Klient: ' + client.numer + ' | ' + client.nazwa + '</div>';
-        html += '</div>';
-    });
-    
-    content.innerHTML = html;
-}
+        function searchGlobalPatterns(searchTerm) {
+            const matchingPatterns = patterns.filter(p => 
+                p.nazwa.toLowerCase().includes(searchTerm) || 
+                p.numer.toLowerCase().includes(searchTerm)
+            );
+            
+            if (matchingPatterns.length === 0) {
+                document.getElementById('content').innerHTML = '<div class="card"><div class="card-body">Nie znaleziono wzorów pasujących do: "' + searchTerm + '"</div></div>';
+                return;
+            }
+            
+            matchingPatterns.sort((a, b) => {
+                const clientA = clients.find(c => c.id === a.klient_id);
+                const clientB = clients.find(c => c.id === b.klient_id);
+                const nameCompare = (clientA?.nazwa || '').localeCompare(clientB?.nazwa || '');
+                if (nameCompare !== 0) return nameCompare;
+                return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
+            });
+            
+            const content = document.getElementById('content');
+            let html = '<h3 style="color: var(--accent); margin-bottom: 1rem;">Wyniki wyszukiwania: "' + searchTerm + '" (' + matchingPatterns.length + ')</h3>';
+            
+            matchingPatterns.forEach(pattern => {
+                const client = clients.find(c => c.id === pattern.klient_id);
+                if (!client) return;
+                
+                html += '<div class="card" onclick="showPatternDetailFromSearch(\'' + pattern.id + '\', \'' + client.id + '\')">';
+                html += '<div class="card-header">' + pattern.numer + ' | ' + pattern.nazwa + '</div>';
+                html += '<div class="card-body">Klient: ' + client.numer + ' | ' + client.nazwa + '</div>';
+                html += '</div>';
+            });
+            
+            content.innerHTML = html;
+        }
 
-function showPatternDetailFromSearch(patternId, clientId) {
-    // Ustaw klienta i wzór
-    currentClient = clients.find(c => c.id === clientId);
-    currentPattern = patterns.find(p => p.id === patternId);
-    
-    if (!currentClient || !currentPattern) {
-        alert('Błąd - odśwież stronę (F5).');
-        return;
-    }
-    
-    currentView = 'pattern-detail';
-    renderView();
-}
+        function showPatternDetailFromSearch(patternId, clientId) {
+            currentClient = clients.find(c => c.id === clientId);
+            currentPattern = patterns.find(p => p.id === patternId);
+            
+            if (!currentClient || !currentPattern) {
+                alert('Błąd - odśwież stronę (F5).');
+                return;
+            }
+            
+            currentView = 'pattern-detail';
+            renderView();
+        }
 
         // Modalne
         function showModal(content) {
@@ -993,50 +1078,48 @@ function showPatternDetailFromSearch(patternId, clientId) {
         }
 
         async function addClient(e) {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const num = fd.get('numer').trim();
-    const name = fd.get('nazwa').trim();
-    
-    // Znajdź najwyższy numer ID
-    let maxNum = 0;
-    clients.forEach(c => {
-        const match = c.id.match(/^CL(\d+)$/);
-        if (match) {
-            const currentNum = parseInt(match[1]);
-            if (currentNum > maxNum) {
-                maxNum = currentNum;
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const num = fd.get('numer').trim();
+            const name = fd.get('nazwa').trim();
+            
+            let maxNum = 0;
+            clients.forEach(c => {
+                const match = c.id.match(/^CL(\d+)$/);
+                if (match) {
+                    const currentNum = parseInt(match[1]);
+                    if (currentNum > maxNum) {
+                        maxNum = currentNum;
+                    }
+                }
+            });
+            
+            const clientId = 'CL' + String(maxNum + 1).padStart(3, '0');
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                await appendToSheet('Klienci', [clientId, num, name]);
+                
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    currentUser || 'System',
+                    'Dodano klienta',
+                    `${name} (${num})`
+                ]);
+
+                closeModal();
+                showSuccessMessage('Klient dodany pomyślnie!');
+                await loadAllData();
+            } catch (error) {
+                alert('Błąd podczas dodawania klienta: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         }
-    });
-    
-    // Nowy ID = najwyższy + 1, z paddingiem do 3 cyfr
-    const clientId = 'CL' + String(maxNum + 1).padStart(3, '0');
-    
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '⏳ Zapisywanie...';
-
-    try {
-        await appendToSheet('Klienci', [clientId, num, name]);
-        
-        await appendToSheet('Historia', [
-            new Date().toLocaleString('pl-PL'),
-            'System',
-            'Dodano klienta',
-            `${name} (${num})`
-        ]);
-
-        closeModal();
-        showSuccessMessage('Klient dodany pomyślnie!');
-        await loadAllData();
-    } catch (error) {
-        alert('Błąd podczas dodawania klienta: ' + error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }
-}
 
         // Dodawanie wzoru
         function showAddPatternModal() {
@@ -1117,7 +1200,6 @@ function showPatternDetailFromSearch(patternId, clientId) {
             const nazwa = formData.get('nazwa').trim();
             const uwagiTresc = formData.get('uwagi_tresc')?.trim() || '';
 
-            // Walidacja sekcji
             const validationErrors = [];
             for (let i = 1; i <= 10; i++) {
                 const kolor = formData.get(`kolor_${i}`)?.trim() || '';
@@ -1139,36 +1221,32 @@ function showPatternDetailFromSearch(patternId, clientId) {
             submitBtn.innerHTML = '⏳ Zapisywanie...';
 
             try {
-                // Dodaj wzór (bez zdjęcia)
                 await appendToSheet('Wzory', [
-    patternId,
-    numer,
-    nazwa,
-    currentClient.id,     // NOWE
-    '',
-    ''
-]);
+                    patternId,
+                    numer,
+                    nazwa,
+                    currentClient.id,
+                    '',
+                    ''
+                ]);
 
-                // Dodaj wszystkie 10 sekcji
                 for (let i = 1; i <= 10; i++) {
                     const kolor = formData.get(`kolor_${i}`)?.trim() || '';
                     const anilox = formData.get(`anilox_${i}`)?.trim() || '';
                     await appendToSheet('Sekcje', [patternId, i, kolor, anilox]);
                 }
 
-                // Historia
                 await appendToSheet('Historia', [
                     new Date().toLocaleString('pl-PL'),
-                    'System',
+                    currentUser || 'System',
                     'Dodano wzór',
                     `${nazwa} (${numer}) dla ${currentClient.nazwa}`
                 ]);
 
-                // Dodaj uwagę jeśli została wpisana
                 if (uwagiTresc) {
                     await appendToSheet('Uwagi', [
                         patternId,
-                        'System',
+                        currentUser || 'System',
                         new Date().toLocaleString('pl-PL'),
                         uwagiTresc
                     ]);
@@ -1213,10 +1291,6 @@ function showPatternDetailFromSearch(patternId, clientId) {
                 <div class="modal-header">Dodaj Uwagę do: ${currentPattern.nazwa}</div>
                 <form onsubmit="addComment(event)">
                     <div class="form-group">
-                        <label>Twoje Imię *</label>
-                        <input type="text" name="autor" required placeholder="np. Paweł">
-                    </div>
-                    <div class="form-group">
                         <label>Uwaga *</label>
                         <textarea name="tresc" required placeholder="Wpisz uwagę dotyczącą tego wzoru..."></textarea>
                     </div>
@@ -1232,10 +1306,8 @@ function showPatternDetailFromSearch(patternId, clientId) {
             event.preventDefault();
             
             const formData = new FormData(event.target);
-            const autor = formData.get('autor').trim();
             const tresc = formData.get('tresc').trim();
 
-            // Wyłącz przycisk
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
@@ -1244,14 +1316,14 @@ function showPatternDetailFromSearch(patternId, clientId) {
             try {
                 await appendToSheet('Uwagi', [
                     currentPattern.id,
-                    autor,
+                    currentUser || 'System',
                     new Date().toLocaleString('pl-PL'),
                     tresc
                 ]);
 
                 await appendToSheet('Historia', [
                     new Date().toLocaleString('pl-PL'),
-                    autor,
+                    currentUser || 'System',
                     'Dodano uwagę',
                     `Wzór: ${currentPattern.nazwa}`
                 ]);
@@ -1268,206 +1340,192 @@ function showPatternDetailFromSearch(patternId, clientId) {
 
         // Kopiowanie wzoru
         function showCopyPatternModal() {
-    // Sortuj klientów po numerze
-    const sortedClients = [...clients].sort((a, b) => {
-        return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
-    });
+            const sortedClients = [...clients].sort((a, b) => {
+                return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
+            });
 
-    showModal(`
-        <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-            💡 Wybierz klienta, dla którego chcesz stworzyć kopię tego wzoru.<br>
-            Następnie będziesz mógł edytować dane przed zapisaniem.
-        </p>
-        <form onsubmit="startCopyPattern(event)">
-            <div class="form-group">
-                <label>Wybierz klienta docelowego *</label>
-                <select name="target_client" required>
-                    <option value="">-- Wybierz --</option>
-                    ${sortedClients.map(c => 
-                        `<option value="${c.id}" ${c.id === currentClient.id ? 'selected' : ''}>${c.numer} | ${c.nazwa}</option>`
-                    ).join('')}
-                </select>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn">➡️ Dalej</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
-            </div>
-        </form>
-    `);
-}
-
-
-function startCopyPattern(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const targetClientId = formData.get('target_client');
-    
-    // Znajdź klienta docelowego
-    const targetClient = clients.find(c => c.id === targetClientId);
-    if (!targetClient) {
-        alert('Nie znaleziono klienta');
-        return;
-    }
-    
-    // Zbierz dane sekcji
-    const patternSections = [];
-    for (let i = 1; i <= 10; i++) {
-        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
-        patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
-    }
-    
-    // Ustaw tymczasowo klienta docelowego
-    const originalClient = currentClient;
-    currentClient = targetClient;
-    
-    // Pokaż formularz z wypełnionymi danymi
-    showCopyPatternForm(patternSections, originalClient);
-}
-
-function showCopyPatternForm(patternSections, originalClient) {
-    const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
-    const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
-    const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
-
-    showModal(`
-        <div class="modal-header">Nowy wzór na podstawie: ${currentPattern.nazwa}</div>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-            🎯 Klient docelowy: <strong>${currentClient.numer} | ${currentClient.nazwa}</strong><br>
-            📋 Kopiujesz z: ${originalClient.numer} | ${originalClient.nazwa}
-        </p>
-        <form id="copyPatternForm" onsubmit="saveCopiedPattern(event)">
-            <div class="form-group">
-                <label>Numer Wzoru *</label>
-                <input type="text" name="numer" required placeholder="np. 1, 003" value="${currentPattern.numer}">
-            </div>
-            <div class="form-group">
-                <label>Nazwa Wzoru *</label>
-                <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${currentPattern.nazwa}">
-            </div>
-            
-            <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                💡 Edytuj co potrzeba przed zapisaniem.
-            </p>
-            
-            <div class="sections-container">
-                ${Array.from({length: 10}, (_, i) => {
-                    const section = patternSections[i];
-                    return `
-                    <div class="section-form">
-                        <h4>Sekcja ${i + 1}</h4>
-                        <div class="section-inputs">
-                            <div class="form-group">
-                                <label>Kolor</label>
-                                <input type="text" 
-                                       list="colors-list" 
-                                       name="kolor_${i + 1}" 
-                                       placeholder="np. Yellow, Cyan, Magenta"
-                                       autocomplete="off"
-                                       value="${section.kolor || ''}">
-                            </div>
-                            <div class="form-group">
-                                <label>Wałek Rastrowy (Anilox)</label>
-                                <input type="text" 
-                                       list="anilox-list" 
-                                       name="anilox_${i + 1}" 
-                                       placeholder="np. 280/5.5"
-                                       autocomplete="off"
-                                       value="${section.anilox || ''}">
-                            </div>
-                        </div>
+            showModal(`
+                <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    💡 Wybierz klienta, dla którego chcesz stworzyć kopię tego wzoru.<br>
+                    Następnie będziesz mógł edytować dane przed zapisaniem.
+                </p>
+                <form onsubmit="startCopyPattern(event)">
+                    <div class="form-group">
+                        <label>Wybierz klienta docelowego *</label>
+                        <select name="target_client" required>
+                            <option value="">-- Wybierz --</option>
+                            ${sortedClients.map(c => 
+                                `<option value="${c.id}" ${c.id === currentClient.id ? 'selected' : ''}>${c.numer} | ${c.nazwa}</option>`
+                            ).join('')}
+                        </select>
                     </div>
-                `}).join('')}
-            </div>
-            
-            <datalist id="colors-list">
-                ${usedColors.map(c => `<option value="${c}">`).join('')}
-            </datalist>
-            
-            <datalist id="anilox-list">
-                ${allAnilox.map(a => `<option value="${a}">`).join('')}
-            </datalist>
-            
-            <div class="button-group">
-                <button type="submit" class="btn">✅ Zapisz Wzór</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
-            </div>
-        </form>
-    `);
-}
-
-async function saveCopiedPattern(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const newPatternId = Date.now().toString();
-    const numer = formData.get('numer').trim();
-    const nazwa = formData.get('nazwa').trim();
-
-    // Walidacja sekcji
-    const validationErrors = [];
-    for (let i = 1; i <= 10; i++) {
-        const kolor = formData.get(`kolor_${i}`)?.trim() || '';
-        const anilox = formData.get(`anilox_${i}`)?.trim() || '';
-        
-        if (kolor && !anilox) {
-            validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
-        }
-    }
-
-    if (validationErrors.length > 0) {
-        alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
-        return;
-    }
-
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '⏳ Zapisywanie...';
-
-    try {
-        // Dodaj wzór
-        await appendToSheet('Wzory', [
-            newPatternId,
-            numer,
-            nazwa,
-            currentClient.id,
-            currentPattern.zdjecie_url || '',
-            ''
-        ]);
-
-        // Dodaj wszystkie 10 sekcji
-        for (let i = 1; i <= 10; i++) {
-            const kolor = formData.get(`kolor_${i}`)?.trim() || '';
-            const anilox = formData.get(`anilox_${i}`)?.trim() || '';
-            await appendToSheet('Sekcje', [newPatternId, i, kolor, anilox]);
+                    <div class="button-group">
+                        <button type="submit" class="btn">➡️ Dalej</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
         }
 
-        // Historia
-        await appendToSheet('Historia', [
-            new Date().toLocaleString('pl-PL'),
-            'System',
-            'Skopiowano wzór',
-            `${nazwa} (${numer}) dla ${currentClient.nazwa}`
-        ]);
+        function startCopyPattern(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const targetClientId = formData.get('target_client');
+            
+            const targetClient = clients.find(c => c.id === targetClientId);
+            if (!targetClient) {
+                alert('Nie znaleziono klienta');
+                return;
+            }
+            
+            const patternSections = [];
+            for (let i = 1; i <= 10; i++) {
+                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+                patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+            }
+            
+            const originalClient = currentClient;
+            currentClient = targetClient;
+            
+            showCopyPatternForm(patternSections, originalClient);
+        }
 
-        closeModal();
-        showSuccessMessage('Wzór został skopiowany i zapisany!');
-        await loadAllData();
-        
-        // Przejdź do nowo utworzonego wzoru
-        showPatternDetail(newPatternId);
-        
-    } catch (error) {
-        alert('Błąd podczas kopiowania wzoru: ' + error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }
-}
-        
-        
+        function showCopyPatternForm(patternSections, originalClient) {
+            const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+            const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
+            const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+
+            showModal(`
+                <div class="modal-header">Nowy wzór na podstawie: ${currentPattern.nazwa}</div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    🎯 Klient docelowy: <strong>${currentClient.numer} | ${currentClient.nazwa}</strong><br>
+                    📋 Kopiujesz z: ${originalClient.numer} | ${originalClient.nazwa}
+                </p>
+                <form id="copyPatternForm" onsubmit="saveCopiedPattern(event)">
+                    <div class="form-group">
+                        <label>Numer Wzoru *</label>
+                        <input type="text" name="numer" required placeholder="np. 1, 003" value="${currentPattern.numer}">
+                    </div>
+                    <div class="form-group">
+                        <label>Nazwa Wzoru *</label>
+                        <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${currentPattern.nazwa}">
+                    </div>
+                    
+                    <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        💡 Edytuj co potrzeba przed zapisaniem.
+                    </p>
+                    
+                    <div class="sections-container">
+                        ${Array.from({length: 10}, (_, i) => {
+                            const section = patternSections[i];
+                            return `
+                            <div class="section-form">
+                                <h4>Sekcja ${i + 1}</h4>
+                                <div class="section-inputs">
+                                    <div class="form-group">
+                                        <label>Kolor</label>
+                                        <input type="text" 
+                                               list="colors-list" 
+                                               name="kolor_${i + 1}" 
+                                               placeholder="np. Yellow, Cyan, Magenta"
+                                               autocomplete="off"
+                                               value="${section.kolor || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Wałek Rastrowy (Anilox)</label>
+                                        <input type="text" 
+                                               list="anilox-list" 
+                                               name="anilox_${i + 1}" 
+                                               placeholder="np. 280/5.5"
+                                               autocomplete="off"
+                                               value="${section.anilox || ''}">
+                                    </div>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                    
+                    <datalist id="colors-list">
+                        ${usedColors.map(c => `<option value="${c}">`).join('')}
+                    </datalist>
+                    
+                    <datalist id="anilox-list">
+                        ${allAnilox.map(a => `<option value="${a}">`).join('')}
+                    </datalist>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Zapisz Wzór</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        async function saveCopiedPattern(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const newPatternId = Date.now().toString();
+            const numer = formData.get('numer').trim();
+            const nazwa = formData.get('nazwa').trim();
+
+            const validationErrors = [];
+            for (let i = 1; i <= 10; i++) {
+                const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+                const anilox = formData.get(`anilox_${i}`)?.trim() || '';
                 
+                if (kolor && !anilox) {
+                    validationErrors.push(`Sekcja ${i}: Wybrałeś kolor "${kolor}" ale nie wybrałeś wałka rastrowego!`);
+                }
+            }
+
+            if (validationErrors.length > 0) {
+                alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                await appendToSheet('Wzory', [
+                    newPatternId,
+                    numer,
+                    nazwa,
+                    currentClient.id,
+                    currentPattern.zdjecie_url || '',
+                    ''
+                ]);
+
+                for (let i = 1; i <= 10; i++) {
+                    const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+                    const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+                    await appendToSheet('Sekcje', [newPatternId, i, kolor, anilox]);
+                }
+
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL'),
+                    currentUser || 'System',
+                    'Skopiowano wzór',
+                    `${nazwa} (${numer}) dla ${currentClient.nazwa}`
+                ]);
+
+                closeModal();
+                showSuccessMessage('Wzór został skopiowany i zapisany!');
+                await loadAllData();
+                
+                showPatternDetail(newPatternId);
+                
+            } catch (error) {
+                alert('Błąd podczas kopiowania wzoru: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
 
         // Usuwanie wzoru
         async function deletePattern() {
@@ -1492,7 +1550,6 @@ async function saveCopiedPattern(event) {
                 patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
             }
 
-            // Utwórz tymczasowy iframe dla druku
             const printFrame = document.createElement('iframe');
             printFrame.style.position = 'absolute';
             printFrame.style.width = '0';
@@ -1604,11 +1661,9 @@ async function saveCopiedPattern(event) {
             `);
             printDocument.close();
 
-            // Czekaj na załadowanie i drukuj
             printFrame.contentWindow.onload = function() {
                 setTimeout(() => {
                     printFrame.contentWindow.print();
-                    // Usuń iframe po wydrukowaniu
                     setTimeout(() => {
                         document.body.removeChild(printFrame);
                     }, 100);
@@ -1771,8 +1826,7 @@ async function saveCopiedPattern(event) {
         });
 
         // Inicjalizacja
-        loadTheme();
-        loadAllData();
+        initApp();
     </script>
 </body>
 </html>
