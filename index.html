@@ -828,17 +828,32 @@
     const colors = ['cyan', 'magenta', 'yellow', 'black'];
     const icons = ['👤', '👤', '👤', '👤'];
     
-    // If no users, show centered spinner
+    // If no users, hide the grid and show a separate centered loading div
     if (users.length === 0) {
-        // Completely replace the grid's class temporarily
-        usersGrid.className = ''; // Remove the 'users-grid' class
-        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.style.display = 'none'; // Hide the grid completely
+        
+        // Check if loading div already exists
+        let loadingDiv = document.getElementById('tempLoadingDiv');
+        if (!loadingDiv) {
+            loadingDiv = document.createElement('div');
+            loadingDiv.id = 'tempLoadingDiv';
+            loadingDiv.className = 'loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div>Ładowanie użytkowników...';
+            loginScreen.appendChild(loadingDiv); // Add it to loginScreen, not usersGrid
+        }
+        
         loginScreen.style.display = 'flex';
         return;
     }
     
-    // Restore the grid class when users are loaded
-    usersGrid.className = 'users-grid'; // Add back the class
+    // Remove the temporary loading div if it exists
+    const tempLoading = document.getElementById('tempLoadingDiv');
+    if (tempLoading) {
+        tempLoading.remove();
+    }
+    
+    // Show the grid again
+    usersGrid.style.display = 'grid';
     
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
