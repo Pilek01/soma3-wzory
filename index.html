@@ -837,9 +837,9 @@
         if (!loadingDiv) {
             loadingDiv = document.createElement('div');
             loadingDiv.id = 'tempLoadingDiv';
-            loadingDiv.className = 'loading';
+            loadingDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; padding: 3rem; color: var(--accent); font-size: 1.2rem;';
             loadingDiv.innerHTML = '<div class="spinner"></div>Ładowanie użytkowników...';
-            loginScreen.appendChild(loadingDiv); // Add it to loginScreen, not usersGrid
+            loginScreen.appendChild(loadingDiv);
         }
         
         loginScreen.style.display = 'flex';
