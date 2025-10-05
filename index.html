@@ -837,8 +837,17 @@
     usersGrid.style.display = 'grid';
     
     usersGrid.innerHTML = users.map((user, index) => `
+        <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
+            <div class="user-icon">${icons[index]}</div>
+            <div class="user-name">${user.name}</div>
+            <div class="user-role">Operator</div>
+        </div>
+    `).join('');
+    
+    loginScreen.style.display = 'flex';
+}  // ← TUTAJ BRAKOWAŁO ZAMKNIĘCIA FUNKCJI
 
-        function hideLoginScreen() {
+function hideLoginScreen() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'block';
     
@@ -848,7 +857,7 @@
     }
 }
 
-        async function attemptLogin(userName) {
+async function attemptLogin(userName) {
     const user = users.find(u => u.name === userName);
     if (!user) {
         alert('Błąd - użytkownik nie znaleziony');
@@ -858,8 +867,6 @@
     // Pokaż modal z hasłem zamiast prompt()
     showPasswordModal(userName, user);
 }
-
-
 
         function checkSession() {
             const savedUser = sessionStorage.getItem('soma3_user');
