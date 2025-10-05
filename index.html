@@ -830,11 +830,16 @@
     
     // If no users, show centered spinner
     if (users.length === 0) {
-        // Add grid-column span to make it take full width
-        usersGrid.innerHTML = '<div class="loading" style="grid-column: span 2;"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.style.display = 'block'; // Change from grid to block
+        usersGrid.style.textAlign = 'center'; // Center the text
         loginScreen.style.display = 'flex';
         return;
     }
+    
+    // Restore grid when users are loaded
+    usersGrid.style.display = 'grid'; // Back to grid
+    usersGrid.style.textAlign = ''; // Reset
     
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
