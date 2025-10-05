@@ -999,7 +999,10 @@ allPatterns.forEach(pattern => {
     }
 });
 
-// Wyciągnij tylko najnowsze wzory
+// Zapisz WSZYSTKIE wzory (z parent_id) do pamięci dla historii
+window.allPatternsWithParents = allPatterns;
+
+// Wyciągnij tylko najnowsze wzory do wyświetlenia
 patterns = Object.values(patternGroups);
 
                 sections = sectionsData.slice(1).filter(row => row[0]).map(row => ({
@@ -1162,6 +1165,7 @@ patterns = Object.values(patternGroups);
                 <div class="button-group">
                     <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
                     <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+                    <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
                     <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
                     <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
                     <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
@@ -2114,6 +2118,200 @@ await batchAppendToSheet('Sekcje', sectionsData);
             alert('⚠️ Usuwanie wymaga dodatkowych uprawnień API.\n\nMożesz usunąć wzór ręcznie w Google Sheets:\n1. Otwórz arkusz\n2. Usuń wiersz z wzoru w zakładce "Wzory"\n3. Usuń powiązane sekcje w zakładce "Sekcje"');
         }
 
+
+
+        // Historia zmian wzoru
+function showPatternHistory() {
+    const versions = getPatternVersions(currentPattern);
+    
+    if (versions.length === 1) {
+        alert('Ten wzór nie ma jeszcze historii zmian.');
+        return;
+    }
+    
+    let historyHTML = `
+        <div class="modal-header">Historia zmian: ${currentPattern.nazwa}</div>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            Wzór ma ${versions.length} wersji. Najnowsza na górze.
+        </p>
+        <div style="max-height: 60vh; overflow-y: auto;">
+    `;
+    
+    versions.forEach((version, index) => {
+        const isCurrentVersion = version.id === currentPattern.id;
+        const versionDate = getVersionDate(version.id);
+        const versionAuthor = getVersionAuthor(version.id);
+        const versionNumber = versions.length - index;
+        
+        // Porównaj z poprzednią wersją
+        let changesHTML = '';
+        if (index < versions.length - 1) {
+            const previousVersion = versions[index + 1];
+            const changes = compareVersions(version, previousVersion);
+            if (changes.length > 0) {
+                changesHTML = '<ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">';
+                changes.forEach(change => {
+                    changesHTML += `<li>${change}</li>`;
+                });
+                changesHTML += '</ul>';
+            }
+        }
+        
+        historyHTML += `
+            <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${isCurrentVersion ? 'var(--accent)' : 'var(--border)'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h4 style="color: var(--accent); margin: 0;">
+                        Wersja ${versionNumber} ${isCurrentVersion ? '(Aktualna)' : ''}
+                    </h4>
+                    <button class="btn btn-secondary" onclick="viewOldVersion('${version.id}')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        👁️ Podgląd
+                    </button>
+                </div>
+                <p style="color: var(--text-secondary); margin: 0.3rem 0;">
+                    <strong>Data:</strong> ${versionDate}<br>
+                    <strong>Autor:</strong> ${versionAuthor}
+                </p>
+                ${changesHTML}
+            </div>
+        `;
+    });
+    
+    historyHTML += `
+        </div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
+        </div>
+    `;
+    
+    showModal(historyHTML);
+}
+
+// Znajdź wszystkie wersje wzoru (od najnowszej do najstarszej)
+function getPatternVersions(pattern) {
+    const versions = [];
+    const allPatterns = [];
+    
+    // Pobierz wszystkie wzory z tego samego klienta i numeru (włącznie ze starymi wersjami)
+    history.forEach(h => {
+        if (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') {
+            const match = h.szczegoly.match(/nowa: (\d+)/);
+            if (match) {
+                const patternId = match[1];
+                // Sprawdź w surowych danych patterns czy ten wzór istnieje
+                const patternData = sections.find(s => s.wzor_id === patternId);
+                if (patternData) {
+                    allPatterns.push(patternId);
+                }
+            }
+        }
+    });
+    
+    // Znajdź wszystkie wersje przez parent_id
+    let currentId = pattern.id;
+    versions.push(pattern);
+    
+    // Idź w górę (starsze wersje)
+    while (pattern.parent_id) {
+        // Musisz przeszukać surowe dane z Google Sheets
+        const parentPattern = findPatternInRawData(pattern.parent_id);
+        if (parentPattern) {
+            versions.push(parentPattern);
+            pattern = parentPattern;
+        } else {
+            break;
+        }
+    }
+    
+    return versions;
+}
+
+// Znajdź wzór w surowych danych (potrzebujemy dostępu do parent_id)
+function findPatternInRawData(patternId) {
+    // Ta funkcja wymaga dostępu do wszystkich wzorów wraz z parent_id
+    // Musimy przechowywać je w pamięci
+    if (window.allPatternsWithParents) {
+        return window.allPatternsWithParents.find(p => p.id === patternId);
+    }
+    return null;
+}
+
+// Pobierz datę utworzenia wersji z historii
+function getVersionDate(patternId) {
+    const historyEntry = history.find(h => 
+        (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') && 
+        h.szczegoly.includes(patternId)
+    );
+    return historyEntry ? historyEntry.data : 'Nieznana';
+}
+
+// Pobierz autora wersji z historii
+function getVersionAuthor(patternId) {
+    const historyEntry = history.find(h => 
+        (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') && 
+        h.szczegoly.includes(patternId)
+    );
+    return historyEntry ? historyEntry.kto : 'Nieznany';
+}
+
+// Porównaj dwie wersje i znajdź zmiany
+function compareVersions(newVersion, oldVersion) {
+    const changes = [];
+    
+    // Pobierz sekcje dla obu wersji
+    const newSections = sections.filter(s => s.wzor_id === newVersion.id);
+    const oldSections = sections.filter(s => s.wzor_id === oldVersion.id);
+    
+    // Porównaj sekcje
+    for (let i = 1; i <= 10; i++) {
+        const newSec = newSections.find(s => s.nr_sekcji === i) || {kolor: '', anilox: ''};
+        const oldSec = oldSections.find(s => s.nr_sekcji === i) || {kolor: '', anilox: ''};
+        
+        if (newSec.kolor !== oldSec.kolor || newSec.anilox !== oldSec.anilox) {
+            let change = `Sekcja ${i}: `;
+            if (newSec.kolor !== oldSec.kolor) {
+                change += `kolor: "${oldSec.kolor || '—'}" → "${newSec.kolor || '—'}"`;
+            }
+            if (newSec.anilox !== oldSec.anilox) {
+                if (newSec.kolor !== oldSec.kolor) change += ', ';
+                change += `anilox: "${oldSec.anilox || '—'}" → "${newSec.anilox || '—'}"`;
+            }
+            changes.push(change);
+        }
+    }
+    
+    return changes;
+}
+
+// Podgląd starej wersji wzoru
+function viewOldVersion(versionId) {
+    const oldPattern = window.allPatternsWithParents.find(p => p.id === versionId);
+    if (!oldPattern) {
+        alert('Nie można załadować tej wersji');
+        return;
+    }
+    
+    closeModal();
+    
+    // Tymczasowo zapisz aktualny wzór
+    const tempCurrent = currentPattern;
+    currentPattern = oldPattern;
+    
+    // Pokaż podgląd
+    renderPatternDetail();
+    
+    // Dodaj banner że to stara wersja
+    const content = document.getElementById('content');
+    const banner = `
+        <div style="background: var(--danger); color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; text-align: center;">
+            ⚠️ Przeglądasz STARĄ WERSJĘ tego wzoru. 
+            <button class="btn btn-secondary" onclick="location.reload()" style="margin-left: 1rem;">
+                Powrót do aktualnej wersji
+            </button>
+        </div>
+    `;
+    content.innerHTML = banner + content.innerHTML;
+}
+        
         // Drukowanie wzoru
         function printPattern() {
             const patternSections = [];
