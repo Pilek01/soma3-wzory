@@ -588,6 +588,7 @@
             gap: 2rem;
             max-width: 700px;
             width: 90%;
+            margin: 0 auto;
         }
 
         .user-card {
@@ -1055,19 +1056,28 @@ patterns = Object.values(patternGroups);
             }
         }
 
-        // Renderowanie widoków
         function renderView() {
-            if (currentView === 'clients') {
-                renderBreadcrumb(['Klienci']);
-                renderClients();
-            } else if (currentView === 'patterns') {
-                renderBreadcrumb(['Klienci', currentClient.nazwa]);
-                renderPatterns();
-            } else if (currentView === 'pattern-detail') {
-                renderBreadcrumb(['Klienci', currentClient.nazwa, currentPattern.nazwa]);
-                renderPatternDetail();
-            }
-        }
+    // Ukryj/pokaż pole wyszukiwania zależnie od widoku
+    const searchBar = document.querySelector('.search-bar');
+    if (currentView === 'clients') {
+        searchBar.style.display = 'block';
+    } else {
+        searchBar.style.display = 'none';
+        // Wyczyść pole wyszukiwania gdy opuszczamy stronę główną
+        document.getElementById('searchInput').value = '';
+    }
+    
+    if (currentView === 'clients') {
+        renderBreadcrumb(['Klienci']);
+        renderClients();
+    } else if (currentView === 'patterns') {
+        renderBreadcrumb(['Klienci', currentClient.nazwa]);
+        renderPatterns();
+    } else if (currentView === 'pattern-detail') {
+        renderBreadcrumb(['Klienci', currentClient.nazwa, currentPattern.nazwa]);
+        renderPatternDetail();
+    }
+}
 
         function renderBreadcrumb(items) {
             const breadcrumb = document.getElementById('breadcrumb');
