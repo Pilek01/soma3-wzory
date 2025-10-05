@@ -835,16 +835,18 @@
         usersGrid.style.justifyContent = 'center';
         usersGrid.style.alignItems = 'center';
         usersGrid.style.width = '100%';
-        usersGrid.style.gridTemplateColumns = 'none'; // ADD THIS LINE
+        usersGrid.style.minHeight = '200px'; // ADD THIS - gives it height to center in
+        usersGrid.style.gridTemplateColumns = 'none';
         loginScreen.style.display = 'flex';
         return;
     }
     
     // Restore grid layout when users are loaded
     usersGrid.style.display = 'grid';
-    usersGrid.style.gridTemplateColumns = ''; // Reset to CSS default
+    usersGrid.style.gridTemplateColumns = '';
     usersGrid.style.justifyContent = '';
     usersGrid.style.alignItems = '';
+    usersGrid.style.minHeight = ''; // Reset this too
     
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
