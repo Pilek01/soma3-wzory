@@ -854,62 +854,7 @@
     showPasswordModal(userName, user);
 }
 
-function showPasswordModal(userName, user) {
-    showModal(`
-        <div class="modal-header">Logowanie - ${userName}</div>
-        <form onsubmit="verifyPassword(event, '${userName}', '${user.password}')">
-            <div class="form-group">
-                <label>🔒 Wprowadź hasło</label>
-                <input type="password" 
-                       name="password" 
-                       id="passwordInput"
-                       required 
-                       placeholder="••••••••"
-                       autocomplete="off"
-                       autofocus>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn btn-success">✅ Zaloguj</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModalAndReload()">❌ Anuluj</button>
-            </div>
-        </form>
-    `);
-    
-    // Autofocus na pole hasła
-    setTimeout(() => {
-        document.getElementById('passwordInput')?.focus();
-    }, 100);
-}
 
-function verifyPassword(event, userName, correctPassword) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const enteredPassword = formData.get('password');
-    
-    if (enteredPassword === correctPassword) {
-        currentUser = userName;
-        const loginTime = Date.now();
-        sessionStorage.setItem('soma3_user', userName);
-        sessionStorage.setItem('soma3_login_time', loginTime.toString());
-        
-        closeModal();
-        hideLoginScreen();
-        loadTheme();
-        loadAllData();
-        showSuccessMessage(`Witaj ${userName}!`);
-    } else {
-        alert('❌ Nieprawidłowe hasło!');
-        // Wyczyść pole i daj kolejną szansę
-        document.getElementById('passwordInput').value = '';
-        document.getElementById('passwordInput').focus();
-    }
-}
-
-function closeModalAndReload() {
-    closeModal();
-    // Opcjonalnie odśwież ekran logowania
-}
 
         function checkSession() {
             const savedUser = sessionStorage.getItem('soma3_user');
@@ -1370,6 +1315,62 @@ patterns = Object.values(patternGroups);
             document.getElementById('modal').classList.remove('active');
         }
 
+function showPasswordModal(userName, user) {
+    showModal(`
+        <div class="modal-header">Logowanie - ${userName}</div>
+        <form onsubmit="verifyPassword(event, '${userName}', '${user.password}')">
+            <div class="form-group">
+                <label>🔒 Wprowadź hasło</label>
+                <input type="password" 
+                       name="password" 
+                       id="passwordInput"
+                       required 
+                       placeholder="••••••••"
+                       autocomplete="off"
+                       autofocus>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-success">✅ Zaloguj</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModalAndReload()">❌ Anuluj</button>
+            </div>
+        </form>
+    `);
+    
+    setTimeout(() => {
+        document.getElementById('passwordInput')?.focus();
+    }, 100);
+}
+
+function verifyPassword(event, userName, correctPassword) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const enteredPassword = formData.get('password');
+    
+    if (enteredPassword === correctPassword) {
+        currentUser = userName;
+        const loginTime = Date.now();
+        sessionStorage.setItem('soma3_user', userName);
+        sessionStorage.setItem('soma3_login_time', loginTime.toString());
+        
+        closeModal();
+        hideLoginScreen();
+        loadTheme();
+        loadAllData();
+        showSuccessMessage(`Witaj ${userName}!`);
+    } else {
+        alert('❌ Nieprawidłowe hasło!');
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+    }
+}
+
+function closeModalAndReload() {
+    closeModal();
+}
+
+
+        
         // Dodawanie klienta
         function showAddClientModal() {
             showModal(`
