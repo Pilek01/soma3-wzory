@@ -828,19 +828,23 @@
     const colors = ['cyan', 'magenta', 'yellow', 'black'];
     const icons = ['👤', '👤', '👤', '👤'];
     
-    // Jeśli nie ma użytkowników, pokaż spinner wycentrowany
+    // If no users, show centered spinner
     if (users.length === 0) {
-    usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
-    usersGrid.style.display = 'flex';
-    usersGrid.style.justifyContent = 'center';
-    usersGrid.style.alignItems = 'center';
-    usersGrid.style.width = '100%'; // DODAJ TĘ LINIĘ
-    loginScreen.style.display = 'flex';
-    return;
-}
+        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.style.display = 'flex';
+        usersGrid.style.justifyContent = 'center';
+        usersGrid.style.alignItems = 'center';
+        usersGrid.style.width = '100%';
+        usersGrid.style.gridTemplateColumns = 'none'; // ADD THIS LINE
+        loginScreen.style.display = 'flex';
+        return;
+    }
     
-    // Przywróć grid layout gdy użytkownicy się załadują
+    // Restore grid layout when users are loaded
     usersGrid.style.display = 'grid';
+    usersGrid.style.gridTemplateColumns = ''; // Reset to CSS default
+    usersGrid.style.justifyContent = '';
+    usersGrid.style.alignItems = '';
     
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
@@ -851,7 +855,7 @@
     `).join('');
     
     loginScreen.style.display = 'flex';
-}  // ← TUTAJ BRAKOWAŁO ZAMKNIĘCIA FUNKCJI
+}
 
 function hideLoginScreen() {
     document.getElementById('loginScreen').style.display = 'none';
