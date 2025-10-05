@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTREX - Anilox Cleaning System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #ff6b35;
+            --accent-hover: #ff8555;
+            --border: #404040;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+        }
+
+        body.light-mode {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--accent);
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid var(--accent);
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .search-bar {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .anilox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .anilox-card {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .anilox-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255,107,53,0.4);
+            border-color: var(--accent);
+        }
+
+        .anilox-card.needs-cleaning {
+            border-color: var(--warning);
+        }
+
+        .anilox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .anilox-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-overdue {
+            background: var(--danger);
+            color: white;
+        }
+
+        .anilox-info {
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        .anilox-info strong {
+            color: var(--text-primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            overflow-y: auto;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .qr-container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 1rem;
+            background: white;
+        }
+
+        .cleaning-history {
+            margin-top: 2rem;
+            border-top: 2px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .history-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .history-date {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .scanner-container {
+            background: var(--bg-tertiary);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .scanner-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            border: 3px solid var(--accent);
+            border-radius: 8px;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .anilox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="title">🔧 SENTREX - System Czyszczenia Anilox</div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
+                <button class="btn" onclick="showAddAniloxModal()">+ Dodaj Wałek</button>
+                <button class="btn btn-success" onclick="showScannerModal()">📷 Skanuj QR</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalAnilox">0</div>
+                <div class="stat-label">Wszystkie wałki</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="cleanedToday">0</div>
+                <div class="stat-label">Wyczyszczone dziś</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="needsCleaning">0</div>
+                <div class="stat-label">Wymaga czyszczenia</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj wałków (nazwa, liniatura, objętość)..." oninput="filterAnilox()">
+        </div>
+
+        <div class="anilox-grid" id="aniloxGrid"></div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        let aniloxRollers = [];
+
+        // Inicjalizacja - wczytaj dane z localStorage
+        function init() {
+            loadTheme();
+            loadData();
+            renderAniloxGrid();
+            updateStats();
+        }
+
+        // Zarządzanie danymi w localStorage
+        function loadData() {
+            const saved = localStorage.getItem('aniloxRollers');
+            if (saved) {
+                aniloxRollers = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('aniloxRollers', JSON.stringify(aniloxRollers));
+        }
+
+        // Renderowanie siatki wałków
+        function renderAniloxGrid() {
+            const grid = document.getElementById('aniloxGrid');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = aniloxRollers;
+            if (searchTerm) {
+                filtered = aniloxRollers.filter(a => 
+                    a.name.toLowerCase().includes(searchTerm) ||
+                    a.liniatura.toLowerCase().includes(searchTerm) ||
+                    a.objetosc.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 3rem;">Brak wałków. Kliknij "+ Dodaj Wałek" aby dodać pierwszy.</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(anilox => {
+                const status = getCleaningStatus(anilox);
+                const daysSince = getDaysSinceLastCleaning(anilox);
+                
+                return `
+                    <div class="anilox-card ${status.needsCleaning ? 'needs-cleaning' : ''}" onclick="showAniloxDetail('${anilox.id}')">
+                        <div class="anilox-header">
+                            <div class="anilox-name">${anilox.name}</div>
+                            <div class="status-badge ${status.class}">${status.text}</div>
+                        </div>
+                        <div class="anilox-info"><strong>Liniatura:</strong> ${anilox.liniatura}</div>
+                        <div class="anilox-info"><strong>Objętość:</strong> ${anilox.objetosc}</div>
+                        <div class="anilox-info"><strong>Ostatnie czyszczenie:</strong> ${anilox.lastCleaning || 'Nigdy'}</div>
+                        <div class="anilox-info"><strong>Dni od czyszczenia:</strong> ${daysSince}</div>
+                        <div class="anilox-info"><strong>Liczba czyszczeń:</strong> ${anilox.cleaningHistory?.length || 0}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Status czyszczenia
+        function getCleaningStatus(anilox) {
+            const days = getDaysSinceLastCleaning(anilox);
+            
+            if (days === 'N/A') {
+                return { text: 'Nowy', class: 'status-warning', needsCleaning: true };
+            }
+            
+            const daysNum = parseInt(days);
+            if (daysNum <= 30) {
+                return { text: 'OK', class: 'status-ok', needsCleaning: false };
+            } else if (daysNum <= 60) {
+                return { text: 'Wkrótce', class: 'status-warning', needsCleaning: true };
+            } else {
+                return { text: 'Pilne!', class: 'status-overdue', needsCleaning: true };
+            }
+        }
+
+        // Dni od ostatniego czyszczenia
+        function getDaysSinceLastCleaning(anilox) {
+            if (!anilox.lastCleaning) return 'N/A';
+            
+            const last = new Date(anilox.lastCleaning);
+            const now = new Date();
+            const diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+            return diff.toString();
+        }
+
+        // Filtrowanie
+        function filterAnilox() {
+            renderAniloxGrid();
+        }
+
+        // Statystyki
+        function updateStats() {
+            document.getElementById('totalAnilox').textContent = aniloxRollers.length;
+            
+            const today = new Date().toLocaleDateString('pl-PL');
+            const cleanedToday = aniloxRollers.filter(a => a.lastCleaning === today).length;
+            document.getElementById('cleanedToday').textContent = cleanedToday;
+            
+            const needsCleaning = aniloxRollers.filter(a => {
+                const status = getCleaningStatus(a);
+                return status.needsCleaning;
+            }).length;
+            document.getElementById('needsCleaning').textContent = needsCleaning;
+        }
+
+        // Modal
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Dodawanie nowego wałka
+        function showAddAniloxModal() {
+            showModal(`
+                <div class="modal-header">Dodaj Nowy Wałek Anilox</div>
+                <form onsubmit="addAnilox(event)">
+                    <div class="form-group">
+                        <label>Nazwa/Numer Wałka *</label>
+                        <input type="text" name="name" required placeholder="np. ANX-001, Wałek 280/5.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Liniatura *</label>
+                        <input type="text" name="liniatura" required placeholder="np. 280, 340, 400">
+                    </div>
+                    <div class="form-group">
+                        <label>Objętość [cm³/m²] *</label>
+                        <input type="text" name="objetosc" required placeholder="np. 5.5, 8.0, 12.0">
+                    </div>
+                    <div class="form-group">
+                        <label>Uwagi (opcjonalne)</label>
+                        <textarea name="notes" placeholder="Dodatkowe informacje..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj i Generuj QR</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function addAnilox(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const id = 'ANX-' + Date.now();
+            
+            const newAnilox = {
+                id: id,
+                name: formData.get('name').trim(),
+                liniatura: formData.get('liniatura').trim(),
+                objetosc: formData.get('objetosc').trim(),
+                notes: formData.get('notes').trim(),
+                createdDate: new Date().toLocaleDateString('pl-PL'),
+                lastCleaning: null,
+                cleaningHistory: []
+            };
+            
+            aniloxRollers.push(newAnilox);
+            saveData();
+            
+            showQRCodeModal(newAnilox);
+        }
+
+        // Generowanie i wyświetlanie QR Code
+        function showQRCodeModal(anilox) {
+            showModal(`
+                <div class="modal-header">Kod QR dla: ${anilox.name}</div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; text-align: center;">
+                    Wydrukuj ten kod QR i naklej na wałek
+                </p>
+                <div class="qr-container" id="qrContainer">
+                    <div id="qrcode"></div>
+                    <div style="margin-top: 1rem; font-weight: 600; color: #000;">${anilox.name}</div>
+                    <div style="color: #666;">${anilox.liniatura} | ${anilox.objetosc} cm³/m²</div>
+                </div>
+                <div class="button-group">
+                    <button class="btn" onclick="printQRCode()">🖨️ Drukuj</button>
+                    <button class="btn btn-secondary" onclick="closeModalAndRefresh()">✅ Gotowe</button>
+                </div>
+            `);
+            
+            // Generuj QR Code
+            new QRCode(document.getElementById("qrcode"), {
+                text: anilox.id,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff"
+            });
+        }
+
+        function printQRCode() {
+            const qrContainer = document.getElementById('qrContainer');
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Kod QR - Anilox</title>');
+            printWindow.document.write('<style>body{text-align:center;padding:20px;font-family:Arial;}@media print{@page{margin:1cm;}}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(qrContainer.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function closeModalAndRefresh() {
+            closeModal();
+            renderAniloxGrid();
+            updateStats();
+            showSuccessMessage('Wałek dodany pomyślnie!');
+        }
+
+        // Skaner QR
+        function showScannerModal() {
+            showModal(`
+                <div class="modal-header">Skanuj Kod QR Wałka</div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+                    Zeskanuj kod QR z wałka lub wprowadź kod ręcznie
+                </p>
+                <div class="scanner-container">
+                    <input type="text" 
+                           class="scanner-input" 
+                           id="scannerInput" 
+                           placeholder="ANX-XXXXXXXXXX" 
+                           autofocus
+                           onkeyup="handleScannerInput(event)">
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">
+                        💡 Naciśnij Enter lub kliknij "Szukaj"
+                    </p>
+                </div>
+                <div class="button-group">
+                    <button class="btn" onclick="findAniloxByCode()">🔍 Szukaj</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                </div>
+            `);
+        }
+
+        function handleScannerInput(event) {
+            if (event.key === 'Enter') {
+                findAniloxByCode();
+            }
+        }
+
+        function findAniloxByCode() {
+            const code = document.getElementById('scannerInput').value.trim();
+            if (!code) {
+                alert('Wprowadź kod wałka');
+                return;
+            }
+            
+            const anilox = aniloxRollers.find(a => a.id === code);
+            if (!anilox) {
+                alert('Nie znaleziono wałka o kodzie: ' + code);
+                return;
+            }
+            
+            closeModal();
+            showCleaningConfirmation(anilox);
+        }
+
+        // Potwierdzenie czyszczenia
+        function showCleaningConfirmation(anilox) {
+            showModal(`
+                <div class="modal-header">Potwierdź Czyszczenie</div>
+                <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem;">${anilox.name}</h3>
+                    <p><strong>Liniatura:</strong> ${anilox.liniatura}</p>
+                    <p><strong>Objętość:</strong> ${anilox.objetosc} cm³/m²</p>
+                    <p><strong>Ostatnie czyszczenie:</strong> ${anilox.lastCleaning || 'Nigdy'}</p>
+                    <p><strong>Dni od czyszczenia:</strong> ${getDaysSinceLastCleaning(anilox)}</p>
+                </div>
+                <form onsubmit="recordCleaning(event, '${anilox.id}')">
+                    <div class="form-group">
+                        <label>Uwagi do czyszczenia (opcjonalne)</label>
+                        <textarea name="cleaningNotes" placeholder="np. Wyczyszczono przy 80% mocy, czas 5 min"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success">✅ Potwierdź Czyszczenie</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        // Zapisz czyszczenie
+        function recordCleaning(event, aniloxId) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const anilox = aniloxRollers.find(a => a.id === aniloxId);
+            
+            if (!anilox) return;
+            
+            const cleaningRecord = {
+                date: new Date().toLocaleDateString('pl-PL'),
+                time: new Date().toLocaleTimeString('pl-PL'),
+                notes: formData.get('cleaningNotes').trim()
+            };
+            
+            if (!anilox.cleaningHistory) {
+                anilox.cleaningHistory = [];
+            }
+            
+            anilox.cleaningHistory.unshift(cleaningRecord);
+            anilox.lastCleaning = cleaningRecord.date;
+            
+            saveData();
+            closeModal();
+            renderAniloxGrid();
+            updateStats();
+            
+            showSuccessMessage(`Wałek ${anilox.name} został wyczyszczony!`);
+        }
+
+        // Szczegóły wałka
+        function showAniloxDetail(aniloxId) {
+            const anilox = aniloxRollers.find(a => a.id === aniloxId);
+            if (!anilox) return;
+            
+            const status = getCleaningStatus(anilox);
+            
+            let historyHTML = '';
+            if (anilox.cleaningHistory && anilox.cleaningHistory.length > 0) {
+                historyHTML = `
+                    <div class="cleaning-history">
+                        <h3 style="color: var(--accent); margin-bottom: 1rem;">Historia Czyszczeń</h3>
+                        ${anilox.cleaningHistory.map(record => `
+                            <div class="history-item">
+                                <div class="history-date">${record.date} ${record.time}</div>
+                                ${record.notes ? `<div style="color: var(--text-secondary);">${record.notes}</div>` : ''}
+                            </div>
+                        `).join('')}
+                   </div>`;
+            }
+            
+            showModal(`
+                <div class="modal-header">${anilox.name}</div>
+                <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div class="anilox-header" style="margin-bottom: 1rem;">
+                        <h3 style="color: var(--accent); margin: 0;">Informacje</h3>
+                        <div class="status-badge ${status.class}">${status.text}</div>
+                    </div>
+                    <p><strong>ID:</strong> ${anilox.id}</p>
+                    <p><strong>Liniatura:</strong> ${anilox.liniatura}</p>
+                    <p><strong>Objętość:</strong> ${anilox.objetosc} cm³/m²</p>
+                    <p><strong>Data dodania:</strong> ${anilox.createdDate}</p>
+                    <p><strong>Ostatnie czyszczenie:</strong> ${anilox.lastCleaning || 'Nigdy'}</p>
+                    <p><strong>Dni od czyszczenia:</strong> ${getDaysSinceLastCleaning(anilox)}</p>
+                    ${anilox.notes ? `<p><strong>Uwagi:</strong> ${anilox.notes}</p>` : ''}
+                </div>
+                
+                ${historyHTML}
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="closeModal(); showCleaningConfirmation(${JSON.stringify(anilox).replace(/"/g, '&quot;')})">🧼 Wyczyść Teraz</button>
+                    <button class="btn btn-secondary" onclick="showQRForExisting('${anilox.id}')">📱 Pokaż QR</button>
+                    <button class="btn btn-danger" onclick="deleteAnilox('${anilox.id}')">🗑️ Usuń</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">❌ Zamknij</button>
+                </div>
+            `);
+        }
+
+        // Pokaż QR dla istniejącego wałka
+        function showQRForExisting(aniloxId) {
+            const anilox = aniloxRollers.find(a => a.id === aniloxId);
+            if (!anilox) return;
+            showQRCodeModal(anilox);
+        }
+
+        // Usuń wałek
+        function deleteAnilox(aniloxId) {
+            if (!confirm('Czy na pewno chcesz usunąć ten wałek? Ta operacja jest nieodwracalna!')) {
+                return;
+            }
+            
+            aniloxRollers = aniloxRollers.filter(a => a.id !== aniloxId);
+            saveData();
+            closeModal();
+            renderAniloxGrid();
+            updateStats();
+            showSuccessMessage('Wałek został usunięty');
+        }
+
+        // Zmiana motywu
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        // Komunikat sukcesu
+        function showSuccessMessage(message) {
+            const existingMsg = document.querySelector('.success-message');
+            if (existingMsg) existingMsg.remove();
+
+            const msg = document.createElement('div');
+            msg.className = 'success-message';
+            msg.textContent = '✅ ' + message;
+            msg.style.position = 'fixed';
+            msg.style.top = '100px';
+            msg.style.right = '20px';
+            msg.style.zIndex = '1000';
+            msg.style.animation = 'slideIn 0.3s';
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => msg.remove(), 300);
+            }, 3000);
+        }
+
+        // Zamknij modal po kliknięciu tła
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Inicjalizacja
+        init();
+    </script>
+</body>
+</html>
