@@ -828,18 +828,21 @@
     const colors = ['cyan', 'magenta', 'yellow', 'black'];
     const icons = ['👤', '👤', '👤', '👤'];
     
-    // If no users, hide the grid and show a separate centered loading div
+    // If no users, add spinner after the subtitle
     if (users.length === 0) {
-        usersGrid.style.display = 'none'; // Hide the grid completely
+        usersGrid.style.display = 'none'; // Hide the grid
         
         // Check if loading div already exists
         let loadingDiv = document.getElementById('tempLoadingDiv');
         if (!loadingDiv) {
             loadingDiv = document.createElement('div');
             loadingDiv.id = 'tempLoadingDiv';
-            loadingDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; padding: 3rem; color: var(--accent); font-size: 1.2rem;';
+            loadingDiv.className = 'loading';
             loadingDiv.innerHTML = '<div class="spinner"></div>Ładowanie użytkowników...';
-            loginScreen.appendChild(loadingDiv);
+            
+            // Insert it after the subtitle, before the usersGrid
+            const subtitle = document.querySelector('.login-subtitle');
+            subtitle.after(loadingDiv);
         }
         
         loginScreen.style.display = 'flex';
