@@ -2241,16 +2241,28 @@ function getVersionDate(patternId) {
         (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') && 
         h.szczegoly.includes(patternId)
     );
-    return historyEntry ? historyEntry.data : 'Nieznana';
-}
-
-// Pobierz autora wersji z historii
-function getVersionAuthor(patternId) {
-    const historyEntry = history.find(h => 
-        (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') && 
-        h.szczegoly.includes(patternId)
-    );
-    return historyEntry ? historyEntry.kto : 'Nieznany';
+    
+    if (!historyEntry) return 'Nieznana';
+    
+    // Jeśli data jest w formacie ISO, konwertuj na polski
+    try {
+        const date = new Date(historyEntry.data);
+        if (!isNaN(date.getTime())) {
+            return date.toLocaleString('pl-PL', {
+                timeZone: 'Europe/Warsaw',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    } catch (e) {
+        // Jeśli błąd parsowania, zwróć oryginalny string
+    }
+    
+    return historyEntry.data;
 }
 
 // Porównaj dwie wersje i znajdź zmiany
@@ -2292,11 +2304,13 @@ function viewOldVersion(versionId) {
     
     closeModal();
     
-    // Tymczasowo zapisz aktualny wzór
-    const tempCurrent = currentPattern;
-    currentPattern = oldPattern;
+    // Zapisz referencję do aktualnej wersji
+    if (!window.originalCurrentPattern) {
+        window.originalCurrentPattern = currentPattern;
+    }
     
-    // Pokaż podgląd
+    // Pokaż podgląd starej wersji
+    currentPattern = oldPattern;
     renderPatternDetail();
     
     // Dodaj banner że to stara wersja
@@ -2304,12 +2318,32 @@ function viewOldVersion(versionId) {
     const banner = `
         <div style="background: var(--danger); color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; text-align: center;">
             ⚠️ Przeglądasz STARĄ WERSJĘ tego wzoru. 
-            <button class="btn btn-secondary" onclick="location.reload()" style="margin-left: 1rem;">
+            <button class="btn btn-secondary" onclick="returnToCurrentVersion()" style="margin-left: 1rem;">
                 Powrót do aktualnej wersji
             </button>
         </div>
     `;
     content.innerHTML = banner + content.innerHTML;
+}
+
+// Funkcja powrotu do aktualnej wersji
+function returnToCurrentVersion() {
+    if (window.originalCurrentPattern) {
+        currentPattern = window.originalCurrentPattern;
+        window.originalCurrentPattern = null;
+    }
+    
+    // Znajdź aktualną wersję wzoru
+    const actualPattern = patterns.find(p => 
+        p.numer === currentPattern.numer && 
+        p.klient_id === currentPattern.klient_id
+    );
+    
+    if (actualPattern) {
+        currentPattern = actualPattern;
+    }
+    
+    renderPatternDetail();
 }
         
         // Drukowanie wzoru
