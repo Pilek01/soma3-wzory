@@ -830,13 +830,14 @@
     
     // Jeśli nie ma użytkowników, pokaż spinner wycentrowany
     if (users.length === 0) {
-        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
-        usersGrid.style.display = 'flex';
-        usersGrid.style.justifyContent = 'center';
-        usersGrid.style.alignItems = 'center';
-        loginScreen.style.display = 'flex';
-        return;
-    }
+    usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+    usersGrid.style.display = 'flex';
+    usersGrid.style.justifyContent = 'center';
+    usersGrid.style.alignItems = 'center';
+    usersGrid.style.width = '100%'; // DODAJ TĘ LINIĘ
+    loginScreen.style.display = 'flex';
+    return;
+}
     
     // Przywróć grid layout gdy użytkownicy się załadują
     usersGrid.style.display = 'grid';
