@@ -830,12 +830,15 @@
     
     // If no users, show centered spinner
     if (users.length === 0) {
-        usersGrid.innerHTML = '<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.style.gridTemplateColumns = '1fr'; // Single column for spinner
+        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
         loginScreen.style.display = 'flex';
         return;
     }
     
-    // When users are loaded, display normally
+    // Restore 2-column grid when users are loaded
+    usersGrid.style.gridTemplateColumns = ''; // Reset to CSS default
+    
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
             <div class="user-icon">${icons[index]}</div>
