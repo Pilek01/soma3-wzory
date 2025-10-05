@@ -2264,7 +2264,16 @@ function getVersionDate(patternId) {
     
     return historyEntry.data;
 }
-
+        
+// Pobierz autora wersji z historii
+function getVersionAuthor(patternId) {
+    const historyEntry = history.find(h => 
+        (h.akcja === 'Edytowano wzór' || h.akcja === 'Dodano wzór') && 
+        h.szczegoly.includes(patternId)
+    );
+    return historyEntry ? historyEntry.kto : 'Nieznany';
+}
+        
 // Porównaj dwie wersje i znajdź zmiany
 function compareVersions(newVersion, oldVersion) {
     const changes = [];
