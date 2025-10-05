@@ -817,22 +817,26 @@
         }
 
         function showLoginScreen() {
-            const loginScreen = document.getElementById('loginScreen');
-            const usersGrid = document.getElementById('usersGrid');
-            
-            const colors = ['cyan', 'magenta', 'yellow', 'black'];
-            const icons = ['👤', '👤', '👤', '👤'];
-            
-            usersGrid.innerHTML = users.map((user, index) => `
-                <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
-                    <div class="user-icon">${icons[index]}</div>
-                    <div class="user-name">${user.name}</div>
-                    <div class="user-role">Operator</div>
-                </div>
-            `).join('');
-            
-            loginScreen.style.display = 'flex';
-        }
+    const loginScreen = document.getElementById('loginScreen');
+    const usersGrid = document.getElementById('usersGrid');
+    
+    const colors = ['cyan', 'magenta', 'yellow', 'black'];
+    const icons = ['👤', '👤', '👤', '👤'];
+    
+    // Jeśli nie ma użytkowników, pokaż spinner wycentrowany
+    if (users.length === 0) {
+        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+        usersGrid.style.display = 'flex';
+        usersGrid.style.justifyContent = 'center';
+        usersGrid.style.alignItems = 'center';
+        loginScreen.style.display = 'flex';
+        return;
+    }
+    
+    // Przywróć grid layout gdy użytkownicy się załadują
+    usersGrid.style.display = 'grid';
+    
+    usersGrid.innerHTML = users.map((user, index) => `
 
         function hideLoginScreen() {
     document.getElementById('loginScreen').style.display = 'none';
