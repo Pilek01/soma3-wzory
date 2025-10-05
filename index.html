@@ -830,16 +830,12 @@
     
     // If no users, show centered spinner
     if (users.length === 0) {
-        usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
-        // Completely override the grid
-        usersGrid.style.cssText = 'display: flex; justify-content: center; align-items: center; width: 90%; min-height: 200px; margin: 0 auto;';
+        usersGrid.innerHTML = '<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div>Ładowanie użytkowników...</div>';
         loginScreen.style.display = 'flex';
         return;
     }
     
-    // Restore grid layout when users are loaded
-    usersGrid.style.cssText = ''; // Clear all inline styles
-    
+    // When users are loaded, display normally
     usersGrid.innerHTML = users.map((user, index) => `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
             <div class="user-icon">${icons[index]}</div>
