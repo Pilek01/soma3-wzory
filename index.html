@@ -1316,6 +1316,9 @@ patterns = Object.values(patternGroups);
         }
 
 function showPasswordModal(userName, user) {
+    // UKRYJ EKRAN LOGOWANIA (żeby modal był widoczny)
+    document.getElementById('loginScreen').style.display = 'none';
+    
     showModal(`
         <div class="modal-header">Logowanie - ${userName}</div>
         <form onsubmit="verifyPassword(event, '${userName}', '${user.password}')">
@@ -1367,6 +1370,8 @@ function verifyPassword(event, userName, correctPassword) {
 
 function closeModalAndReload() {
     closeModal();
+    // POKAŻ Z POWROTEM EKRAN LOGOWANIA
+    document.getElementById('loginScreen').style.display = 'flex';
 }
 
 
