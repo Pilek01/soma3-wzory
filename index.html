@@ -1513,13 +1513,13 @@ function closeModalAndReload() {
 
         // Dodawanie wzoru
         function showAddPatternModal() {
-            const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
-            const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
-            const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+    const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+    // ZMIANA: tylko aniloxy z arkusza
+    const allAnilox = [...aniloxy].sort();
 
-            showModal(`
-                <div class="modal-header">Dodaj Wzór dla: ${currentClient.nazwa}</div>
-                <form id="addPatternForm" onsubmit="addPattern(event)">
+    showModal(`
+        <div class="modal-header">Dodaj Wzór dla: ${currentClient.nazwa}</div>
+        <form id="addPatternForm" onsubmit="addPattern(event)">
                     <div class="form-group">
                         <label>Numer Wzoru *</label>
                         <input type="text" name="numer" required placeholder="np. 1, 003">
@@ -1678,15 +1678,15 @@ await batchAppendToSheet('Sekcje', sectionsData);
         
         // Edycja wzoru
         function showEditPatternModal() {
-            const patternSections = [];
-            for (let i = 1; i <= 10; i++) {
-                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
-                patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
-            }
+    const patternSections = [];
+    for (let i = 1; i <= 10; i++) {
+        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+        patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+    }
 
-            const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
-            const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
-            const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+    const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+    // ZMIANA: tylko aniloxy z arkusza
+    const allAnilox = [...aniloxy].sort();
 
             // Przycisk do Google Sheets tylko dla Kamila
             const googleSheetsButton = currentUser === 'Kamil' ? 
@@ -1986,11 +1986,11 @@ if (oldComments.length > 0) {
         }
 
         function showCopyPatternForm(patternSections, originalClient) {
-            const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
-            const usedAnilox = [...new Set(sections.map(s => s.anilox).filter(a => a))].sort();
-            const allAnilox = [...new Set([...aniloxy, ...usedAnilox])].sort();
+    const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
+    // ZMIANA: tylko aniloxy z arkusza
+    const allAnilox = [...aniloxy].sort();
 
-            showModal(`
+    showModal(`
                 <div class="modal-header">Nowy wzór na podstawie: ${currentPattern.nazwa}</div>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem;">
                     🎯 Klient docelowy: <strong>${currentClient.numer} | ${currentClient.nazwa}</strong><br>
