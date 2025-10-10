@@ -2391,7 +2391,7 @@ function returnToCurrentVersion() {
 }
         
         // Drukowanie wzoru
-        function printPattern() {
+        unction printPattern() {
     const patternSections = [];
     for (let i = 1; i <= 10; i++) {
         const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
@@ -2408,38 +2408,16 @@ function returnToCurrentVersion() {
         }
     });
 
-    // Przygotuj HTML dla uwag
+    // Przygotuj HTML dla uwag - TYLKO TREŚĆ
     let commentsHTML = '';
     if (selectedComments.length > 0) {
         commentsHTML = `
             <h2 style="margin-top: 30px;">💬 Uwagi</h2>
-            ${selectedComments.map(comment => {
-                let displayDate = comment.data;
-                try {
-                    const parsedDate = new Date(comment.data);
-                    if (!isNaN(parsedDate.getTime())) {
-                        displayDate = parsedDate.toLocaleString('pl-PL', {
-                            timeZone: 'Europe/Warsaw',
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                    }
-                } catch (e) {}
-                
-                return `
-                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
-                            <span><strong style="color: #ff6b35;">${comment.autor}</strong></span>
-                            <span>${displayDate}</span>
-                        </div>
-                        <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
-                    </div>
-                `;
-            }).join('')}
+            ${selectedComments.map(comment => `
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
+                    <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                </div>
+            `).join('')}
         `;
     }
 
@@ -2583,38 +2561,16 @@ function returnToCurrentVersion() {
         }
     });
 
-    // Przygotuj HTML dla uwag
+    // Przygotuj HTML dla uwag - TYLKO TREŚĆ
     let commentsHTML = '';
     if (selectedComments.length > 0) {
         commentsHTML = `
             <h2 style="margin-top: 30px;">💬 Uwagi</h2>
-            ${selectedComments.map(comment => {
-                let displayDate = comment.data;
-                try {
-                    const parsedDate = new Date(comment.data);
-                    if (!isNaN(parsedDate.getTime())) {
-                        displayDate = parsedDate.toLocaleString('pl-PL', {
-                            timeZone: 'Europe/Warsaw',
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                    }
-                } catch (e) {}
-                
-                return `
-                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
-                            <span><strong style="color: #ff6b35;">${comment.autor}</strong></span>
-                            <span>${displayDate}</span>
-                        </div>
-                        <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
-                    </div>
-                `;
-            }).join('')}
+            ${selectedComments.map(comment => `
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
+                    <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                </div>
+            `).join('')}
         `;
     }
 
