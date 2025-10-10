@@ -1173,87 +1173,92 @@ patterns = Object.values(patternGroups);
         }
 
         function renderPatternDetail() {
-            const content = document.getElementById('content');
-            const patternSections = [];
-            
-            for (let i = 1; i <= 10; i++) {
-                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
-                patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
-            }
+    const content = document.getElementById('content');
+    const patternSections = [];
+    
+    for (let i = 1; i <= 10; i++) {
+        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+        patternSections.push(section || {nr_sekcji: i, kolor: '', anilox: ''});
+    }
 
-            const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
+    const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
 
-            let html = `
-                <div class="card" style="cursor: default;">
-                    <div class="card-header">${currentPattern.numer} | ${currentPattern.nazwa}</div>
-                    <div class="card-body">
-                        <p><strong>Klient:</strong> ${currentClient.nazwa}</p>
-                        ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" class="pattern-image" alt="Wzór">` : ''}
-                    </div>
+    let html = `
+        <div class="card" style="cursor: default;">
+            <div class="card-header">${currentPattern.numer} | ${currentPattern.nazwa}</div>
+            <div class="card-body">
+                <p><strong>Klient:</strong> ${currentClient.nazwa}</p>
+                ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" class="pattern-image" alt="Wzór">` : ''}
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
+            <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+            <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+            <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+            <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
+            <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
+        </div>
+
+        <h3 style="margin-top: 2rem; color: var(--accent); font-size: 1.5rem;">Sekcje (1-10)</h3>
+        <div class="sections-grid">
+            ${patternSections.map(section => `
+                <div class="section-card ${!section.kolor && !section.anilox ? 'empty' : ''}">
+                    <h4>Sekcja ${section.nr_sekcji}</h4>
+                    <p><strong>Kolor:</strong> ${section.kolor || '—'}</p>
+                    <p><strong>Anilox:</strong> ${section.anilox || '—'}</p>
                 </div>
+            `).join('')}
+        </div>
 
-                <div class="button-group">
-                    <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
-                    <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
-                    <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
-                    <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
-                    <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
-                    <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
-                </div>
-
-                <h3 style="margin-top: 2rem; color: var(--accent); font-size: 1.5rem;">Sekcje (1-10)</h3>
-                <div class="sections-grid">
-                    ${patternSections.map(section => `
-                        <div class="section-card ${!section.kolor && !section.anilox ? 'empty' : ''}">
-                            <h4>Sekcja ${section.nr_sekcji}</h4>
-                            <p><strong>Kolor:</strong> ${section.kolor || '—'}</p>
-                            <p><strong>Anilox:</strong> ${section.anilox || '—'}</p>
+        <div class="comments-section">
+            <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">💬 Uwagi</h3>
+            <button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>
+            <div style="margin-top: 1.5rem">
+                ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
+                    patternComments.map((comment, index) => {
+                        let displayDate = comment.data;
+                        try {
+                            const parsedDate = new Date(comment.data);
+                            if (!isNaN(parsedDate.getTime())) {
+                                displayDate = parsedDate.toLocaleString('pl-PL', {
+                                    timeZone: 'Europe/Warsaw',
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                });
+                            }
+                        } catch (e) {}
+                        
+                        return `
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span><strong>${comment.autor}</strong></span>
+                                <span style="display: flex; align-items: center; gap: 1rem;">
+                                    <span>${displayDate}</span>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                        <input type="checkbox" 
+                                               class="print-comment-checkbox" 
+                                               id="comment-${index}"
+                                               style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 1.2rem;">🖨️</span>
+                                    </label>
+                                </span>
+                            </div>
+                            <div style="white-space: pre-wrap;">${comment.tresc}</div>
                         </div>
-                    `).join('')}
-                </div>
+                    `}).join('')
+                }
+            </div>
+        </div>
+    `;
 
-                <div class="comments-section">
-                    <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">💬 Uwagi</h3>
-                    <button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>
-                    <div style="margin-top: 1.5rem">
-                        ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
-                            patternComments.map(comment => {
-                                // Formatuj datę przy wyświetlaniu
-                                let displayDate = comment.data;
-                                try {
-                                    // Spróbuj przekonwertować jeśli to ISO format
-                                    const parsedDate = new Date(comment.data);
-                                    if (!isNaN(parsedDate.getTime())) {
-                                        displayDate = parsedDate.toLocaleString('pl-PL', {
-                                            timeZone: 'Europe/Warsaw',
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit'
-                                        });
-                                    }
-                                } catch (e) {
-                                    // Jeśli błąd parsowania, zostaw oryginalny string
-                                }
-                                
-                                return `
-                                <div class="comment">
-                                    <div class="comment-header">
-                                        <span><strong>${comment.autor}</strong></span>
-                                        <span>${displayDate}</span>
-                                    </div>
-                                    <div style="white-space: pre-wrap;">${comment.tresc}</div>
-                                </div>
-                            `}).join('')
-                        }
-                    </div>
-                </div>
-            `;
-
-            content.innerHTML = html;
-        }
+    content.innerHTML = html;
+}
 
         // Nawigacja
         function showClients() {
@@ -2387,243 +2392,335 @@ function returnToCurrentVersion() {
         
         // Drukowanie wzoru
         function printPattern() {
-            const patternSections = [];
-            for (let i = 1; i <= 10; i++) {
-                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
-                patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
-            }
+    const patternSections = [];
+    for (let i = 1; i <= 10; i++) {
+        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+        patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
+    }
 
-            const printFrame = document.createElement('iframe');
-            printFrame.style.position = 'absolute';
-            printFrame.style.width = '0';
-            printFrame.style.height = '0';
-            printFrame.style.border = 'none';
-            document.body.appendChild(printFrame);
-
-            const printDocument = printFrame.contentWindow.document;
-            printDocument.open();
-            printDocument.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title></title>
-                    <style>
-                        @media print {
-                            @page {
-                                margin: 1.5cm;
-                            }
-                            body {
-                                margin: 0;
-                                padding: 0;
-                            }
-                        }
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            padding: 10px;
-                            max-width: 100%;
-                            margin: 0 auto;
-                        }
-                        h1 { 
-                            color: #ff6b35; 
-                            border-bottom: 3px solid #ff6b35; 
-                            padding-bottom: 10px;
-                            text-align: center;
-                            margin-bottom: 20px;
-                            font-size: 24px;
-                        }
-                        .header-info { 
-                            background: #f5f5f5; 
-                            padding: 15px; 
-                            border-radius: 8px;
-                            margin-bottom: 20px; 
-                        }
-                        .header-info p { 
-                            margin: 6px 0; 
-                            font-size: 15px; 
-                        }
-                        h2 { 
-                            color: #333; 
-                            margin-top: 20px;
-                            margin-bottom: 10px;
-                            font-size: 18px;
-                        }
-                        table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            margin-top: 15px; 
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                        }
-                        th, td { 
-                            border: 2px solid #ddd; 
-                            padding: 12px; 
-                            text-align: left; 
-                        }
-                        th { 
-                            background-color: #ff6b35; 
-                            color: white; 
-                            font-weight: bold;
-                        }
-                        tr:nth-child(even) { 
-                            background-color: #f9f9f9; 
-                        }
-                        .empty { 
-                            color: #999; 
-                            font-style: italic; 
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
-                    <div class="header-info">
-                        <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
-                        <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
-                    </div>
-                    ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
-                    <h2>Sekcje SOMA 3 (1-10)</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 20%;">Sekcja</th>
-                                <th style="width: 40%;">Kolor</th>
-                                <th style="width: 40%;">Anilox</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${patternSections.map(section => `
-                                <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
-                                    <td><strong>${section.nr_sekcji}</strong></td>
-                                    <td>${section.kolor || '—'}</td>
-                                    <td>${section.anilox || '—'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </body>
-                </html>
-            `);
-            printDocument.close();
-
-            printFrame.contentWindow.onload = function() {
-                setTimeout(() => {
-                    printFrame.contentWindow.print();
-                    setTimeout(() => {
-                        document.body.removeChild(printFrame);
-                    }, 100);
-                }, 100);
-            };
+    // Zbierz zaznaczone uwagi
+    const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
+    const selectedComments = [];
+    
+    document.querySelectorAll('.print-comment-checkbox').forEach((checkbox, index) => {
+        if (checkbox.checked && patternComments[index]) {
+            selectedComments.push(patternComments[index]);
         }
+    });
+
+    // Przygotuj HTML dla uwag
+    let commentsHTML = '';
+    if (selectedComments.length > 0) {
+        commentsHTML = `
+            <h2 style="margin-top: 30px;">💬 Uwagi</h2>
+            ${selectedComments.map(comment => {
+                let displayDate = comment.data;
+                try {
+                    const parsedDate = new Date(comment.data);
+                    if (!isNaN(parsedDate.getTime())) {
+                        displayDate = parsedDate.toLocaleString('pl-PL', {
+                            timeZone: 'Europe/Warsaw',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    }
+                } catch (e) {}
+                
+                return `
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
+                            <span><strong style="color: #ff6b35;">${comment.autor}</strong></span>
+                            <span>${displayDate}</span>
+                        </div>
+                        <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                    </div>
+                `;
+            }).join('')}
+        `;
+    }
+
+    const printFrame = document.createElement('iframe');
+    printFrame.style.position = 'absolute';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = 'none';
+    document.body.appendChild(printFrame);
+
+    const printDocument = printFrame.contentWindow.document;
+    printDocument.open();
+    printDocument.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title></title>
+            <style>
+                @media print {
+                    @page {
+                        margin: 1.5cm;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 10px;
+                    max-width: 100%;
+                    margin: 0 auto;
+                }
+                h1 { 
+                    color: #ff6b35; 
+                    border-bottom: 3px solid #ff6b35; 
+                    padding-bottom: 10px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                .header-info { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 8px;
+                    margin-bottom: 20px; 
+                }
+                .header-info p { 
+                    margin: 6px 0; 
+                    font-size: 15px; 
+                }
+                h2 { 
+                    color: #333; 
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    font-size: 18px;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 15px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+                th, td { 
+                    border: 2px solid #ddd; 
+                    padding: 12px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #ff6b35; 
+                    color: white; 
+                    font-weight: bold;
+                }
+                tr:nth-child(even) { 
+                    background-color: #f9f9f9; 
+                }
+                .empty { 
+                    color: #999; 
+                    font-style: italic; 
+                }
+            </style>
+        </head>
+        <body>
+            <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
+            <div class="header-info">
+                <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
+                <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+            </div>
+            ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
+            <h2>Sekcje SOMA 3 (1-10)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Sekcja</th>
+                        <th style="width: 40%;">Kolor</th>
+                        <th style="width: 40%;">Anilox</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${patternSections.map(section => `
+                        <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
+                            <td><strong>${section.nr_sekcji}</strong></td>
+                            <td>${section.kolor || '—'}</td>
+                            <td>${section.anilox || '—'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ${commentsHTML}
+        </body>
+        </html>
+    `);
+    printDocument.close();
+
+    printFrame.contentWindow.onload = function() {
+        setTimeout(() => {
+            printFrame.contentWindow.print();
+            setTimeout(() => {
+                document.body.removeChild(printFrame);
+            }, 100);
+        }, 100);
+    };
+}
 
         // Eksport do PDF
         function exportToPDF() {
-            const patternSections = [];
-            for (let i = 1; i <= 10; i++) {
-                const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
-                patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
-            }
+    const patternSections = [];
+    for (let i = 1; i <= 10; i++) {
+        const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
+        patternSections.push(section || {nr_sekcji: i, kolor: '—', anilox: '—'});
+    }
 
-            let pdfContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Wzór ${currentPattern.numer} - ${currentPattern.nazwa}</title>
-                    <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            padding: 20px;
-                            max-width: 800px;
-                            margin: 0 auto;
-                        }
-                        h1 { 
-                            color: #ff6b35; 
-                            border-bottom: 3px solid #ff6b35; 
-                            padding-bottom: 10px;
-                            text-align: center;
-                            margin-bottom: 20px;
-                            font-size: 24px;
-                        }
-                        .header-info { 
-                            background: #f5f5f5; 
-                            padding: 15px; 
-                            border-radius: 8px;
-                            margin-bottom: 20px; 
-                        }
-                        .header-info p { 
-                            margin: 6px 0; 
-                            font-size: 15px; 
-                        }
-                        h2 { 
-                            color: #333; 
-                            margin-top: 20px;
-                            margin-bottom: 10px;
-                            font-size: 18px;
-                        }
-                        table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            margin-top: 15px; 
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                        }
-                        th, td { 
-                            border: 2px solid #ddd; 
-                            padding: 12px; 
-                            text-align: left; 
-                        }
-                        th { 
-                            background-color: #ff6b35; 
-                            color: white; 
-                            font-weight: bold;
-                        }
-                        tr:nth-child(even) { 
-                            background-color: #f9f9f9; 
-                        }
-                        .empty { 
-                            color: #999; 
-                            font-style: italic; 
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
-                    <div class="header-info">
-                        <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
-                        <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
-                    </div>
-                    ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
-                    <h2>Sekcje SOMA 3 (1-10)</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 20%;">Sekcja</th>
-                                <th style="width: 40%;">Kolor</th>
-                                <th style="width: 40%;">Anilox</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${patternSections.map(section => `
-                                <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
-                                    <td><strong>${section.nr_sekcji}</strong></td>
-                                    <td>${section.kolor || '—'}</td>
-                                    <td>${section.anilox || '—'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob([pdfContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `SENTREX_SOMA3_${currentPattern.numer}_${currentPattern.nazwa.replace(/[^a-z0-9]/gi, '_')}.html`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showSuccessMessage('Plik HTML został pobrany! Możesz go otworzyć i wydrukować jako PDF.');
+    // Zbierz zaznaczone uwagi
+    const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
+    const selectedComments = [];
+    
+    document.querySelectorAll('.print-comment-checkbox').forEach((checkbox, index) => {
+        if (checkbox.checked && patternComments[index]) {
+            selectedComments.push(patternComments[index]);
         }
+    });
+
+    // Przygotuj HTML dla uwag
+    let commentsHTML = '';
+    if (selectedComments.length > 0) {
+        commentsHTML = `
+            <h2 style="margin-top: 30px;">💬 Uwagi</h2>
+            ${selectedComments.map(comment => {
+                let displayDate = comment.data;
+                try {
+                    const parsedDate = new Date(comment.data);
+                    if (!isNaN(parsedDate.getTime())) {
+                        displayDate = parsedDate.toLocaleString('pl-PL', {
+                            timeZone: 'Europe/Warsaw',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    }
+                } catch (e) {}
+                
+                return `
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
+                            <span><strong style="color: #ff6b35;">${comment.autor}</strong></span>
+                            <span>${displayDate}</span>
+                        </div>
+                        <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                    </div>
+                `;
+            }).join('')}
+        `;
+    }
+
+    let pdfContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Wzór ${currentPattern.numer} - ${currentPattern.nazwa}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 20px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                }
+                h1 { 
+                    color: #ff6b35; 
+                    border-bottom: 3px solid #ff6b35; 
+                    padding-bottom: 10px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                .header-info { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 8px;
+                    margin-bottom: 20px; 
+                }
+                .header-info p { 
+                    margin: 6px 0; 
+                    font-size: 15px; 
+                }
+                h2 { 
+                    color: #333; 
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    font-size: 18px;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 15px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+                th, td { 
+                    border: 2px solid #ddd; 
+                    padding: 12px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #ff6b35; 
+                    color: white; 
+                    font-weight: bold;
+                }
+                tr:nth-child(even) { 
+                    background-color: #f9f9f9; 
+                }
+                .empty { 
+                    color: #999; 
+                    font-style: italic; 
+                }
+            </style>
+        </head>
+        <body>
+            <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
+            <div class="header-info">
+                <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
+                <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+            </div>
+            ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
+            <h2>Sekcje SOMA 3 (1-10)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Sekcja</th>
+                        <th style="width: 40%;">Kolor</th>
+                        <th style="width: 40%;">Anilox</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${patternSections.map(section => `
+                        <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
+                            <td><strong>${section.nr_sekcji}</strong></td>
+                            <td>${section.kolor || '—'}</td>
+                            <td>${section.anilox || '—'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ${commentsHTML}
+        </body>
+        </html>
+    `;
+
+    const blob = new Blob([pdfContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SENTREX_SOMA3_${currentPattern.numer}_${currentPattern.nazwa.replace(/[^a-z0-9]/gi, '_')}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showSuccessMessage('Plik HTML został pobrany! Możesz go otworzyć i wydrukować jako PDF.');
+}
 
         // Zmiana motywu
         function toggleTheme() {
