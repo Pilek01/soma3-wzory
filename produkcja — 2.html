@@ -1100,7 +1100,7 @@
 
         function isDayHoliday(dayKey) {
             const customSchedule = getCustomSchedule(dayKey);
-            return customSchedule && customSchedule.isHoliday === true;
+            return customSchedule && customSchedule.isHoliday == true; // == zamiast === aby złapać "true" i true
         }
 
         function getShift(worker, date) {
@@ -1158,7 +1158,7 @@
                     const shift = getShiftForDay(worker, date);
                     if (shift !== 0) {
                         workingCount++;
-                        if (dayData[worker]) {
+                        if (dayData[worker] !== undefined) {
                             dataCount++;
                         }
                     }
@@ -1173,7 +1173,14 @@
                 }
             }
             
-            const totalRelevantDays = isCurrentMonth ? todayDay : daysInMonth;
+            // Poprawka: pomijamy dni oznaczone jako święto przy liczeniu "dni do wypełnienia"
+let totalRelevantDays = 0;
+for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
+    const dayKey = getDayKey(currentYear, currentMonth, day);
+    if (!isDayHoliday(dayKey)) {
+        totalRelevantDays++;
+    }
+}
             const filledDays = daysWithFullData + daysWithMissingData;
             const percentage = totalRelevantDays > 0 ? (filledDays / totalRelevantDays) * 100 : 0;
             
@@ -1250,7 +1257,7 @@
                 
                 let dayTotal = 0;
                 WORKERS.forEach(worker => {
-                    if (dayData[worker]) {
+                    if (dayData[worker] !== undefined) {
                         dayTotal += dayData[worker];
                     }
                 });
@@ -1540,6 +1547,11 @@
                 }
             });
             
+            // Usuń cały dzień jeśli jest pusty
+            if (Object.keys(data[dayKey]).length === 0) {
+                delete data[dayKey];
+            }
+            
             setProductionData(data);
             showToast('✅ Produkcja zapisana!');
             closeModal();
@@ -1754,7 +1766,7 @@
                 WORKERS.forEach(worker => {
                     const value = dayData[worker] || 0;
                     dailyData[worker].push(value);
-                    if (dayData[worker]) {
+                    if (dayData[worker] !== undefined) {
                         stats[worker].total += dayData[worker];
                         stats[worker].days += 1;
                     }
@@ -1960,7 +1972,7 @@
                 
                 let hasDayData = false;
                 WORKERS.forEach(worker => {
-                    if (dayData[worker]) {
+                    if (dayData[worker] !== undefined) {
                         totalSoFar += dayData[worker];
                         hasDayData = true;
                     }
@@ -2033,7 +2045,7 @@
                     const dayData = data[dayKey] || {};
                     
                     WORKERS.forEach(worker => {
-                        if (dayData[worker]) {
+                        if (dayData[worker] !== undefined) {
                             monthData[worker] += dayData[worker];
                             yearlyTotals[worker] += dayData[worker];
                         }
@@ -2067,7 +2079,7 @@
                     const dayData = data[dayKey] || {};
                     
                     WORKERS.forEach(worker => {
-                        if (dayData[worker]) {
+                        if (dayData[worker] !== undefined) {
                             workerDays[worker] += 1;
                         }
                     });
@@ -2085,7 +2097,7 @@
                     
                     let hasDayData = false;
                     WORKERS.forEach(worker => {
-                        if (dayData[worker]) {
+                        if (dayData[worker] !== undefined) {
                             hasDayData = true;
                         }
                     });
