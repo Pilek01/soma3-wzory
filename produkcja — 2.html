@@ -938,6 +938,24 @@
             color: var(--text-secondary);
             margin-top: 0.5rem;
         }
+
+        .comparison-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .comparison-text.trend-up {
+            color: var(--success);
+        }
+
+        .comparison-text.trend-down {
+            color: var(--danger);
+        }
+
+        .comparison-text.trend-stable {
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
@@ -1329,6 +1347,9 @@
                 
                 html += `
                         </div>
+                        <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="saveSchedule()">
+                            ⚙️ Zapisz harmonogram
+                        </button>
                         <button class="reset-schedule-btn" onclick="resetScheduleToDefault()">
                             🔄 Przywróć domyślny harmonogram
                         </button>
@@ -1365,7 +1386,6 @@
             let buttonsHtml = '';
             if (editMode) {
                 buttonsHtml = `
-                    <button class="btn" onclick="saveSchedule()">⚙️ Zapisz harmonogram</button>
                     <button class="btn" onclick="saveProductionOnly()">💾 Zapisz produkcję</button>
                     <button class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
                 `;
@@ -1576,39 +1596,143 @@
                 }
             }
             
+            // Pobierz statystyki z poprzedniego miesiąca
+            const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            const prevStats = getMonthStatsForComparison(prevYear, prevMonth);
+            
             const sortedWorkers = WORKERS.map(worker => ({
                 name: worker,
                 total: stats[worker].total,
                 days: stats[worker].days,
-                avg: stats[worker].days > 0 ? (stats[worker].total / stats[worker].days).toFixed(1) : 0
+                avg: stats[worker].days > 0 ? (stats[worker].total / stats[worker].days).toFixed(1) : 0,
+                prevAvg: prevStats.workers[worker] ? prevStats.workers[worker].avg : 0
             })).sort((a, b) => b.total - a.total);
             
+            // Karta SUMA WSZYSTKICH
             const dailyAvg = daysWithData > 0 ? (totalSum / daysWithData).toFixed(1) : 0;
+            const prevDailyAvg = prevStats.totalAvg;
+            
+            let comparisonHtml = '';
+            if (daysWithData >= 3 && prevDailyAvg > 0) {
+                const comparison = calculateComparison(parseFloat(dailyAvg), prevDailyAvg);
+                comparisonHtml = `<div class="total-subtitle comparison-text ${comparison.class}">Poprz. mies.: ${prevDailyAvg} kg/dzień ${comparison.icon} ${comparison.text}</div>`;
+            } else if (daysWithData >= 3) {
+                comparisonHtml = `<div class="total-subtitle comparison-text">Poprz. mies.: brak danych</div>`;
+            }
+            
             const totalHtml = `
                 <div class="total-card">
                     <div class="total-title">🏆 SUMA WSZYSTKICH</div>
                     <div class="total-value">${totalSum.toFixed(0)} kg</div>
                     <div class="total-subtitle">Średnia dzienna: ${dailyAvg} kg/dzień • ${daysWithData} dni z danymi</div>
+                    ${comparisonHtml}
                 </div>
             `;
             document.getElementById('totalCard').innerHTML = totalHtml;
             
+            // Podium z rankingiem
             const medals = ['🥇', '🥈', '🥉', '4️⃣'];
             let html = '';
             
             sortedWorkers.forEach((worker, index) => {
                 const rank = index + 1;
+                
+                let workerComparisonHtml = '';
+                if (worker.days >= 3 && worker.prevAvg > 0) {
+                    const comparison = calculateComparison(parseFloat(worker.avg), worker.prevAvg);
+                    workerComparisonHtml = `<div class="podium-label comparison-text ${comparison.class}">Poprz. mies.: ${worker.prevAvg} kg/dzień ${comparison.icon} ${comparison.text}</div>`;
+                } else if (worker.days >= 3) {
+                    workerComparisonHtml = `<div class="podium-label comparison-text">Poprz. mies.: brak danych</div>`;
+                }
+                
                 html += `
                     <div class="podium-card rank-${rank} ${worker.name.toLowerCase()}">
                         <div class="podium-rank">${medals[index]}</div>
                         <div class="podium-name">${worker.name}</div>
                         <div class="podium-value">${worker.total.toFixed(0)} kg</div>
                         <div class="podium-label">Średnia: ${worker.avg} kg/dzień • ${worker.days} dni</div>
+                        ${workerComparisonHtml}
                     </div>
                 `;
             });
             
             document.getElementById('monthlyStats').innerHTML = html;
+        }
+
+        function getMonthStatsForComparison(year, month) {
+            const data = getProductionData();
+            const stats = {
+                totalAvg: 0,
+                workers: {}
+            };
+            
+            let totalSum = 0;
+            let daysWithData = 0;
+            
+            WORKERS.forEach(worker => {
+                stats.workers[worker] = { total: 0, days: 0, avg: 0 };
+            });
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayKey = getDayKey(year, month, day);
+                const dayData = data[dayKey] || {};
+                
+                if (isDayHoliday(dayKey)) {
+                    continue;
+                }
+                
+                let hasDayData = false;
+                WORKERS.forEach(worker => {
+                    if (dayData[worker] !== undefined) {
+                        stats.workers[worker].total += dayData[worker];
+                        stats.workers[worker].days += 1;
+                        totalSum += dayData[worker];
+                        hasDayData = true;
+                    }
+                });
+                
+                if (hasDayData) {
+                    daysWithData += 1;
+                }
+            }
+            
+            // Oblicz średnie
+            stats.totalAvg = daysWithData > 0 ? (totalSum / daysWithData).toFixed(1) : 0;
+            
+            WORKERS.forEach(worker => {
+                const workerStats = stats.workers[worker];
+                workerStats.avg = workerStats.days > 0 ? (workerStats.total / workerStats.days).toFixed(1) : 0;
+            });
+            
+            return stats;
+        }
+
+        function calculateComparison(current, previous) {
+            const diff = current - previous;
+            const percent = previous > 0 ? ((diff / previous) * 100).toFixed(1) : 0;
+            
+            if (Math.abs(percent) < 2) {
+                return {
+                    icon: '➡️',
+                    text: `${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg (${percent}%)`,
+                    class: 'trend-stable'
+                };
+            } else if (percent >= 2) {
+                return {
+                    icon: '↗️',
+                    text: `+${diff.toFixed(1)} kg (+${percent}%)`,
+                    class: 'trend-up'
+                };
+            } else {
+                return {
+                    icon: '↘️',
+                    text: `${diff.toFixed(1)} kg (${percent}%)`,
+                    class: 'trend-down'
+                };
+            }
         }
 
         function renderCharts() {
