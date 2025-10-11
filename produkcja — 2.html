@@ -177,6 +177,56 @@
             color: var(--accent);
         }
 
+        .progress-bar-container {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .progress-bar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .day-complete {
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        .day-incomplete {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
         .calendar-table {
             background: var(--bg-secondary);
             border-radius: 10px;
@@ -213,6 +263,11 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 600;
+        }
+
+        .day-indicator {
+            margin-left: 0.3rem;
+            font-size: 1rem;
         }
 
         .today-row {
@@ -267,6 +322,10 @@
             animation: fadeIn 0.3s;
         }
 
+        #scheduleModal {
+            z-index: 300;
+        }
+
         .modal.active {
             display: flex;
             align-items: center;
@@ -280,6 +339,8 @@
             padding: 2rem;
             max-width: 600px;
             width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
             animation: slideIn 0.3s;
         }
@@ -310,6 +371,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .edit-schedule-btn {
@@ -340,6 +403,8 @@
             border-radius: 8px;
             margin-bottom: 1.5rem;
             border: 2px solid var(--accent);
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
         .schedule-editor-title {
@@ -422,6 +487,26 @@
             margin-left: 0.3rem;
         }
 
+        .reset-schedule-btn {
+            background: var(--danger);
+            border: 2px solid var(--danger);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .reset-schedule-btn:hover {
+            background: #d32f2f;
+            border-color: #d32f2f;
+            transform: translateY(-2px);
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -479,6 +564,7 @@
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -496,6 +582,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            min-width: 150px;
         }
 
         .btn:hover {
@@ -506,6 +593,12 @@
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
         }
 
         .summary-section {
@@ -637,6 +730,10 @@
                 text-align: center;
             }
 
+            .title {
+                font-size: 1.3rem;
+            }
+
             table {
                 font-size: 0.85rem;
             }
@@ -649,12 +746,16 @@
                 grid-template-columns: 1fr;
             }
 
-            .title {
-                font-size: 1.3rem;
-            }
-
             .charts-section {
                 grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
             }
         }
 
@@ -921,23 +1022,7 @@
         <div class="modal-content">
             <div class="modal-header" id="modalTitle"></div>
             <div id="modalBody"></div>
-            <div class="button-group" id="modalButtons">
-                <button class="btn" onclick="saveProductionOnly()">💾 Zapisz</button>
-                <button class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="scheduleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>⚙️ Edycja harmonogramu</span>
-            </div>
-            <div id="scheduleModalBody"></div>
-            <div class="button-group">
-                <button class="btn" onclick="saveScheduleAndClose()">✅ Zapisz i zamknij</button>
-                <button class="btn btn-secondary" onclick="closeScheduleModal()">❌ Anuluj</button>
-            </div>
+            <div class="button-group" id="modalButtons"></div>
         </div>
     </div>
 
@@ -945,7 +1030,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script>
-        // Daty startowe cyklu dla każdego pracownika
         const CYCLE_START_DATES = {
             'Kamil': new Date('2025-01-04'),
             'Igor': new Date('2025-01-16'),
@@ -953,7 +1037,6 @@
             'Jarek': new Date('2025-01-12')
         };
 
-        // Cykl: 1111w3333ww2222w (4 rano, wolne, 4 noce, 2 wolne, 4 popołudnie, wolne) = 16 dni
         const SHIFT_CYCLE = [1,1,1,1,0,3,3,3,3,0,0,2,2,2,2,0];
         const CYCLE_LENGTH = 16;
 
@@ -967,9 +1050,8 @@
         let selectedDay = null;
         let comparisonChart = null;
         let trendChart = null;
-        let editMode = false; // Tryb edycji harmonogramu
+        let editMode = false;
 
-        // Funkcja do pobierania customowego harmonogramu lub domyślnego
         function getCustomSchedule(dayKey) {
             const customSchedules = JSON.parse(localStorage.getItem('customSchedules') || '{}');
             return customSchedules[dayKey] || null;
@@ -978,6 +1060,12 @@
         function setCustomSchedule(dayKey, schedule) {
             const customSchedules = JSON.parse(localStorage.getItem('customSchedules') || '{}');
             customSchedules[dayKey] = schedule;
+            localStorage.setItem('customSchedules', JSON.stringify(customSchedules));
+        }
+
+        function deleteCustomSchedule(dayKey) {
+            const customSchedules = JSON.parse(localStorage.getItem('customSchedules') || '{}');
+            delete customSchedules[dayKey];
             localStorage.setItem('customSchedules', JSON.stringify(customSchedules));
         }
 
@@ -996,10 +1084,10 @@
             const customSchedule = getCustomSchedule(dayKey);
             return customSchedule && customSchedule.isHoliday === true;
         }
+
         function getShift(worker, date) {
             const startDate = CYCLE_START_DATES[worker];
             
-            // Normalizacja dat do UTC północy żeby uniknąć problemów ze strefami czasowymi
             const dateUTC = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
             const startUTC = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
             
@@ -1037,7 +1125,6 @@
             const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
             const todayDay = today.getDate();
             
-            // Liczenie dni z pełnymi danymi i pustych dni
             let daysWithFullData = 0;
             let daysWithMissingData = 0;
             
@@ -1050,7 +1137,7 @@
                 let dataCount = 0;
                 
                 WORKERS.forEach(worker => {
-                    const shift = getShift(worker, date);
+                    const shift = getShiftForDay(worker, date);
                     if (shift !== 0) {
                         workingCount++;
                         if (dayData[worker]) {
@@ -1068,7 +1155,6 @@
                 }
             }
             
-            // Progress bar
             const totalRelevantDays = isCurrentMonth ? todayDay : daysInMonth;
             const filledDays = daysWithFullData + daysWithMissingData;
             const percentage = totalRelevantDays > 0 ? (filledDays / totalRelevantDays) * 100 : 0;
@@ -1111,11 +1197,8 @@
                 const dayName = dayNames[date.getDay()];
                 
                 const isTodayRow = isCurrentMonth && day === todayDay ? 'today-row' : '';
-                
-                // Sprawdź czy jest customowy harmonogram
                 const hasCustomSchedule = getCustomSchedule(dayKey) !== null;
                 
-                // Sprawdź czy dzień ma pełne dane lub brakujące
                 let workingCount = 0;
                 let dataCount = 0;
                 WORKERS.forEach(worker => {
@@ -1189,11 +1272,6 @@
         function openProductionModal(day) {
             selectedDay = day;
             editMode = false;
-            const date = new Date(currentYear, currentMonth, day);
-            const dayKey = getDayKey(currentYear, currentMonth, day);
-            const data = getProductionData();
-            const dayData = data[dayKey] || {};
-            
             renderProductionModal();
         }
 
@@ -1215,12 +1293,11 @@
             let html = '';
             
             if (editMode) {
-                // Tryb edycji harmonogramu
                 html += `
                     <div class="schedule-editor">
                         <div class="schedule-editor-title">⚙️ Edytor harmonogramu</div>
                         
-                        <div class="holiday-checkbox">
+                        <div class="holiday-checkbox ${isHoliday ? 'active' : ''}">
                             <input type="checkbox" id="holidayCheckbox" ${isHoliday ? 'checked' : ''} 
                                    onchange="updateHolidayStatus()">
                             <label for="holidayCheckbox">🎄 Dzień wolny od pracy (święto) - wyłącz z obliczeń</label>
@@ -1252,11 +1329,13 @@
                 
                 html += `
                         </div>
+                        <button class="reset-schedule-btn" onclick="resetScheduleToDefault()">
+                            🔄 Przywróć domyślny harmonogram
+                        </button>
                     </div>
                 `;
             }
             
-            // Formularz wpisywania produkcji (zawsze widoczny, ale ukryj osoby z wolnym jeśli nie edit mode)
             WORKERS.forEach(worker => {
                 const shift = getShiftForDay(worker, date);
                 const shiftText = shift === 1 ? '☀️ Rano (6-14)' : 
@@ -1264,7 +1343,6 @@
                                  shift === 3 ? '🌙 Noc (22-6)' : '💤 Wolne';
                 const value = dayData[worker] !== undefined ? dayData[worker] : '';
                 
-                // Ukryj osoby z wolnym jeśli nie jesteśmy w trybie edycji
                 if (shift === 0 && !editMode) {
                     return;
                 }
@@ -1284,7 +1362,6 @@
             
             document.getElementById('modalBody').innerHTML = html;
             
-            // Aktualizuj przyciski w zależności od trybu
             let buttonsHtml = '';
             if (editMode) {
                 buttonsHtml = `
@@ -1302,7 +1379,6 @@
             
             document.getElementById('productionModal').classList.add('active');
             
-            // Focus na pierwszy aktywny input
             if (!editMode) {
                 setTimeout(() => {
                     const firstInput = document.querySelector('#modalBody input:not([disabled])');
@@ -1325,7 +1401,6 @@
         function updateHolidayStatus() {
             const isHoliday = document.getElementById('holidayCheckbox').checked;
             
-            // Disable/enable wszystkie checkboxy i selecty
             WORKERS.forEach(worker => {
                 const checkbox = document.getElementById(`checkbox-${worker}`);
                 const shiftSelector = document.getElementById(`shift-${worker}`);
@@ -1334,10 +1409,56 @@
             });
         }
 
+        function saveSchedule() {
+            if (!selectedDay) return;
+            
+            const dayKey = getDayKey(currentYear, currentMonth, selectedDay);
+            const isHoliday = document.getElementById('holidayCheckbox').checked;
+            
+            const schedule = {
+                isHoliday: isHoliday,
+                workers: {}
+            };
+            
+            if (!isHoliday) {
+                WORKERS.forEach(worker => {
+                    const checkbox = document.getElementById(`checkbox-${worker}`);
+                    const shiftSelector = document.getElementById(`shift-${worker}`);
+                    
+                    if (checkbox && checkbox.checked && shiftSelector) {
+                        schedule.workers[worker] = parseInt(shiftSelector.value);
+                    } else {
+                        schedule.workers[worker] = 0;
+                    }
+                });
+            } else {
+                WORKERS.forEach(worker => {
+                    schedule.workers[worker] = 0;
+                });
+            }
+            
+            setCustomSchedule(dayKey, schedule);
+            showToast('⚙️ Harmonogram zapisany!');
+            renderProductionModal();
+            renderCalendar();
+        }
+
+        function resetScheduleToDefault() {
+            if (!selectedDay) return;
+            
+            if (confirm('Czy na pewno chcesz przywrócić domyślny harmonogram dla tego dnia?')) {
+                const dayKey = getDayKey(currentYear, currentMonth, selectedDay);
+                deleteCustomSchedule(dayKey);
+                showToast('🔄 Przywrócono domyślny harmonogram!');
+                renderProductionModal();
+                renderCalendar();
+            }
+        }
+
         function handleModalKeydown(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                saveProduction();
+                saveProductionOnly();
             } else if (event.key === 'Escape') {
                 event.preventDefault();
                 closeModal();
@@ -1417,6 +1538,7 @@
         function closeModal() {
             document.getElementById('productionModal').classList.remove('active');
             selectedDay = null;
+            editMode = false;
         }
 
         function renderMonthlyStats() {
@@ -1435,7 +1557,6 @@
                 const dayKey = getDayKey(currentYear, currentMonth, day);
                 const dayData = data[dayKey] || {};
                 
-                // Pomiń święta w obliczeniach
                 if (isDayHoliday(dayKey)) {
                     continue;
                 }
@@ -1455,7 +1576,6 @@
                 }
             }
             
-            // Sortowanie pracowników według produkcji (od największej)
             const sortedWorkers = WORKERS.map(worker => ({
                 name: worker,
                 total: stats[worker].total,
@@ -1463,7 +1583,6 @@
                 avg: stats[worker].days > 0 ? (stats[worker].total / stats[worker].days).toFixed(1) : 0
             })).sort((a, b) => b.total - a.total);
             
-            // Karta SUMA WSZYSTKICH
             const dailyAvg = daysWithData > 0 ? (totalSum / daysWithData).toFixed(1) : 0;
             const totalHtml = `
                 <div class="total-card">
@@ -1474,7 +1593,6 @@
             `;
             document.getElementById('totalCard').innerHTML = totalHtml;
             
-            // Podium z rankingiem
             const medals = ['🥇', '🥈', '🥉', '4️⃣'];
             let html = '';
             
@@ -1519,7 +1637,6 @@
                 });
             }
             
-            // Wykres słupkowy - porównanie
             const comparisonCtx = document.getElementById('comparisonChart');
             if (!comparisonCtx) return;
             
@@ -1597,7 +1714,6 @@
                 }
             });
             
-            // Wykres liniowy - trend
             const trendCtx = document.getElementById('trendChart');
             if (!trendCtx) return;
             
@@ -1738,13 +1854,16 @@
             
             const avgPerDay = totalSoFar / daysWithDataSoFar;
             
-            // Oszacowanie dni z danymi pozostałych
             let estimatedRemainingDays = 0;
             for (let day = currentDay + 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day);
+                const dayKey = getDayKey(currentYear, currentMonth, day);
+                
+                if (isDayHoliday(dayKey)) continue;
+                
                 let hasWorkingPeople = false;
                 WORKERS.forEach(worker => {
-                    const shift = getShift(worker, date);
+                    const shift = getShiftForDay(worker, date);
                     if (shift !== 0) hasWorkingPeople = true;
                 });
                 if (hasWorkingPeople) estimatedRemainingDays += 1;
@@ -1775,7 +1894,6 @@
                 yearlyTotals[worker] = 0;
             });
             
-            // Zbieranie danych dla każdego miesiąca
             for (let month = 0; month < 12; month++) {
                 const monthData = {};
                 let monthTotal = 0;
@@ -1809,13 +1927,11 @@
                 });
             }
             
-            // Sortowanie pracowników według produkcji rocznej
             const sortedWorkers = WORKERS.map(worker => ({
                 name: worker,
                 total: yearlyTotals[worker]
             })).sort((a, b) => b.total - a.total);
             
-            // Obliczanie dni roboczych
             let yearTotal = 0;
             const workerDays = {};
             WORKERS.forEach(worker => workerDays[worker] = 0);
@@ -1836,7 +1952,6 @@
             
             yearTotal = sortedWorkers.reduce((sum, w) => sum + w.total, 0);
             
-            // Obliczanie dni z danymi (nie dni roboczych pracowników!)
             const daysWithData = new Set();
             for (let month = 0; month < 12; month++) {
                 const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
@@ -1860,14 +1975,9 @@
             const totalDaysWithData = daysWithData.size;
             const yearlyAvg = totalDaysWithData > 0 ? (yearTotal / totalDaysWithData).toFixed(1) : 0;
             
-            // Średnia miesięczna - tylko z miesięcy które mają dane
             const monthsWithData = monthlyStats.filter(m => m.total > 0).length;
             const monthlyAvg = monthsWithData > 0 ? (yearTotal / monthsWithData).toFixed(0) : 0;
             
-            // Obliczanie dni roboczych per pracownik (dla kart pracowników)
-            const totalWorkerDays = Object.values(workerDays).reduce((sum, d) => sum + d, 0);
-            
-            // Karta SUMA ROCZNA
             const totalHtml = `
                 <div class="total-card">
                     <div class="total-title">🏆 SUMA ROCZNA ${currentYear}</div>
@@ -1880,7 +1990,6 @@
             `;
             document.getElementById('yearlyTotalCard').innerHTML = totalHtml;
             
-            // Ranking z medalami
             const medals = ['🥇', '🥈', '🥉', '4️⃣'];
             let rankingHtml = '';
             
@@ -1901,7 +2010,6 @@
             
             document.getElementById('yearlyStats').innerHTML = rankingHtml;
             
-            // Tworzenie tabeli miesięcznej z kolorami
             let tableHtml = `
                 <table>
                     <thead>
@@ -1927,7 +2035,6 @@
                 tableHtml += `</tr>`;
             });
             
-            // Wiersz RAZEM
             tableHtml += `<tr class="total-row">`;
             tableHtml += `<td><strong>RAZEM</strong></td>`;
             WORKERS.forEach(worker => {
@@ -1986,8 +2093,17 @@
         }
 
         function exportData() {
-            const data = getProductionData();
-            const dataStr = JSON.stringify(data, null, 2);
+            const productionData = getProductionData();
+            const customSchedules = JSON.parse(localStorage.getItem('customSchedules') || '{}');
+            
+            const exportObj = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                productionData: productionData,
+                customSchedules: customSchedules
+            };
+            
+            const dataStr = JSON.stringify(exportObj, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
             
             const url = URL.createObjectURL(dataBlob);
@@ -2002,39 +2118,6 @@
             showToast('💾 Backup pobrany!');
         }
 
-        function autoBackup() {
-            const now = new Date();
-            const hour = now.getHours();
-            const lastBackup = localStorage.getItem('lastAutoBackup');
-            const today = now.toISOString().split('T')[0];
-            
-            // Sprawdź czy już był backup dzisiaj o tej godzinie
-            const backupKey = `${today}_${hour}`;
-            
-            if (lastBackup !== backupKey && (hour === 7 || hour === 15 || hour === 23)) {
-                const data = getProductionData();
-                const dataStr = JSON.stringify(data, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `backup/produkcja_auto_${now.toISOString().replace(/:/g, '-').split('.')[0]}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-                localStorage.setItem('lastAutoBackup', backupKey);
-                console.log('✅ Automatyczny backup wykonany:', backupKey);
-            }
-        }
-
-        // Sprawdzaj co godzinę czy trzeba zrobić backup
-        setInterval(autoBackup, 60 * 60 * 1000); // Co godzinę
-        // Sprawdź od razu przy starcie
-        setTimeout(autoBackup, 5000); // Po 5 sekundach od załadowania
-
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2044,14 +2127,21 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
                     
-                    // Walidacja danych
                     if (typeof importedData !== 'object') {
                         throw new Error('Nieprawidłowy format danych');
                     }
                     
-                    // Pytanie o potwierdzenie
                     if (confirm('⚠️ UWAGA!\n\nImport nadpisze wszystkie obecne dane!\n\nCzy chcesz kontynuować?')) {
-                        setProductionData(importedData);
+                        if (importedData.productionData) {
+                            setProductionData(importedData.productionData);
+                        } else {
+                            setProductionData(importedData);
+                        }
+                        
+                        if (importedData.customSchedules) {
+                            localStorage.setItem('customSchedules', JSON.stringify(importedData.customSchedules));
+                        }
+                        
                         renderCalendar();
                         showToast('✅ Dane zaimportowane!');
                     }
@@ -2061,7 +2151,6 @@
             };
             reader.readAsText(file);
             
-            // Reset input
             event.target.value = '';
         }
 
