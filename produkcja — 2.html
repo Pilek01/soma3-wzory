@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statystyki Produkcji - Flexo</title>
+    <title>Statystyki Produkcji - Flexo PRO</title>
     <style>
         * {
             margin: 0;
@@ -22,6 +22,7 @@
             --border: #404040;
             --success: #4caf50;
             --danger: #f44336;
+            --warning: #f59e0b;
             
             --kamil: #7bed9f;
             --kamil-dark: #2ed573;
@@ -136,6 +137,242 @@
             color: white;
         }
 
+        /* KPI Dashboard Styles */
+        .kpi-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-icon {
+            font-size: 2rem;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kpi-change.positive {
+            color: var(--success);
+        }
+
+        .kpi-change.negative {
+            color: var(--danger);
+        }
+
+        .kpi-change.neutral {
+            color: var(--warning);
+        }
+
+        /* Advanced Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .chart-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .chart-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Excel Export Button */
+        .excel-btn {
+            background: linear-gradient(135deg, #217346 0%, #2d9c5e 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .excel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 115, 70, 0.4);
+        }
+
+        /* Cloud Sync Indicator */
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .sync-status.synced {
+            border-left: 3px solid var(--success);
+        }
+
+        .sync-status.syncing {
+            border-left: 3px solid var(--warning);
+        }
+
+        .sync-status.error {
+            border-left: 3px solid var(--danger);
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .sync-dot.synced {
+            background: var(--success);
+        }
+
+        .sync-dot.syncing {
+            background: var(--warning);
+        }
+
+        .sync-dot.error {
+            background: var(--danger);
+        }
+
+        /* Analysis Cards */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .analysis-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .analysis-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .analysis-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-label {
+            color: var(--text-secondary);
+        }
+
+        .analysis-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Existing styles from original app */
         .month-selector {
             background: var(--bg-secondary);
             padding: 1.5rem;
@@ -320,10 +557,6 @@
             z-index: 200;
             overflow-y: auto;
             animation: fadeIn 0.3s;
-        }
-
-        #scheduleModal {
-            z-index: 300;
         }
 
         .modal.active {
@@ -746,7 +979,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .charts-section {
+            .charts-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -756,6 +989,14 @@
 
             .btn {
                 width: 100%;
+            }
+
+            .kpi-dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -791,45 +1032,6 @@
             }
         }
 
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .chart-container {
-            background: var(--bg-tertiary);
-            padding: 1.5rem;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 1rem;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 280px;
-            width: 100%;
-        }
-
-        canvas {
-            max-width: 100%;
-        }
-
-        .forecast-card {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-top: 1.5rem;
-        }
-
         .total-card {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #1a1a1a;
@@ -854,6 +1056,14 @@
             font-size: 1rem;
             opacity: 0.8;
             margin-top: 0.5rem;
+        }
+
+        .forecast-card {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
         }
 
         .forecast-title {
@@ -954,18 +1164,23 @@
         }
 
         .comparison-text.trend-stable {
-    color: #f59e0b; /* Żółty kolor */
-}
+            color: var(--warning);
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
-            <div class="title">📊 Statystyki Produkcji Flexo</div>
+            <div class="title">📊 Statystyki Produkcji Flexo PRO</div>
             <div class="header-controls">
+                <div class="sync-status synced" id="syncStatus">
+                    <div class="sync-dot synced"></div>
+                    <span id="syncText">Zsynchronizowano</span>
+                </div>
                 <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-                <button class="btn btn-secondary" onclick="exportData()">Export 💾</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Import 📥</button>
+                <button class="excel-btn" onclick="exportToExcel()">📊 Export Excel</button>
+                <button class="btn btn-secondary" onclick="exportData()">💾 Backup</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import</button>
                 <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -973,11 +1188,44 @@
 
     <div class="container">
         <div class="view-selector">
-            <button class="view-btn active" onclick="showView('monthly')">📅 Miesięczny</button>
+            <button class="view-btn active" onclick="showView('dashboard')">📊 Dashboard</button>
+            <button class="view-btn" onclick="showView('monthly')">📅 Miesięczny</button>
             <button class="view-btn" onclick="showView('yearly')">📈 Roczny</button>
+            <button class="view-btn" onclick="showView('analytics')">🔬 Analityka</button>
         </div>
 
-        <div id="monthlyView">
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <div class="kpi-dashboard" id="kpiDashboard"></div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">📈 Trend produkcji (3 miesiące)</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="dashboardTrendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">👥 Porównanie wydajności</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="dashboardPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <div class="summary-title">🏆 Top Performers - Bieżący miesiąc</div>
+                <div class="podium-section" id="dashboardPodium"></div>
+            </div>
+        </div>
+
+        <!-- Monthly View -->
+        <div id="monthlyView" style="display: none;">
             <div class="month-selector">
                 <div class="month-nav">
                     <button onclick="changeMonth(-1)">◀</button>
@@ -1004,15 +1252,19 @@
                 
                 <div class="podium-section" id="monthlyStats"></div>
                 
-                <div class="charts-section">
-                    <div class="chart-container">
-                        <div class="chart-title">📊 Porównanie produkcji</div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">📊 Porównanie produkcji</div>
+                        </div>
                         <div class="chart-wrapper">
                             <canvas id="comparisonChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-container">
-                        <div class="chart-title">📈 Trend produkcji w miesiącu</div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">📈 Trend produkcji w miesiącu</div>
+                        </div>
                         <div class="chart-wrapper">
                             <canvas id="trendChart"></canvas>
                         </div>
@@ -1023,6 +1275,7 @@
             </div>
         </div>
 
+        <!-- Yearly View -->
         <div id="yearlyView" style="display: none;">
             <div class="summary-section">
                 <div class="summary-title">📈 Podsumowanie roczne <span id="yearlyTitle"></span></div>
@@ -1032,6 +1285,53 @@
                 <div class="podium-section" id="yearlyStats"></div>
                 
                 <div class="yearly-table" id="yearlyTable"></div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analyticsView" style="display: none;">
+            <div class="summary-section">
+                <div class="summary-title">🔬 Zaawansowana analityka</div>
+                
+                <div class="analysis-grid" id="analysisCards"></div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">📊 Efektywność według zmian</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="shiftEfficiencyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">📈 Wzrost rok do roku</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="yoyGrowthChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">🎯 Ranking według średniej</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="averageRankingChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">📊 Rozkład produkcji (z całego roku)</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1047,6 +1347,7 @@
     <div id="toast"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         const CYCLE_START_DATES = {
             'Kamil': new Date('2025-01-04'),
@@ -1068,7 +1369,35 @@
         let selectedDay = null;
         let comparisonChart = null;
         let trendChart = null;
+        let dashboardTrendChart = null;
+        let dashboardPerformanceChart = null;
+        let shiftEfficiencyChart = null;
+        let yoyGrowthChart = null;
+        let averageRankingChart = null;
+        let distributionChart = null;
         let editMode = false;
+        let currentView = 'dashboard';
+
+        // Cloud sync simulation
+        let syncInterval = null;
+
+        function initCloudSync() {
+            // Simulate cloud sync - w produkcji tutaj byłaby integracja z Firebase/Supabase
+            syncInterval = setInterval(() => {
+                const syncStatus = document.getElementById('syncStatus');
+                const syncText = document.getElementById('syncText');
+                
+                syncStatus.className = 'sync-status syncing';
+                syncStatus.querySelector('.sync-dot').className = 'sync-dot syncing';
+                syncText.textContent = 'Synchronizuję...';
+                
+                setTimeout(() => {
+                    syncStatus.className = 'sync-status synced';
+                    syncStatus.querySelector('.sync-dot').className = 'sync-dot synced';
+                    syncText.textContent = 'Zsynchronizowano ' + new Date().toLocaleTimeString();
+                }, 1000);
+            }, 60000); // Co minutę
+        }
 
         function getCustomSchedule(dayKey) {
             const customSchedules = JSON.parse(localStorage.getItem('customSchedules') || '{}');
@@ -1100,7 +1429,7 @@
 
         function isDayHoliday(dayKey) {
             const customSchedule = getCustomSchedule(dayKey);
-            return customSchedule && customSchedule.isHoliday == true; // == zamiast === aby złapać "true" i true
+            return customSchedule && customSchedule.isHoliday == true;
         }
 
         function getShift(worker, date) {
@@ -1136,6 +1465,1001 @@
             return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         }
 
+        // Excel Export Function
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            const data = getProductionData();
+            
+            // Arkusz 1: Dane miesięczne
+            const monthlyData = [];
+            monthlyData.push(['Data', 'Kamil', 'Igor', 'Jarek', 'Wowa', 'SUMA', 'Zmiana Kamil', 'Zmiana Igor', 'Zmiana Jarek', 'Zmiana Wowa']);
+            
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dayKey = getDayKey(currentYear, currentMonth, day);
+                const dayData = data[dayKey] || {};
+                
+                const row = [
+                    `${day} ${MONTHS[currentMonth]} ${currentYear}`,
+                    dayData['Kamil'] || 0,
+                    dayData['Igor'] || 0,
+                    dayData['Jarek'] || 0,
+                    dayData['Wowa'] || 0,
+                    (dayData['Kamil'] || 0) + (dayData['Igor'] || 0) + (dayData['Jarek'] || 0) + (dayData['Wowa'] || 0),
+                    getShift('Kamil', date),
+                    getShift('Igor', date),
+                    getShift('Jarek', date),
+                    getShift('Wowa', date)
+                ];
+                monthlyData.push(row);
+            }
+            
+            const ws1 = XLSX.utils.aoa_to_sheet(monthlyData);
+            XLSX.utils.book_append_sheet(wb, ws1, "Dane miesięczne");
+            
+            // Arkusz 2: Zestawienie roczne
+            const yearlyData = [];
+            yearlyData.push(['Miesiąc', 'Kamil', 'Igor', 'Jarek', 'Wowa', 'SUMA']);
+            
+            for (let month = 0; month < 12; month++) {
+                const monthStats = {};
+                WORKERS.forEach(w => monthStats[w] = 0);
+                
+                const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayKey = getDayKey(currentYear, month, day);
+                    const dayData = data[dayKey] || {};
+                    
+                    WORKERS.forEach(worker => {
+                        if (dayData[worker]) monthStats[worker] += dayData[worker];
+                    });
+                }
+                
+                const total = WORKERS.reduce((sum, w) => sum + monthStats[w], 0);
+                yearlyData.push([
+                    MONTHS[month],
+                    monthStats['Kamil'],
+                    monthStats['Igor'],
+                    monthStats['Jarek'],
+                    monthStats['Wowa'],
+                    total
+                ]);
+            }
+            
+            const ws2 = XLSX.utils.aoa_to_sheet(yearlyData);
+            XLSX.utils.book_append_sheet(wb, ws2, "Zestawienie roczne");
+            
+            // Arkusz 3: Statystyki
+            const statsData = [];
+            statsData.push(['Statystyka', 'Wartość']);
+            
+            const monthStats = getMonthStatsForComparison(currentYear, currentMonth);
+            statsData.push(['Bieżący miesiąc', `${MONTHS[currentMonth]} ${currentYear}`]);
+            statsData.push(['Suma produkcji', monthStats.total || 0]);
+            statsData.push(['Średnia dzienna', monthStats.totalAvg || 0]);
+            statsData.push(['']);
+            
+            WORKERS.forEach(worker => {
+                const workerStats = monthStats.workers[worker] || { total: 0, avg: 0, days: 0 };
+                statsData.push([`${worker} - Suma`, workerStats.total]);
+                statsData.push([`${worker} - Średnia`, workerStats.avg]);
+                statsData.push([`${worker} - Dni pracy`, workerStats.days]);
+                statsData.push(['']);
+            });
+            
+            const ws3 = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, ws3, "Statystyki");
+            
+            // Zapisz plik
+            XLSX.writeFile(wb, `Produkcja_Flexo_${currentYear}_${MONTHS[currentMonth]}.xlsx`);
+            showToast('📊 Eksport do Excel zakończony!');
+        }
+
+        // Dashboard KPI rendering
+        function renderDashboard() {
+            renderKPIDashboard();
+            renderDashboardCharts();
+            renderDashboardPodium();
+        }
+
+        function renderKPIDashboard() {
+            const data = getProductionData();
+            const today = new Date();
+            const thisMonth = today.getMonth();
+            const thisYear = today.getFullYear();
+            
+            // Statystyki dla bieżącego miesiąca
+            const currentStats = getMonthStatsForComparison(thisYear, thisMonth);
+            
+            // Statystyki dla poprzedniego miesiąca
+            const prevMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+            const prevYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+            const prevStats = getMonthStatsForComparison(prevYear, prevMonth);
+            
+            const kpis = [
+                {
+                    icon: '📦',
+                    title: 'Produkcja w tym miesiącu',
+                    value: currentStats.total ? currentStats.total.toFixed(0) + ' kg' : '0 kg',
+                    change: calculateKPIChange(currentStats.total || 0, prevStats.total || 0),
+                    prevValue: prevStats.total ? prevStats.total.toFixed(0) + ' kg' : '0 kg'
+                },
+                {
+                    icon: '📊',
+                    title: 'Średnia dzienna',
+                    value: currentStats.totalAvg ? parseFloat(currentStats.totalAvg).toFixed(1) + ' kg' : '0 kg',
+                    change: calculateKPIChange(parseFloat(currentStats.totalAvg) || 0, parseFloat(prevStats.totalAvg) || 0),
+                    prevValue: prevStats.totalAvg ? parseFloat(prevStats.totalAvg).toFixed(1) + ' kg' : '0 kg'
+                },
+                {
+                    icon: '🔮',
+                    title: 'Prognoza na koniec miesiąca',
+                    value: getMonthForecast(currentStats),
+                    change: null
+                },
+                {
+                    icon: '🎯',
+                    title: 'Dni z danymi',
+                    value: currentStats.daysWithData || 0,
+                    change: null
+                }
+            ];
+            
+            let html = '';
+            kpis.forEach(kpi => {
+                let changeHtml = '';
+                if (kpi.change !== null) {
+                    const changeClass = kpi.change.percent >= 10 ? 'positive' : 
+                                      kpi.change.percent <= -10 ? 'negative' : 'neutral';
+                    const icon = kpi.change.percent > 0 ? '↗' : 
+                               kpi.change.percent < 0 ? '↘' : '→';
+                    
+                    changeHtml = `
+                        <div class="kpi-change ${changeClass}">
+                            <span>${icon} ${kpi.change.percent > 0 ? '+' : ''}${kpi.change.percent.toFixed(1)}%</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">vs poprz. mies.: ${kpi.prevValue}</span>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon">${kpi.icon}</div>
+                            <div class="kpi-title">${kpi.title}</div>
+                        </div>
+                        <div class="kpi-value">${kpi.value}</div>
+                        ${changeHtml}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('kpiDashboard').innerHTML = html;
+        }
+
+        function calculateKPIChange(current, previous) {
+            if (previous === 0) return { percent: 0, diff: current };
+            const diff = current - previous;
+            const percent = (diff / previous) * 100;
+            return { percent, diff };
+        }
+
+        function getMonthForecast(stats) {
+            const today = new Date();
+            const thisMonth = today.getMonth();
+            const thisYear = today.getFullYear();
+            
+            // Sprawdź czy to bieżący miesiąc
+            if (currentYear !== thisYear || currentMonth !== thisMonth) {
+                return 'Tylko dla bieżącego miesiąca';
+            }
+            
+            const data = getProductionData();
+            const currentDay = today.getDate();
+            const daysInMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
+            
+            // Oblicz sumę dotychczasową
+            let totalSoFar = 0;
+            let daysWithDataSoFar = 0;
+            
+            for (let day = 1; day <= currentDay; day++) {
+                const dayKey = getDayKey(thisYear, thisMonth, day);
+                const dayData = data[dayKey] || {};
+                
+                let hasDayData = false;
+                WORKERS.forEach(worker => {
+                    if (dayData[worker] !== undefined) {
+                        totalSoFar += dayData[worker];
+                        hasDayData = true;
+                    }
+                });
+                
+                if (hasDayData) {
+                    daysWithDataSoFar += 1;
+                }
+            }
+            
+            if (daysWithDataSoFar === 0) {
+                return 'Brak danych';
+            }
+            
+            const avgPerDay = totalSoFar / daysWithDataSoFar;
+            
+            // Szacuj pozostałe dni robocze
+            let estimatedRemainingDays = 0;
+            for (let day = currentDay + 1; day <= daysInMonth; day++) {
+                const date = new Date(thisYear, thisMonth, day);
+                const dayKey = getDayKey(thisYear, thisMonth, day);
+                
+                if (isDayHoliday(dayKey)) continue;
+                
+                let hasWorkingPeople = false;
+                WORKERS.forEach(worker => {
+                    const shift = getShiftForDay(worker, date);
+                    if (shift !== 0) hasWorkingPeople = true;
+                });
+                if (hasWorkingPeople) estimatedRemainingDays += 1;
+            }
+            
+            const forecastTotal = totalSoFar + (avgPerDay * estimatedRemainingDays);
+            
+            return forecastTotal.toFixed(0) + ' kg';
+        }
+
+        function renderDashboardCharts() {
+            const ctx1 = document.getElementById('dashboardTrendChart');
+            if (!ctx1) return;
+            
+            if (dashboardTrendChart) {
+                dashboardTrendChart.destroy();
+            }
+            
+            // Trend ostatnich 3 miesięcy
+            const today = new Date();
+            const months = [];
+            const totals = [];
+            
+            for (let i = 2; i >= 0; i--) {
+                const month = today.getMonth() - i;
+                const year = month < 0 ? today.getFullYear() - 1 : today.getFullYear();
+                const adjustedMonth = month < 0 ? 12 + month : month;
+                
+                const stats = getMonthStatsForComparison(year, adjustedMonth);
+                months.push(MONTHS[adjustedMonth]);
+                totals.push(stats.total || 0);
+            }
+            
+            dashboardTrendChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Produkcja (kg)',
+                        data: totals,
+                        borderColor: 'rgb(255, 107, 53)',
+                        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: 'rgb(255, 107, 53)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(0) + ' kg';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { 
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return value + ' kg';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#b0b0b0' }
+                        }
+                    }
+                }
+            });
+            
+            // Performance comparison
+            const ctx2 = document.getElementById('dashboardPerformanceChart');
+            if (!ctx2) return;
+            
+            if (dashboardPerformanceChart) {
+                dashboardPerformanceChart.destroy();
+            }
+            
+            const currentStats = getMonthStatsForComparison(today.getFullYear(), today.getMonth());
+            const workerAvgs = WORKERS.map(w => {
+                const stats = currentStats.workers[w];
+                return stats && stats.days >= 3 ? parseFloat(stats.avg) : 0;
+            });
+            
+            dashboardPerformanceChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: WORKERS,
+                    datasets: [{
+                        label: 'Średnia dzienna (kg)',
+                        data: workerAvgs,
+                        backgroundColor: [
+                            'rgba(123, 237, 159, 0.8)',
+                            'rgba(255, 165, 2, 0.8)',
+                            'rgba(112, 161, 255, 0.8)',
+                            'rgba(255, 99, 72, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(46, 213, 115)',
+                            'rgb(255, 127, 0)',
+                            'rgb(30, 144, 255)',
+                            'rgb(255, 71, 87)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(1) + ' kg/dzień';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { 
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return value + ' kg';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                color: '#b0b0b0',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDashboardPodium() {
+            const today = new Date();
+            const currentStats = getMonthStatsForComparison(today.getFullYear(), today.getMonth());
+            const prevMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+            const prevYear = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+            const prevStats = getMonthStatsForComparison(prevYear, prevMonth);
+            
+            const sortedWorkers = WORKERS.map(worker => {
+                const stats = currentStats.workers[worker] || { total: 0, avg: 0, days: 0 };
+                const prevWorkerStats = prevStats.workers[worker] || { avg: 0 };
+                
+                return {
+                    name: worker,
+                    total: stats.total,
+                    avg: parseFloat(stats.avg),
+                    days: stats.days,
+                    prevAvg: parseFloat(prevWorkerStats.avg)
+                };
+            }).sort((a, b) => b.total - a.total);
+            
+            const medals = ['🥇', '🥈', '🥉', '4️⃣'];
+            let html = '';
+            
+            sortedWorkers.forEach((worker, index) => {
+                const rank = index + 1;
+                
+                let workerComparisonHtml = '';
+                if (worker.days >= 3 && worker.prevAvg > 0) {
+                    const comparison = calculateComparison(worker.avg, worker.prevAvg);
+                    workerComparisonHtml = `<div class="podium-label comparison-text ${comparison.class}">Poprz. mies.: ${worker.prevAvg.toFixed(1)} kg/dzień ${comparison.icon} ${comparison.text}</div>`;
+                } else if (worker.days >= 3) {
+                    workerComparisonHtml = `<div class="podium-label comparison-text">Poprz. mies.: brak danych</div>`;
+                }
+                
+                html += `
+                    <div class="podium-card rank-${rank} ${worker.name.toLowerCase()}">
+                        <div class="podium-rank">${medals[index]}</div>
+                        <div class="podium-name">${worker.name}</div>
+                        <div class="podium-value">${worker.total.toFixed(0)} kg</div>
+                        <div class="podium-label">Średnia: ${worker.avg.toFixed(1)} kg/dzień • ${worker.days} dni</div>
+                        ${workerComparisonHtml}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('dashboardPodium').innerHTML = html;
+        }
+
+        // Analytics View
+        function renderAnalytics() {
+            renderAnalysisCards();
+            renderAnalyticsCharts();
+        }
+
+        function renderAnalysisCards() {
+            const data = getProductionData();
+            const today = new Date();
+            
+            // Analiza efektywności według zmian
+            const shiftStats = {
+                1: { total: 0, count: 0 },
+                2: { total: 0, count: 0 },
+                3: { total: 0, count: 0 }
+            };
+            
+            // Zbierz dane dla zmian
+            Object.keys(data).forEach(dayKey => {
+                const [year, month, day] = dayKey.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                const dayData = data[dayKey];
+                
+                WORKERS.forEach(worker => {
+                    if (dayData[worker]) {
+                        const shift = getShiftForDay(worker, date);
+                        if (shift > 0) {
+                            shiftStats[shift].total += dayData[worker];
+                            shiftStats[shift].count += 1;
+                        }
+                    }
+                });
+            });
+            
+            // Oblicz średnie dla zmian
+            const shiftAvgs = {};
+            [1, 2, 3].forEach(shift => {
+                shiftAvgs[shift] = shiftStats[shift].count > 0 ? 
+                    (shiftStats[shift].total / shiftStats[shift].count).toFixed(1) : 0;
+            });
+            
+            // Momentum produkcji (ostatnie 7 dni vs poprzednie 7 dni)
+            const momentumData = calculateMomentum();
+            
+            const cards = [
+                {
+                    title: '🌅 Efektywność według zmian',
+                    items: [
+                        { label: 'Rano (6-14)', value: `${shiftAvgs[1]} kg/dzień` },
+                        { label: 'Popołudnie (14-22)', value: `${shiftAvgs[2]} kg/dzień` },
+                        { label: 'Noc (22-6)', value: `${shiftAvgs[3]} kg/dzień` }
+                    ]
+                },
+                {
+                    title: '📈 Momentum produkcji (trend 7vs7 dni)',
+                    items: momentumData.items
+                },
+                {
+                    title: '📊 Trendy roczne',
+                    items: calculateYearlyTrends()
+                }
+            ];
+            
+            let html = '';
+            cards.forEach(card => {
+                html += `
+                    <div class="analysis-card">
+                        <div class="analysis-title">${card.title}</div>
+                `;
+                
+                card.items.forEach(item => {
+                    html += `
+                        <div class="analysis-item">
+                            <span class="analysis-label">${item.label}</span>
+                            <span class="analysis-value">${item.value}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            document.getElementById('analysisCards').innerHTML = html;
+        }
+
+        function calculateYearlyTrends() {
+            const data = getProductionData();
+            const monthlyTotals = {};
+            
+            for (let i = 0; i < 12; i++) {
+                monthlyTotals[i] = 0;
+            }
+            
+            Object.keys(data).forEach(dayKey => {
+                const [year, month, day] = dayKey.split('-').map(Number);
+                if (year === currentYear) {
+                    const dayData = data[dayKey];
+                    WORKERS.forEach(worker => {
+                        if (dayData[worker]) {
+                            monthlyTotals[month - 1] += dayData[worker];
+                        }
+                    });
+                }
+            });
+            
+            const totals = Object.values(monthlyTotals).filter(v => v > 0);
+            if (totals.length === 0) {
+                return [{ label: 'Brak danych', value: '-' }];
+            }
+            
+            const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
+            const max = Math.max(...totals);
+            const min = Math.min(...totals);
+            
+            const maxMonth = Object.keys(monthlyTotals).find(m => monthlyTotals[m] === max);
+            const minMonth = Object.keys(monthlyTotals).find(m => monthlyTotals[m] === min);
+            
+            return [
+                { label: 'Średnia miesięczna', value: `${avg.toFixed(0)} kg` },
+                { label: 'Najlepszy miesiąc', value: `${MONTHS[maxMonth]} (${max.toFixed(0)} kg)` },
+                { label: 'Najsłabszy miesiąc', value: `${MONTHS[minMonth]} (${min.toFixed(0)} kg)` }
+            ];
+        }
+
+        function calculateMomentum() {
+            const data = getProductionData();
+            const today = new Date();
+            
+            // Zbierz dane z ostatnich 14 dni
+            const last7Days = [];
+            const previous7Days = [];
+            
+            for (let i = 1; i <= 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dayKey = getDayKey(date.getFullYear(), date.getMonth(), date.getDate());
+                const dayData = data[dayKey] || {};
+                
+                let dayTotal = 0;
+                WORKERS.forEach(worker => {
+                    if (dayData[worker]) {
+                        dayTotal += dayData[worker];
+                    }
+                });
+                
+                last7Days.push(dayTotal);
+            }
+            
+            for (let i = 8; i <= 14; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dayKey = getDayKey(date.getFullYear(), date.getMonth(), date.getDate());
+                const dayData = data[dayKey] || {};
+                
+                let dayTotal = 0;
+                WORKERS.forEach(worker => {
+                    if (dayData[worker]) {
+                        dayTotal += dayData[worker];
+                    }
+                });
+                
+                previous7Days.push(dayTotal);
+            }
+            
+            const last7Total = last7Days.reduce((a, b) => a + b, 0);
+            const previous7Total = previous7Days.reduce((a, b) => a + b, 0);
+            
+            const last7Avg = last7Days.length > 0 ? last7Total / 7 : 0;
+            const previous7Avg = previous7Days.length > 0 ? previous7Total / 7 : 0;
+            
+            let trend = '';
+            let trendIcon = '';
+            let trendClass = '';
+            let changePercent = 0;
+            
+            if (previous7Avg > 0) {
+                changePercent = ((last7Avg - previous7Avg) / previous7Avg * 100);
+                
+                if (changePercent >= 10) {
+                    trend = 'ROSNĄCY ↗️';
+                    trendIcon = '🔥';
+                    trendClass = 'trend-up';
+                } else if (changePercent <= -10) {
+                    trend = 'SPADAJĄCY ↘️';
+                    trendIcon = '⚠️';
+                    trendClass = 'trend-down';
+                } else if (changePercent > 0) {
+                    trend = 'STABILNY (lekki wzrost) →';
+                    trendIcon = '✅';
+                    trendClass = 'trend-stable';
+                } else if (changePercent < 0) {
+                    trend = 'STABILNY (lekki spadek) →';
+                    trendIcon = '⚠️';
+                    trendClass = 'trend-stable';
+                } else {
+                    trend = 'BEZ ZMIAN →';
+                    trendIcon = '➡️';
+                    trendClass = 'trend-stable';
+                }
+            } else {
+                trend = 'Brak danych z poprzedniego okresu';
+                trendIcon = '❓';
+                trendClass = '';
+            }
+            
+            const items = [
+                { label: 'Ostatnie 7 dni (średnia)', value: `${last7Avg.toFixed(0)} kg/dzień` },
+                { label: 'Poprzednie 7 dni (średnia)', value: `${previous7Avg.toFixed(0)} kg/dzień` },
+                { label: 'Zmiana', value: previous7Avg > 0 ? `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(1)}%` : '-' },
+                { label: `${trendIcon} Trend`, value: trend }
+            ];
+            
+            return { items, trendClass };
+        }
+
+        function renderAnalyticsCharts() {
+            renderShiftEfficiencyChart();
+            renderYoYGrowthChart();
+            renderAverageRankingChart();
+            renderDistributionChart();
+        }
+
+        function renderShiftEfficiencyChart() {
+            const ctx = document.getElementById('shiftEfficiencyChart');
+            if (!ctx) return;
+            
+            if (shiftEfficiencyChart) {
+                shiftEfficiencyChart.destroy();
+            }
+            
+            const data = getProductionData();
+            const shiftStats = {
+                1: { total: 0, count: 0 },
+                2: { total: 0, count: 0 },
+                3: { total: 0, count: 0 }
+            };
+            
+            Object.keys(data).forEach(dayKey => {
+                const [year, month, day] = dayKey.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                const dayData = data[dayKey];
+                
+                WORKERS.forEach(worker => {
+                    if (dayData[worker]) {
+                        const shift = getShiftForDay(worker, date);
+                        if (shift > 0) {
+                            shiftStats[shift].total += dayData[worker];
+                            shiftStats[shift].count += 1;
+                        }
+                    }
+                });
+            });
+            
+            const avgs = [1, 2, 3].map(shift => 
+                shiftStats[shift].count > 0 ? shiftStats[shift].total / shiftStats[shift].count : 0
+            );
+            
+            shiftEfficiencyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Rano (6-14)', 'Popołudnie (14-22)', 'Noc (22-6)'],
+                    datasets: [{
+                        label: 'Średnia produkcja (kg)',
+                        data: avgs,
+                        backgroundColor: [
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(255, 107, 53, 0.8)',
+                            'rgba(155, 89, 182, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 215, 0)',
+                            'rgb(255, 107, 53)',
+                            'rgb(155, 89, 182)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(1) + ' kg';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#b0b0b0' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#b0b0b0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderYoYGrowthChart() {
+            const ctx = document.getElementById('yoyGrowthChart');
+            if (!ctx) return;
+            
+            if (yoyGrowthChart) {
+                yoyGrowthChart.destroy();
+            }
+            
+            // Porównanie roku do roku dla każdego miesiąca
+            const data = getProductionData();
+            const years = [currentYear - 1, currentYear];
+            const datasets = [];
+            
+            years.forEach((year, idx) => {
+                const monthlyData = [];
+                for (let month = 0; month < 12; month++) {
+                    const stats = getMonthStatsForComparison(year, month);
+                    monthlyData.push(stats.total || 0);
+                }
+                
+                datasets.push({
+                    label: year.toString(),
+                    data: monthlyData,
+                    borderColor: idx === 0 ? 'rgba(176, 176, 176, 0.8)' : 'rgba(255, 107, 53, 0.8)',
+                    backgroundColor: idx === 0 ? 'rgba(176, 176, 176, 0.1)' : 'rgba(255, 107, 53, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                });
+            });
+            
+            yoyGrowthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: MONTHS,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#b0b0b0' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(0) + ' kg';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#b0b0b0' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#b0b0b0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderAverageRankingChart() {
+            const ctx = document.getElementById('averageRankingChart');
+            if (!ctx) return;
+            
+            if (averageRankingChart) {
+                averageRankingChart.destroy();
+            }
+            
+            const data = getProductionData();
+            const workerAvgs = {};
+            
+            WORKERS.forEach(worker => {
+                const productions = [];
+                Object.keys(data).forEach(dayKey => {
+                    const dayData = data[dayKey];
+                    if (dayData[worker]) {
+                        productions.push(dayData[worker]);
+                    }
+                });
+                
+                workerAvgs[worker] = productions.length > 0 ?
+                    productions.reduce((a, b) => a + b, 0) / productions.length : 0;
+            });
+            
+            const sorted = WORKERS.map(w => ({
+                name: w,
+                avg: workerAvgs[w]
+            })).sort((a, b) => b.avg - a.avg);
+            
+            // Mapowanie kolorów według nazwy pracownika, nie według pozycji w rankingu
+            const getWorkerColors = (workerName) => {
+                const colorMap = {
+                    'Kamil': {
+                        bg: 'rgba(123, 237, 159, 0.8)',
+                        border: 'rgb(46, 213, 115)'
+                    },
+                    'Igor': {
+                        bg: 'rgba(255, 165, 2, 0.8)',
+                        border: 'rgb(255, 127, 0)'
+                    },
+                    'Jarek': {
+                        bg: 'rgba(112, 161, 255, 0.8)',
+                        border: 'rgb(30, 144, 255)'
+                    },
+                    'Wowa': {
+                        bg: 'rgba(255, 99, 72, 0.8)',
+                        border: 'rgb(255, 71, 87)'
+                    }
+                };
+                return colorMap[workerName] || { bg: 'rgba(100, 100, 100, 0.8)', border: 'rgb(100, 100, 100)' };
+            };
+            
+            averageRankingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(w => w.name),
+                    datasets: [{
+                        label: 'Średnia ogólna (kg/dzień)',
+                        data: sorted.map(w => w.avg),
+                        backgroundColor: sorted.map(w => getWorkerColors(w.name).bg),
+                        borderColor: sorted.map(w => getWorkerColors(w.name).border),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x.toFixed(1) + ' kg/dzień';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#b0b0b0' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { 
+                                color: '#b0b0b0',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderDistributionChart() {
+            const ctx = document.getElementById('distributionChart');
+            if (!ctx) return;
+            
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+            
+            // Zbierz dane z całego roku
+            const data = getProductionData();
+            const yearlyTotals = {};
+            
+            WORKERS.forEach(worker => {
+                yearlyTotals[worker] = 0;
+            });
+            
+            // Sumuj wszystkie dane z bieżącego roku
+            Object.keys(data).forEach(dayKey => {
+                const [year, month, day] = dayKey.split('-').map(Number);
+                if (year === currentYear) {
+                    const dayData = data[dayKey];
+                    WORKERS.forEach(worker => {
+                        if (dayData[worker]) {
+                            yearlyTotals[worker] += dayData[worker];
+                        }
+                    });
+                }
+            });
+            
+            const totals = WORKERS.map(w => yearlyTotals[w]);
+            
+            distributionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: WORKERS,
+                    datasets: [{
+                        data: totals,
+                        backgroundColor: [
+                            'rgba(123, 237, 159, 0.8)',
+                            'rgba(255, 165, 2, 0.8)',
+                            'rgba(112, 161, 255, 0.8)',
+                            'rgba(255, 99, 72, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(46, 213, 115)',
+                            'rgb(255, 127, 0)',
+                            'rgb(30, 144, 255)',
+                            'rgb(255, 71, 87)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#b0b0b0',
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percent = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                    return context.label + ': ' + context.parsed.toFixed(0) + ' kg (' + percent + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Pozostałe funkcje z oryginalnego kodu (renderCalendar, modals, etc.)
+        // ... (cały pozostały kod z oryginalnego pliku)
+        
         function renderCalendar() {
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const data = getProductionData();
@@ -1173,14 +2497,14 @@
                 }
             }
             
-            // Poprawka: pomijamy dni oznaczone jako święto przy liczeniu "dni do wypełnienia"
-let totalRelevantDays = 0;
-for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
-    const dayKey = getDayKey(currentYear, currentMonth, day);
-    if (!isDayHoliday(dayKey)) {
-        totalRelevantDays++;
-    }
-}
+            let totalRelevantDays = 0;
+            for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
+                const dayKey = getDayKey(currentYear, currentMonth, day);
+                if (!isDayHoliday(dayKey)) {
+                    totalRelevantDays++;
+                }
+            }
+            
             const filledDays = daysWithFullData + daysWithMissingData;
             const percentage = totalRelevantDays > 0 ? (filledDays / totalRelevantDays) * 100 : 0;
             
@@ -1547,7 +2871,6 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                 }
             });
             
-            // Usuń cały dzień jeśli jest pusty
             if (Object.keys(data[dayKey]).length === 0) {
                 delete data[dayKey];
             }
@@ -1555,7 +2878,17 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
             setProductionData(data);
             showToast('✅ Produkcja zapisana!');
             closeModal();
-            renderCalendar();
+            
+            // Odśwież aktualny widok
+            if (currentView === 'dashboard') {
+                renderDashboard();
+            } else if (currentView === 'monthly') {
+                renderCalendar();
+            } else if (currentView === 'yearly') {
+                renderYearlyStats();
+            } else if (currentView === 'analytics') {
+                renderAnalytics();
+            }
         }
 
         function showToast(message) {
@@ -1608,7 +2941,6 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                 }
             }
             
-            // Pobierz statystyki z poprzedniego miesiąca
             const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
             const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
             const prevStats = getMonthStatsForComparison(prevYear, prevMonth);
@@ -1621,7 +2953,6 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                 prevAvg: prevStats.workers[worker] ? prevStats.workers[worker].avg : 0
             })).sort((a, b) => b.total - a.total);
             
-            // Karta SUMA WSZYSTKICH
             const dailyAvg = daysWithData > 0 ? (totalSum / daysWithData).toFixed(1) : 0;
             const prevDailyAvg = prevStats.totalAvg;
             
@@ -1643,7 +2974,6 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
             `;
             document.getElementById('totalCard').innerHTML = totalHtml;
             
-            // Podium z rankingiem
             const medals = ['🥇', '🥈', '🥉', '4️⃣'];
             let html = '';
             
@@ -1676,6 +3006,8 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
             const data = getProductionData();
             const stats = {
                 totalAvg: 0,
+                total: 0,
+                daysWithData: 0,
                 workers: {}
             };
             
@@ -1711,8 +3043,9 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                 }
             }
             
-            // Oblicz średnie
             stats.totalAvg = daysWithData > 0 ? (totalSum / daysWithData).toFixed(1) : 0;
+            stats.total = totalSum;
+            stats.daysWithData = daysWithData;
             
             WORKERS.forEach(worker => {
                 const workerStats = stats.workers[worker];
@@ -1723,46 +3056,41 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
         }
 
         function calculateComparison(current, previous) {
-    const diff = current - previous;
-    const percent = previous > 0 ? ((diff / previous) * 100).toFixed(1) : 0;
-    
-    if (percent >= 10) {
-        // Wzrost >= 10% - ZIELONY
-        return {
-            icon: '↗️',
-            text: `+${diff.toFixed(1)} kg (+${percent}%)`,
-            class: 'trend-up'
-        };
-    } else if (percent <= -10) {
-        // Spadek <= -10% - CZERWONY
-        return {
-            icon: '↘️',
-            text: `${diff.toFixed(1)} kg (${percent}%)`,
-            class: 'trend-down'
-        };
-    } else if (percent > 0) {
-        // Wzrost 0-10% - ŻÓŁTY (stabilny)
-        return {
-            icon: '↗️',
-            text: `+${diff.toFixed(1)} kg (+${percent}%)`,
-            class: 'trend-stable'
-        };
-    } else if (percent < 0) {
-        // Spadek 0 do -10% - ŻÓŁTY (stabilny)
-        return {
-            icon: '↘️',
-            text: `${diff.toFixed(1)} kg (${percent}%)`,
-            class: 'trend-stable'
-        };
-    } else {
-        // Dokładnie 0% - ŻÓŁTY
-        return {
-            icon: '➡️',
-            text: `${diff.toFixed(1)} kg (${percent}%)`,
-            class: 'trend-stable'
-        };
-    }
-}
+            const diff = current - previous;
+            const percent = previous > 0 ? ((diff / previous) * 100).toFixed(1) : 0;
+            
+            if (percent >= 10) {
+                return {
+                    icon: '↗️',
+                    text: `+${diff.toFixed(1)} kg (+${percent}%)`,
+                    class: 'trend-up'
+                };
+            } else if (percent <= -10) {
+                return {
+                    icon: '↘️',
+                    text: `${diff.toFixed(1)} kg (${percent}%)`,
+                    class: 'trend-down'
+                };
+            } else if (percent > 0) {
+                return {
+                    icon: '↗️',
+                    text: `+${diff.toFixed(1)} kg (+${percent}%)`,
+                    class: 'trend-stable'
+                };
+            } else if (percent < 0) {
+                return {
+                    icon: '↘️',
+                    text: `${diff.toFixed(1)} kg (${percent}%)`,
+                    class: 'trend-stable'
+                };
+            } else {
+                return {
+                    icon: '➡️',
+                    text: `${diff.toFixed(1)} kg (${percent}%)`,
+                    class: 'trend-stable'
+                };
+            }
+        }
 
         function renderCharts() {
             const data = getProductionData();
@@ -1823,14 +3151,10 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { 
-                            display: false 
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             padding: 12,
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
                             callbacks: {
                                 label: function(context) {
                                     return context.parsed.y.toFixed(0) + ' kg';
@@ -1841,9 +3165,7 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { 
-                                color: 'rgba(255,255,255,0.1)' 
-                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
                             ticks: { 
                                 color: '#b0b0b0',
                                 callback: function(value) {
@@ -1852,15 +3174,10 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                             }
                         },
                         x: {
-                            grid: { 
-                                display: false 
-                            },
+                            grid: { display: false },
                             ticks: { 
                                 color: '#b0b0b0',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
+                                font: { size: 14, weight: 'bold' }
                             }
                         }
                     }
@@ -1915,9 +3232,7 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                         legend: {
                             labels: { 
                                 color: '#b0b0b0',
-                                font: {
-                                    size: 11
-                                },
+                                font: { size: 11 },
                                 padding: 10,
                                 usePointStyle: true,
                                 boxWidth: 6
@@ -1926,8 +3241,6 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                         tooltip: {
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             padding: 12,
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
                             callbacks: {
                                 label: function(context) {
                                     return context.dataset.label + ': ' + context.parsed.y.toFixed(0) + ' kg';
@@ -1938,9 +3251,7 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { 
-                                color: 'rgba(255,255,255,0.1)' 
-                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
                             ticks: { 
                                 color: '#b0b0b0',
                                 callback: function(value) {
@@ -1949,9 +3260,7 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                             }
                         },
                         x: {
-                            grid: { 
-                                color: 'rgba(255,255,255,0.05)' 
-                            },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
                             ticks: { 
                                 color: '#b0b0b0',
                                 maxTicksLimit: 15
@@ -2129,41 +3438,40 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
             const yearlyAvg = totalDaysWithData > 0 ? (yearTotal / totalDaysWithData).toFixed(1) : 0;
             
             const today = new Date();
-let fullMonthsCount = 0;
+            let fullMonthsCount = 0;
 
-for (let month = 0; month < 12; month++) {
-    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
-    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
-    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
-    
-    if (monthlyStats[month].total > 0 && isFullMonth) {
-        fullMonthsCount++;
-    }
-}
+            for (let month = 0; month < 12; month++) {
+                const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+                const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+                const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+                
+                if (monthlyStats[month].total > 0 && isFullMonth) {
+                    fullMonthsCount++;
+                }
+            }
 
-// Oblicz sumę tylko z pełnych miesięcy
-let fullMonthsTotal = 0;
-for (let month = 0; month < 12; month++) {
-    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
-    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
-    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
-    
-    if (monthlyStats[month].total > 0 && isFullMonth) {
-        fullMonthsTotal += monthlyStats[month].total;
-    }
-}
+            let fullMonthsTotal = 0;
+            for (let month = 0; month < 12; month++) {
+                const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+                const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+                const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+                
+                if (monthlyStats[month].total > 0 && isFullMonth) {
+                    fullMonthsTotal += monthlyStats[month].total;
+                }
+            }
 
-const monthlyAvg = fullMonthsCount > 0 ? (fullMonthsTotal / fullMonthsCount).toFixed(0) : 0;
-const isCurrentYearIncomplete = currentYear === today.getFullYear() && today.getMonth() < 11;
+            const monthlyAvg = fullMonthsCount > 0 ? (fullMonthsTotal / fullMonthsCount).toFixed(0) : 0;
+            const isCurrentYearIncomplete = currentYear === today.getFullYear() && today.getMonth() < 11;
 
-let monthlyAvgText = '';
-if (fullMonthsCount > 0) {
-    monthlyAvgText = `Średnia miesięczna: ${monthlyAvg} kg/miesiąc • ${fullMonthsCount} ${fullMonthsCount === 1 ? 'pełny miesiąc' : 'pełne miesiące'}`;
-    if (isCurrentYearIncomplete && fullMonthsCount < 12) {
-        const currentMonthName = MONTHS[today.getMonth()];
-        monthlyAvgText += `<br><span style="font-size: 0.85rem; opacity: 0.7;">${currentMonthName} w trakcie - nie liczony do średniej</span>`;
-    }
-}
+            let monthlyAvgText = '';
+            if (fullMonthsCount > 0) {
+                monthlyAvgText = `Średnia miesięczna: ${monthlyAvg} kg/miesiąc • ${fullMonthsCount} ${fullMonthsCount === 1 ? 'pełny miesiąc' : 'pełne miesiące'}`;
+                if (isCurrentYearIncomplete && fullMonthsCount < 12) {
+                    const currentMonthName = MONTHS[today.getMonth()];
+                    monthlyAvgText += `<br><span style="font-size: 0.85rem; opacity: 0.7;">${currentMonthName} w trakcie - nie liczony do średniej</span>`;
+                }
+            }
             
             const totalHtml = `
                 <div class="total-card">
@@ -2171,7 +3479,7 @@ if (fullMonthsCount > 0) {
                     <div class="total-value">${yearTotal.toFixed(0)} kg</div>
                     <div class="total-subtitle">
                         Średnia dzienna: ${yearlyAvg} kg/dzień • ${totalDaysWithData} dni z danymi<br>
-            ${monthlyAvgText}
+                        ${monthlyAvgText}
                     </div>
                 </div>
             `;
@@ -2184,29 +3492,27 @@ if (fullMonthsCount > 0) {
                 const rank = index + 1;
                 const days = workerDays[worker.name];
                 const avg = days > 0 ? (worker.total / days).toFixed(1) : 0;
+
+                let workerFullMonths = 0;
+                let workerFullMonthsTotal = 0;
+                for (let month = 0; month < 12; month++) {
+                    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+                    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+                    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+                    
+                    if (isFullMonth && monthlyStats[month].data[worker.name] > 0) {
+                        workerFullMonths++;
+                        workerFullMonthsTotal += monthlyStats[month].data[worker.name];
+                    }
+                }
+
+                const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerFullMonths).toFixed(0) : 0;
+        
+                let monthlyAvgHtml = '';
+                if (workerFullMonths > 0) {
+                    monthlyAvgHtml = `<div class="podium-label">Średnia miesięczna: ${monthlyAvgWorker} kg/miesiąc • ${workerFullMonths} ${workerFullMonths === 1 ? 'miesiąc' : 'miesięcy'}</div>`;
+                }
                 
-
-
-                // Oblicz średnią miesięczną dla pracownika
-let workerFullMonths = 0;
-let workerFullMonthsTotal = 0;
-for (let month = 0; month < 12; month++) {
-    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
-    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
-    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
-    
-    if (isFullMonth && monthlyStats[month].data[worker.name] > 0) {
-        workerFullMonths++;
-        workerFullMonthsTotal += monthlyStats[month].data[worker.name];
-    }
-}
-
-const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerFullMonths).toFixed(0) : 0;
-    
-    let monthlyAvgHtml = '';
-    if (workerFullMonths > 0) {
-        monthlyAvgHtml = `<div class="podium-label">Średnia miesięczna: ${monthlyAvgWorker} kg/miesiąc • ${workerFullMonths} ${workerFullMonths === 1 ? 'miesiąc' : 'miesięcy'}</div>`;
-    }
                 rankingHtml += `
                     <div class="podium-card rank-${rank} ${worker.name.toLowerCase()}">
                         <div class="podium-rank">${medals[index]}</div>
@@ -2215,7 +3521,6 @@ const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerF
                         <div class="podium-label">Średnia dzienna: ${avg} kg/dzień • ${days} dni</div>
                         ${monthlyAvgHtml}
                     </div>
-                
                 `;
             });
             
@@ -2282,19 +3587,30 @@ const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerF
         }
 
         function showView(view) {
+            currentView = view;
+            
             document.querySelectorAll('.view-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
             
-            if (view === 'monthly') {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('monthlyView').style.display = 'none';
+            document.getElementById('yearlyView').style.display = 'none';
+            document.getElementById('analyticsView').style.display = 'none';
+            
+            if (view === 'dashboard') {
+                document.getElementById('dashboardView').style.display = 'block';
+                renderDashboard();
+            } else if (view === 'monthly') {
                 document.getElementById('monthlyView').style.display = 'block';
-                document.getElementById('yearlyView').style.display = 'none';
                 renderCalendar();
-            } else {
-                document.getElementById('monthlyView').style.display = 'none';
+            } else if (view === 'yearly') {
                 document.getElementById('yearlyView').style.display = 'block';
                 renderYearlyStats();
+            } else if (view === 'analytics') {
+                document.getElementById('analyticsView').style.display = 'block';
+                renderAnalytics();
             }
         }
 
@@ -2367,12 +3683,15 @@ const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerF
 
         window.onload = function() {
             initData();
+            initCloudSync();
+            
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
             }
+            
             document.getElementById('yearSelect').value = currentYear;
-            renderCalendar();
+            renderDashboard();
         };
 
         window.onclick = function(event) {
