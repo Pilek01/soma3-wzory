@@ -954,8 +954,8 @@
         }
 
         .comparison-text.trend-stable {
-            color: var(--text-secondary);
-        }
+    color: #f59e0b; /* Żółty kolor */
+}
     </style>
 </head>
 <body>
@@ -1723,29 +1723,46 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
         }
 
         function calculateComparison(current, previous) {
-            const diff = current - previous;
-            const percent = previous > 0 ? ((diff / previous) * 100).toFixed(1) : 0;
-            
-            if (Math.abs(percent) < 2) {
-                return {
-                    icon: '➡️',
-                    text: `${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg (${percent}%)`,
-                    class: 'trend-stable'
-                };
-            } else if (percent >= 2) {
-                return {
-                    icon: '↗️',
-                    text: `+${diff.toFixed(1)} kg (+${percent}%)`,
-                    class: 'trend-up'
-                };
-            } else {
-                return {
-                    icon: '↘️',
-                    text: `${diff.toFixed(1)} kg (${percent}%)`,
-                    class: 'trend-down'
-                };
-            }
-        }
+    const diff = current - previous;
+    const percent = previous > 0 ? ((diff / previous) * 100).toFixed(1) : 0;
+    
+    if (percent >= 10) {
+        // Wzrost >= 10% - ZIELONY
+        return {
+            icon: '↗️',
+            text: `+${diff.toFixed(1)} kg (+${percent}%)`,
+            class: 'trend-up'
+        };
+    } else if (percent <= -10) {
+        // Spadek <= -10% - CZERWONY
+        return {
+            icon: '↘️',
+            text: `${diff.toFixed(1)} kg (${percent}%)`,
+            class: 'trend-down'
+        };
+    } else if (percent > 0) {
+        // Wzrost 0-10% - ŻÓŁTY (stabilny)
+        return {
+            icon: '↗️',
+            text: `+${diff.toFixed(1)} kg (+${percent}%)`,
+            class: 'trend-stable'
+        };
+    } else if (percent < 0) {
+        // Spadek 0 do -10% - ŻÓŁTY (stabilny)
+        return {
+            icon: '↘️',
+            text: `${diff.toFixed(1)} kg (${percent}%)`,
+            class: 'trend-stable'
+        };
+    } else {
+        // Dokładnie 0% - ŻÓŁTY
+        return {
+            icon: '➡️',
+            text: `${diff.toFixed(1)} kg (${percent}%)`,
+            class: 'trend-stable'
+        };
+    }
+}
 
         function renderCharts() {
             const data = getProductionData();
@@ -2111,8 +2128,42 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
             const totalDaysWithData = daysWithData.size;
             const yearlyAvg = totalDaysWithData > 0 ? (yearTotal / totalDaysWithData).toFixed(1) : 0;
             
-            const monthsWithData = monthlyStats.filter(m => m.total > 0).length;
-            const monthlyAvg = monthsWithData > 0 ? (yearTotal / monthsWithData).toFixed(0) : 0;
+            const today = new Date();
+let fullMonthsCount = 0;
+
+for (let month = 0; month < 12; month++) {
+    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+    
+    if (monthlyStats[month].total > 0 && isFullMonth) {
+        fullMonthsCount++;
+    }
+}
+
+// Oblicz sumę tylko z pełnych miesięcy
+let fullMonthsTotal = 0;
+for (let month = 0; month < 12; month++) {
+    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+    
+    if (monthlyStats[month].total > 0 && isFullMonth) {
+        fullMonthsTotal += monthlyStats[month].total;
+    }
+}
+
+const monthlyAvg = fullMonthsCount > 0 ? (fullMonthsTotal / fullMonthsCount).toFixed(0) : 0;
+const isCurrentYearIncomplete = currentYear === today.getFullYear() && today.getMonth() < 11;
+
+let monthlyAvgText = '';
+if (fullMonthsCount > 0) {
+    monthlyAvgText = `Średnia miesięczna: ${monthlyAvg} kg/miesiąc • ${fullMonthsCount} ${fullMonthsCount === 1 ? 'pełny miesiąc' : 'pełne miesiące'}`;
+    if (isCurrentYearIncomplete && fullMonthsCount < 12) {
+        const currentMonthName = MONTHS[today.getMonth()];
+        monthlyAvgText += `<br><span style="font-size: 0.85rem; opacity: 0.7;">${currentMonthName} w trakcie - nie liczony do średniej</span>`;
+    }
+}
             
             const totalHtml = `
                 <div class="total-card">
@@ -2120,7 +2171,7 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                     <div class="total-value">${yearTotal.toFixed(0)} kg</div>
                     <div class="total-subtitle">
                         Średnia dzienna: ${yearlyAvg} kg/dzień • ${totalDaysWithData} dni z danymi<br>
-                        Średnia miesięczna: ${monthlyAvg} kg/miesiąc • ${monthsWithData} miesięcy z danymi
+            ${monthlyAvgText}
                     </div>
                 </div>
             `;
@@ -2134,13 +2185,37 @@ for (let day = 1; day <= (isCurrentMonth ? todayDay : daysInMonth); day++) {
                 const days = workerDays[worker.name];
                 const avg = days > 0 ? (worker.total / days).toFixed(1) : 0;
                 
+
+
+                // Oblicz średnią miesięczną dla pracownika
+let workerFullMonths = 0;
+let workerFullMonthsTotal = 0;
+for (let month = 0; month < 12; month++) {
+    const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+    const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+    const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+    
+    if (isFullMonth && monthlyStats[month].data[worker.name] > 0) {
+        workerFullMonths++;
+        workerFullMonthsTotal += monthlyStats[month].data[worker.name];
+    }
+}
+
+const monthlyAvgWorker = workerFullMonths > 0 ? (workerFullMonthsTotal / workerFullMonths).toFixed(0) : 0;
+    
+    let monthlyAvgHtml = '';
+    if (workerFullMonths > 0) {
+        monthlyAvgHtml = `<div class="podium-label">Średnia miesięczna: ${monthlyAvgWorker} kg/miesiąc • ${workerFullMonths} ${workerFullMonths === 1 ? 'miesiąc' : 'miesięcy'}</div>`;
+    }
                 rankingHtml += `
                     <div class="podium-card rank-${rank} ${worker.name.toLowerCase()}">
                         <div class="podium-rank">${medals[index]}</div>
                         <div class="podium-name">${worker.name}</div>
                         <div class="podium-value">${worker.total.toFixed(0)} kg</div>
-                        <div class="podium-label">Średnia: ${avg} kg/dzień • ${days} dni</div>
+                        <div class="podium-label">Średnia dzienna: ${avg} kg/dzień • ${days} dni</div>
+                        ${monthlyAvgHtml}
                     </div>
+                
                 `;
             });
             
