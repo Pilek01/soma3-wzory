@@ -1196,6 +1196,21 @@
 
         <!-- Dashboard View -->
         <div id="dashboardView">
+            <!-- Monthly Goal Progress Bar -->
+            <div class="progress-bar-container" style="margin-bottom: 2rem;">
+                <div class="progress-bar-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>🎯 Realizacja celu miesięcznego</span>
+                    <button class="chart-btn" onclick="openGoalSettings()" style="font-size: 1.2rem; padding: 0.5rem 1rem;" title="Ustaw cel miesięczny">
+                        ⚙️
+                    </button>
+                </div>
+                <div id="monthlyGoalInfo" style="margin-bottom: 1rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"></div>
+                <div class="progress-bar" style="height: 40px; border-radius: 20px;">
+                    <div id="goalProgressFill" class="progress-fill" style="font-size: 1.1rem;"></div>
+                </div>
+                <div id="goalStatusMessage" style="margin-top: 1rem; font-size: 0.95rem; font-weight: 600;"></div>
+            </div>
+            
             <div class="kpi-dashboard" id="kpiDashboard"></div>
             
             <div class="charts-grid">
@@ -1557,7 +1572,171 @@
         }
 
         // Dashboard KPI rendering
+        // Monthly Goal Management
+        function getMonthlyGoal() {
+            const savedGoal = localStorage.getItem('monthlyGoal');
+            return savedGoal ? parseInt(savedGoal) : 400000; // Default 400 ton = 400,000 kg
+        }
+
+        function setMonthlyGoal(goal) {
+            localStorage.setItem('monthlyGoal', goal);
+        }
+
+        function openGoalSettings() {
+            const currentGoal = getMonthlyGoal();
+            const goalInTons = (currentGoal / 1000).toFixed(0);
+            
+            const newGoalTons = prompt(`Ustaw cel miesięczny w tonach:\n\nAktualny cel: ${goalInTons} ton (${currentGoal.toLocaleString()} kg)`, goalInTons);
+            
+            if (newGoalTons !== null && newGoalTons !== '') {
+                const newGoalKg = parseFloat(newGoalTons) * 1000;
+                if (!isNaN(newGoalKg) && newGoalKg > 0) {
+                    setMonthlyGoal(newGoalKg);
+                    showToast(`🎯 Cel miesięczny ustawiony na ${newGoalTons} ton!`);
+                    renderMonthlyGoalProgress();
+                } else {
+                    alert('Proszę podać prawidłową wartość (większą od 0)');
+                }
+            }
+        }
+
+        function renderMonthlyGoalProgress() {
+            const today = new Date();
+            const thisMonth = today.getMonth();
+            const thisYear = today.getFullYear();
+            
+            // Sprawdź czy to bieżący miesiąc
+            if (currentYear !== thisYear || currentMonth !== thisMonth) {
+                document.querySelector('.progress-bar-container').style.display = 'none';
+                return;
+            }
+            
+            document.querySelector('.progress-bar-container').style.display = 'block';
+            
+            const goal = getMonthlyGoal();
+            const currentStats = getMonthStatsForComparison(thisYear, thisMonth);
+            const current = currentStats.total || 0;
+            const percentage = goal > 0 ? (current / goal) * 100 : 0;
+            
+            const currentDay = today.getDate();
+            const daysInMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
+            const daysRemaining = daysInMonth - currentDay;
+            
+            // Oblicz ile dni roboczych pozostało
+            const data = getProductionData();
+            let workingDaysRemaining = 0;
+            for (let day = currentDay + 1; day <= daysInMonth; day++) {
+                const date = new Date(thisYear, thisMonth, day);
+                const dayKey = getDayKey(thisYear, thisMonth, day);
+                
+                if (isDayHoliday(dayKey)) continue;
+                
+                let hasWorkingPeople = false;
+                WORKERS.forEach(worker => {
+                    const shift = getShiftForDay(worker, date);
+                    if (shift !== 0) hasWorkingPeople = true;
+                });
+                if (hasWorkingPeople) workingDaysRemaining += 1;
+            }
+            
+            const remaining = goal - current;
+            const neededPerDay = workingDaysRemaining > 0 ? remaining / workingDaysRemaining : 0;
+            const avgPerDay = currentStats.daysWithData > 0 ? parseFloat(currentStats.totalAvg) : 0;
+            
+            // Określ status
+            let statusClass = 'neutral';
+            let statusIcon = '→';
+            let statusText = 'Stabilnie';
+            
+            if (percentage >= 100) {
+                statusClass = 'positive';
+                statusIcon = '🎉';
+                statusText = 'CEL OSIĄGNIĘTY!';
+            } else if (neededPerDay <= avgPerDay) {
+                statusClass = 'positive';
+                statusIcon = '✅';
+                statusText = 'Na czasie - obecne tempo wystarczy!';
+            } else if (neededPerDay <= avgPerDay * 1.1) {
+                statusClass = 'neutral';
+                statusIcon = '⚠️';
+                statusText = 'Blisko celu - lekkie przyspieszenie potrzebne';
+            } else {
+                statusClass = 'negative';
+                statusIcon = '🔴';
+                statusText = 'Opóźnienie - potrzebne znaczne przyspieszenie!';
+            }
+            
+            // Renderuj info
+            const infoHtml = `
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Cel miesięczny</div>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent);">${(goal / 1000).toFixed(0)} ton</div>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Dotychczas</div>
+                    <div style="font-size: 1.3rem; font-weight: 700;">${(current / 1000).toFixed(1)} ton</div>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Pozostało</div>
+                    <div style="font-size: 1.3rem; font-weight: 700;">${(remaining / 1000).toFixed(1)} ton</div>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">Dni robocze pozostało</div>
+                    <div style="font-size: 1.3rem; font-weight: 700;">${workingDaysRemaining} dni</div>
+                </div>
+            `;
+            
+            document.getElementById('monthlyGoalInfo').innerHTML = infoHtml;
+            
+            // Renderuj progress bar
+            const progressFill = document.getElementById('goalProgressFill');
+            const cappedPercentage = Math.min(percentage, 100);
+            progressFill.style.width = cappedPercentage + '%';
+            
+            if (percentage >= 100) {
+                progressFill.style.background = 'linear-gradient(90deg, #4caf50 0%, #66bb6a 100%)';
+                progressFill.textContent = '🎉 ' + percentage.toFixed(1) + '%';
+            } else if (percentage >= 80) {
+                progressFill.style.background = 'linear-gradient(90deg, #4caf50 0%, #66bb6a 100%)';
+                progressFill.textContent = percentage.toFixed(1) + '%';
+            } else if (percentage >= 50) {
+                progressFill.style.background = 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)';
+                progressFill.textContent = percentage.toFixed(1) + '%';
+            } else {
+                progressFill.style.background = 'linear-gradient(90deg, #f44336 0%, #ef5350 100%)';
+                progressFill.textContent = percentage.toFixed(1) + '%';
+            }
+            
+            // Renderuj status message
+            let statusMessageHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div class="kpi-change ${statusClass}" style="margin: 0;">
+                        <span>${statusIcon} ${statusText}</span>
+                    </div>
+            `;
+            
+            if (percentage < 100 && workingDaysRemaining > 0) {
+                const comparisonClass = neededPerDay <= avgPerDay ? 'positive' : 'negative';
+                statusMessageHtml += `
+                    <div style="text-align: right;">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem;">Potrzebne dziennie</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: ${comparisonClass === 'positive' ? 'var(--success)' : 'var(--danger)'};">
+                            ${(neededPerDay / 1000).toFixed(1)} ton/dzień
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Obecne tempo: ${(avgPerDay / 1000).toFixed(1)} ton/dzień
+                        </div>
+                    </div>
+                `;
+            }
+            
+            statusMessageHtml += `</div>`;
+            
+            document.getElementById('goalStatusMessage').innerHTML = statusMessageHtml;
+        }
+
         function renderDashboard() {
+            renderMonthlyGoalProgress();
             renderKPIDashboard();
             renderDashboardCharts();
             renderDashboardPodium();
@@ -1577,20 +1756,63 @@
             const prevYear = thisMonth === 0 ? thisYear - 1 : thisYear;
             const prevStats = getMonthStatsForComparison(prevYear, prevMonth);
             
+            // Sprawdź czy bieżący miesiąc jest w trakcie
+            const isCurrentMonth = true; // zawsze true bo renderKPIDashboard działa tylko dla dashboardu (bieżącego miesiąca)
+            const currentDay = today.getDate();
+            
+            // Dla porównania "dzień do dnia" - oblicz statystyki poprzedniego miesiąca DO tego samego dnia
+            let prevMonthSameDayStats = { total: 0, totalAvg: 0, daysWithData: 0 };
+            
+            if (isCurrentMonth) {
+                // Zlicz produkcję z poprzedniego miesiąca do tego samego dnia co dziś
+                let totalSoFar = 0;
+                let daysWithData = 0;
+                
+                const prevMonthDaysInMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+                const daysToCompare = Math.min(currentDay, prevMonthDaysInMonth);
+                
+                for (let day = 1; day <= daysToCompare; day++) {
+                    const dayKey = getDayKey(prevYear, prevMonth, day);
+                    const dayData = data[dayKey] || {};
+                    
+                    if (isDayHoliday(dayKey)) {
+                        continue;
+                    }
+                    
+                    let hasDayData = false;
+                    WORKERS.forEach(worker => {
+                        if (dayData[worker] !== undefined) {
+                            totalSoFar += dayData[worker];
+                            hasDayData = true;
+                        }
+                    });
+                    
+                    if (hasDayData) {
+                        daysWithData += 1;
+                    }
+                }
+                
+                prevMonthSameDayStats.total = totalSoFar;
+                prevMonthSameDayStats.daysWithData = daysWithData;
+                prevMonthSameDayStats.totalAvg = daysWithData > 0 ? (totalSoFar / daysWithData).toFixed(1) : 0;
+            }
+            
             const kpis = [
                 {
                     icon: '📦',
                     title: 'Produkcja w tym miesiącu',
                     value: currentStats.total ? currentStats.total.toFixed(0) + ' kg' : '0 kg',
-                    change: calculateKPIChange(currentStats.total || 0, prevStats.total || 0),
-                    prevValue: prevStats.total ? prevStats.total.toFixed(0) + ' kg' : '0 kg'
+                    change: calculateKPIChange(currentStats.total || 0, prevMonthSameDayStats.total || 0),
+                    prevValue: `${prevMonthSameDayStats.total.toFixed(0)} kg (do ${currentDay}. dnia)`,
+                    compareLabel: 'vs poprz. mies.'
                 },
                 {
                     icon: '📊',
                     title: 'Średnia dzienna',
                     value: currentStats.totalAvg ? parseFloat(currentStats.totalAvg).toFixed(1) + ' kg' : '0 kg',
                     change: calculateKPIChange(parseFloat(currentStats.totalAvg) || 0, parseFloat(prevStats.totalAvg) || 0),
-                    prevValue: prevStats.totalAvg ? parseFloat(prevStats.totalAvg).toFixed(1) + ' kg' : '0 kg'
+                    prevValue: prevStats.totalAvg ? parseFloat(prevStats.totalAvg).toFixed(1) + ' kg' : '0 kg',
+                    compareLabel: 'vs poprz. mies.'
                 },
                 {
                     icon: '🔮',
@@ -1617,8 +1839,8 @@
                     
                     changeHtml = `
                         <div class="kpi-change ${changeClass}">
-                            <span>${icon} ${kpi.change.percent > 0 ? '+' : ''}${kpi.change.percent.toFixed(1)}%</span>
-                            <span style="font-size: 0.8rem; opacity: 0.8;">vs poprz. mies.: ${kpi.prevValue}</span>
+                            <span>${icon}${kpi.change.percent > 0 ? '+' : ''}${kpi.change.percent.toFixed(1)}%</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">${kpi.compareLabel}: ${kpi.prevValue}</span>
                         </div>
                     `;
                 }
@@ -1990,6 +2212,7 @@
 
         function calculateYearlyTrends() {
             const data = getProductionData();
+            const today = new Date();
             const monthlyTotals = {};
             
             for (let i = 0; i < 12; i++) {
@@ -2008,33 +2231,79 @@
                 }
             });
             
-            const totals = Object.values(monthlyTotals).filter(v => v > 0);
-            if (totals.length === 0) {
+            // Zlicz tylko pełne miesiące (pomijamy bieżący miesiąc jeśli nie jest zakończony)
+            let fullMonthsCount = 0;
+            let fullMonthsTotal = 0;
+            let maxValue = 0;
+            let minValue = Infinity;
+            let maxMonth = null;
+            let minMonth = null;
+            
+            for (let month = 0; month < 12; month++) {
+                const isCurrentMonth = (month === today.getMonth() && currentYear === today.getFullYear());
+                const lastDayOfMonth = new Date(currentYear, month + 1, 0).getDate();
+                const isFullMonth = !isCurrentMonth || today.getDate() >= lastDayOfMonth;
+                
+                // Tylko pełne miesiące z produkcją
+                if (monthlyTotals[month] > 0 && isFullMonth) {
+                    fullMonthsCount++;
+                    fullMonthsTotal += monthlyTotals[month];
+                    
+                    // Szukaj max i min tylko w pełnych miesiącach
+                    if (monthlyTotals[month] > maxValue) {
+                        maxValue = monthlyTotals[month];
+                        maxMonth = month;
+                    }
+                    if (monthlyTotals[month] < minValue) {
+                        minValue = monthlyTotals[month];
+                        minMonth = month;
+                    }
+                }
+            }
+            
+            if (fullMonthsCount === 0) {
                 return [{ label: 'Brak danych', value: '-' }];
             }
             
-            const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
-            const max = Math.max(...totals);
-            const min = Math.min(...totals);
+            const avg = fullMonthsTotal / fullMonthsCount;
+            const isCurrentYearIncomplete = currentYear === today.getFullYear() && today.getMonth() < 11;
+            const currentMonthName = MONTHS[today.getMonth()];
             
-            const maxMonth = Object.keys(monthlyTotals).find(m => monthlyTotals[m] === max);
-            const minMonth = Object.keys(monthlyTotals).find(m => monthlyTotals[m] === min);
-            
-            return [
-                { label: 'Średnia miesięczna', value: `${avg.toFixed(0)} kg` },
-                { label: 'Najlepszy miesiąc', value: `${MONTHS[maxMonth]} (${max.toFixed(0)} kg)` },
-                { label: 'Najsłabszy miesiąc', value: `${MONTHS[minMonth]} (${min.toFixed(0)} kg)` }
+            const items = [
+                { 
+                    label: 'Średnia miesięczna', 
+                    value: `${avg.toFixed(0)} kg (${fullMonthsCount} ${fullMonthsCount === 1 ? 'miesiąc' : 'miesięcy'})` 
+                },
+                { 
+                    label: 'Najlepszy miesiąc', 
+                    value: maxMonth !== null ? `${MONTHS[maxMonth]} (${maxValue.toFixed(0)} kg)` : '-' 
+                },
+                { 
+                    label: 'Najsłabszy miesiąc', 
+                    value: minMonth !== null ? `${MONTHS[minMonth]} (${minValue.toFixed(0)} kg)` : '-' 
+                }
             ];
+            
+            // Dodaj info o bieżącym miesiącu jeśli jest w trakcie
+            if (isCurrentYearIncomplete && fullMonthsCount < 12) {
+                items.push({
+                    label: '📌 Uwaga',
+                    value: `${currentMonthName} w trakcie - nie liczony`
+                });
+            }
+            
+            return items;
         }
 
         function calculateMomentum() {
             const data = getProductionData();
             const today = new Date();
             
-            // Zbierz dane z ostatnich 14 dni
+            // Zbierz dane z ostatnich 14 dni (NIE licząc dzisiejszego dnia)
             const last7Days = [];
             const previous7Days = [];
             
+            // Ostatnie 7 dni = wczoraj i 6 dni wstecz (dni 1-7 wstecz od dzisiaj)
             for (let i = 1; i <= 7; i++) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - i);
@@ -2051,6 +2320,7 @@
                 last7Days.push(dayTotal);
             }
             
+            // Poprzednie 7 dni = 8-14 dni wstecz od dzisiaj
             for (let i = 8; i <= 14; i++) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - i);
@@ -2288,24 +2558,51 @@
             }
             
             const data = getProductionData();
-            const workerAvgs = {};
+            const today = new Date();
+            const workerStats = {};
             
             WORKERS.forEach(worker => {
-                const productions = [];
-                Object.keys(data).forEach(dayKey => {
-                    const dayData = data[dayKey];
-                    if (dayData[worker]) {
-                        productions.push(dayData[worker]);
+                workerStats[worker] = {
+                    total: 0,
+                    days: 0
+                };
+            });
+            
+            // Przechodzimy przez wszystkie dni w bazie danych (tylko te które faktycznie miały miejsce)
+            Object.keys(data).forEach(dayKey => {
+                const [year, month, day] = dayKey.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                
+                // Pomijamy przyszłe dni
+                if (date > today) return;
+                
+                const dayData = data[dayKey];
+                
+                WORKERS.forEach(worker => {
+                    const shift = getShiftForDay(worker, date);
+                    
+                    // Jeśli pracownik miał zmianę tego dnia (nie wolne)
+                    if (shift !== 0) {
+                        // Sprawdź czy jest wpis dla tego pracownika
+                        if (dayData[worker] !== undefined) {
+                            workerStats[worker].days += 1;
+                            workerStats[worker].total += dayData[worker]; // może być 0 lub wartość
+                        }
                     }
                 });
-                
-                workerAvgs[worker] = productions.length > 0 ?
-                    productions.reduce((a, b) => a + b, 0) / productions.length : 0;
+            });
+            
+            // Oblicz średnie
+            const workerAvgs = {};
+            WORKERS.forEach(worker => {
+                workerAvgs[worker] = workerStats[worker].days > 0 ?
+                    workerStats[worker].total / workerStats[worker].days : 0;
             });
             
             const sorted = WORKERS.map(w => ({
                 name: w,
-                avg: workerAvgs[w]
+                avg: workerAvgs[w],
+                days: workerStats[w].days
             })).sort((a, b) => b.avg - a.avg);
             
             // Mapowanie kolorów według nazwy pracownika, nie według pozycji w rankingu
@@ -2354,7 +2651,11 @@
                             padding: 12,
                             callbacks: {
                                 label: function(context) {
-                                    return context.parsed.x.toFixed(1) + ' kg/dzień';
+                                    const workerData = sorted[context.dataIndex];
+                                    return [
+                                        context.parsed.x.toFixed(1) + ' kg/dzień',
+                                        'Dni robocze: ' + workerData.days
+                                    ];
                                 }
                             }
                         }
