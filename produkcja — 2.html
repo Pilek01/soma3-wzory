@@ -3593,12 +3593,10 @@
             const data = getProductionData();
             const stats = {};
             const dailyData = {};
-            const dailyLabels = {}; // Etykiety tylko dla dni roboczych
             
             WORKERS.forEach(worker => {
                 stats[worker] = { total: 0, days: 0 };
                 dailyData[worker] = [];
-                dailyLabels[worker] = [];
             });
             
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -3610,16 +3608,18 @@
                 
                 WORKERS.forEach(worker => {
                     const shift = getShiftForDay(worker, date);
-                    const value = dayData[worker] || 0;
+                    const value = dayData[worker];
                     
-                    // Dodaj do wykresu TYLKO jeśli pracownik miał zmianę (nie dzień wolny)
-                    if (shift !== 0) {
-                        dailyData[worker].push(value);
-                        dailyLabels[worker].push(day);
+                    // Jeśli dzień wolny - dodaj null (linia się przerywa)
+                    // Jeśli dzień roboczy - dodaj wartość (lub 0 jeśli nie ma danych)
+                    if (shift === 0) {
+                        dailyData[worker].push(null);
+                    } else {
+                        dailyData[worker].push(value !== undefined ? value : null);
                     }
                     
-                    if (dayData[worker] !== undefined) {
-                        stats[worker].total += dayData[worker];
+                    if (value !== undefined) {
+                        stats[worker].total += value;
                         stats[worker].days += 1;
                     }
                 });
@@ -3698,18 +3698,12 @@
                 trendChart.destroy();
             }
             
-            // Użyj najdłuższej listy etykiet (największa liczba dni roboczych)
-            let maxLabels = [];
-            WORKERS.forEach(worker => {
-                if (dailyLabels[worker].length > maxLabels.length) {
-                    maxLabels = dailyLabels[worker];
-                }
-            });
+            const days = Array.from({length: daysInMonth}, (_, i) => i + 1);
             
             trendChart = new Chart(trendCtx, {
                 type: 'line',
                 data: {
-                    labels: maxLabels.length > 0 ? maxLabels : Array.from({length: daysInMonth}, (_, i) => i + 1),
+                    labels: days,
                     datasets: WORKERS.map((worker, idx) => ({
                         label: worker,
                         data: dailyData[worker],
@@ -3736,7 +3730,7 @@
                             'rgb(30, 144, 255)',
                             'rgb(255, 71, 87)'
                         ][idx],
-                        spanGaps: false // Nie łącz linii przez braki danych
+                        spanGaps: true // ŁĄCZ linie przez dni wolne - ciągła linia!
                     }))
                 },
                 options: {
@@ -3756,10 +3750,10 @@
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             padding: 12,
                             callbacks: {
-                                title: function(context) {
-                                    return 'Dzień ' + context[0].label;
-                                },
                                 label: function(context) {
+                                    if (context.parsed.y === null) {
+                                        return context.dataset.label + ': Dzień wolny';
+                                    }
                                     return context.dataset.label + ': ' + context.parsed.y.toFixed(0) + ' kg';
                                 }
                             }
