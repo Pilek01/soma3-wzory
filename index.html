@@ -11,37 +11,7 @@
         box-sizing: border-box;
     }
 
-/* Wersja aplikacji w stopce */
-.app-version {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    opacity: 0.6;
-    transition: opacity 0.3s;
-    z-index: 10000;
-}
 
-.app-version:hover {
-    opacity: 1;
-}
-
-.login-screen .app-version {
-    color: rgba(255,255,255,0.4);
-}
-
-.login-screen .app-version:hover {
-    color: rgba(255,255,255,0.7);
-}
-
-@media (max-width: 768px) {
-    .app-version {
-        font-size: 0.75rem;
-        bottom: 0.5rem;
-        right: 0.5rem;
-    }
-}
         
     :root {
         --bg-primary: #1a1a1a;
@@ -746,6 +716,23 @@
         flex-shrink: 0;
     }
 
+/* Wersja aplikacji - środek pod gościem */
+.app-version {
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .app-version {
+        font-size: 0.8rem;
+        margin-top: 1.5rem;
+    }
+}
+        
     .guest-card:hover .guest-arrow {
         opacity: 1;
         transform: translateX(10px);
@@ -946,15 +933,7 @@
         usersGrid.style.justifyContent = 'center';
         usersGrid.style.alignItems = 'center';
         usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
-        // Dodaj wersję aplikacji do ekranu logowania
-if (!document.querySelector('.app-version')) {
-    const versionDiv = document.createElement('div');
-    versionDiv.className = 'app-version';
-    versionDiv.textContent = `v${APP_VERSION}`;
-    loginScreen.appendChild(versionDiv);
-}
-
-loginScreen.style.display = 'flex';
+        loginScreen.style.display = 'flex';
         return;
     }
     
@@ -996,6 +975,9 @@ loginScreen.style.display = 'flex';
         </div>
         `;
     }
+    
+    // Dodaj wersję pod kartą gościa ⬅️ TUTAJ!
+    html += `<div class="app-version">v${APP_VERSION}</div>`;
     
     usersGrid.innerHTML = html;
     loginScreen.style.display = 'flex';
