@@ -915,13 +915,15 @@ async function attemptLogin(userName) {
 }
 
         function logout() {
-            if (confirm('Czy na pewno chcesz się wylogować?')) {
-                sessionStorage.removeItem('soma3_user');
-                sessionStorage.removeItem('soma3_login_time');
-                currentUser = null;
-                location.reload();
-            }
-        }
+    if (confirm('Czy na pewno chcesz się wylogować?')) {
+        sessionStorage.removeItem('soma3_user');
+        sessionStorage.removeItem('soma3_login_time');
+        sessionStorage.removeItem('soma3_is_guest'); // ← DODAJ TĘ LINIĘ
+        currentUser = null;
+        isGuest = false; // ← I OPCJONALNIE TĘ
+        location.reload();
+    }
+}
 
         // Funkcja do odczytu danych z arkusza przez Apps Script
         async function fetchSheetData(sheetName) {
