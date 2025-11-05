@@ -796,6 +796,7 @@
         let sections = [];
         let comments = [];
         let history = [];
+        let isGuest = false;
         let aniloxy = [];
         let users = [];
         let currentView = 'clients';
@@ -816,12 +817,18 @@
         }
 
         async function loadUsers() {
-            const usersData = await fetchSheetData('Użytkownicy');
-            users = usersData.slice(1).filter(row => row[0]).map(row => ({
-                name: String(row[0] || '').trim(),
-                password: String(row[1] || '').trim()
-            }));
-        }
+    const usersData = await fetchSheetData('Użytkownicy');
+    users = usersData.slice(1).filter(row => row[0]).map(row => ({
+        name: String(row[0] || '').trim(),
+        password: String(row[1] || '').trim()
+    }));
+    
+    // Dodaj konto gościa
+    users.push({
+        name: 'Gość',
+        password: 'gosc'
+    });
+}
 
         function showLoginScreen() {
     const loginScreen = document.getElementById('loginScreen');
@@ -831,7 +838,6 @@
     const icons = ['👤', '👤', '👤', '👤'];
     
     if (users.length === 0) {
-        // Override grid with flex for centering
         usersGrid.style.display = 'flex';
         usersGrid.style.justifyContent = 'center';
         usersGrid.style.alignItems = 'center';
@@ -840,18 +846,23 @@
         return;
     }
     
-    // Restore grid layout
     usersGrid.style.display = 'grid';
     usersGrid.style.justifyContent = '';
     usersGrid.style.alignItems = '';
     
-    usersGrid.innerHTML = users.map((user, index) => `
+    usersGrid.innerHTML = users.map((user, index) => {
+        const isGuest = user.name === 'Gość';
+        const icon = isGuest ? '👁️' : icons[index % 4];
+        const role = isGuest ? 'Tylko podgląd' : 'Operator';
+        
+        return `
         <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${user.name}')">
-            <div class="user-icon">${icons[index]}</div>
+            <div class="user-icon">${icon}</div>
             <div class="user-name">${user.name}</div>
-            <div class="user-role">Operator</div>
+            <div class="user-role">${role}</div>
         </div>
-    `).join('');
+        `;
+    }).join('');
     
     loginScreen.style.display = 'flex';
 }
@@ -859,6 +870,12 @@
 function hideLoginScreen() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'block';
+    
+    // Ukryj przycisk dodawania klienta dla gościa
+    const addClientBtn = document.querySelector('.header-controls .btn:last-child');
+    if (addClientBtn && isGuest) {
+        addClientBtn.style.display = 'none';
+    }
     
     // Pokaż przycisk Google Sheets tylko dla Kamila
     if (currentUser === 'Kamil') {
@@ -878,21 +895,24 @@ async function attemptLogin(userName) {
 }
 
         function checkSession() {
-            const savedUser = sessionStorage.getItem('soma3_user');
-            const loginTime = sessionStorage.getItem('soma3_login_time');
-            
-            if (!savedUser || !loginTime) return false;
-            
-            const elapsed = Date.now() - parseInt(loginTime);
-            if (elapsed > SESSION_DURATION) {
-                sessionStorage.removeItem('soma3_user');
-                sessionStorage.removeItem('soma3_login_time');
-                return false;
-            }
-            
-            currentUser = savedUser;
-            return true;
-        }
+    const savedUser = sessionStorage.getItem('soma3_user');
+    const loginTime = sessionStorage.getItem('soma3_login_time');
+    const savedIsGuest = sessionStorage.getItem('soma3_is_guest');
+    
+    if (!savedUser || !loginTime) return false;
+    
+    const elapsed = Date.now() - parseInt(loginTime);
+    if (elapsed > SESSION_DURATION) {
+        sessionStorage.removeItem('soma3_user');
+        sessionStorage.removeItem('soma3_login_time');
+        sessionStorage.removeItem('soma3_is_guest');
+        return false;
+    }
+    
+    currentUser = savedUser;
+    isGuest = (savedIsGuest === 'true');
+    return true;
+}
 
         function logout() {
             if (confirm('Czy na pewno chcesz się wylogować?')) {
@@ -1139,38 +1159,42 @@ patterns = Object.values(patternGroups);
         }
 
         function renderPatterns() {
-            const content = document.getElementById('content');
-            const clientPatterns = patterns.filter(p => p.klient_id === currentClient.id);
-            const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']);
-            
-            console.log('Filtrowanie wzorów dla klienta:', currentClient.numer);
-            console.log('Znalezione wzory:', clientPatterns);
-            
-            filteredPatterns.sort((a, b) => {
-                const numA = parseInt(a.numer) || 0;
-                const numB = parseInt(b.numer) || 0;
-                return numA - numB;
-            });
+    const content = document.getElementById('content');
+    const clientPatterns = patterns.filter(p => p.klient_id === currentClient.id);
+    const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']);
+    
+    filteredPatterns.sort((a, b) => {
+        const numA = parseInt(a.numer) || 0;
+        const numB = parseInt(b.numer) || 0;
+        return numA - numB;
+    });
 
-            let html = `
-                <div class="button-group">
-                    <button class="btn" onclick="showAddPatternModal()">+ Dodaj Wzór</button>
-                </div>
-            `;
+    let html = '';
+    
+    // Ukryj przycisk dodawania wzoru dla gościa
+    if (!isGuest) {
+        html += `
+            <div class="button-group">
+                <button class="btn" onclick="showAddPatternModal()">+ Dodaj Wzór</button>
+            </div>
+        `;
+    }
 
-            if (filteredPatterns.length === 0) {
-                html += '<div class="card"><div class="card-body">Brak wzorów dla tego klienta. Kliknij "+ Dodaj Wzór" aby dodać pierwszy wzór.</div></div>';
-            } else {
-                html += filteredPatterns.map(pattern => `
-                    <div class="card" onclick="showPatternDetail('${pattern.id}')">
-                        <div class="card-header">${pattern.numer} | ${pattern.nazwa}</div>
-                        ${pattern.zdjecie_url ? '<div class="card-body">📷 Ze zdjęciem</div>' : ''}
-                    </div>
-                `).join('');
-            }
+    if (filteredPatterns.length === 0) {
+        html += '<div class="card"><div class="card-body">Brak wzorów dla tego klienta.' + 
+                (!isGuest ? ' Kliknij "+ Dodaj Wzór" aby dodać pierwszy wzór.' : '') + 
+                '</div></div>';
+    } else {
+        html += filteredPatterns.map(pattern => `
+            <div class="card" onclick="showPatternDetail('${pattern.id}')">
+                <div class="card-header">${pattern.numer} | ${pattern.nazwa}</div>
+                ${pattern.zdjecie_url ? '<div class="card-body">📷 Ze zdjęciem</div>' : ''}
+            </div>
+        `).join('');
+    }
 
-            content.innerHTML = html;
-        }
+    content.innerHTML = html;
+}
 
         function renderPatternDetail() {
     const content = document.getElementById('content');
@@ -1183,6 +1207,30 @@ patterns = Object.values(patternGroups);
 
     const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
 
+    // Przyciski dla gościa - tylko podgląd i drukowanie
+    let buttonsHTML = '';
+    if (isGuest) {
+        buttonsHTML = `
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+                <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+                <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+            </div>
+        `;
+    } else {
+        // Przyciski dla zalogowanych użytkowników
+        buttonsHTML = `
+            <div class="button-group">
+                <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
+                <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+                <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+                <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+                <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
+                <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
+            </div>
+        `;
+    }
+
     let html = `
         <div class="card" style="cursor: default;">
             <div class="card-header">${currentPattern.numer} | ${currentPattern.nazwa}</div>
@@ -1192,14 +1240,7 @@ patterns = Object.values(patternGroups);
             </div>
         </div>
 
-        <div class="button-group">
-            <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
-            <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
-            <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
-            <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
-            <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
-            <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
-        </div>
+        ${buttonsHTML}
 
         <h3 style="margin-top: 2rem; color: var(--accent); font-size: 1.5rem;">Sekcje (1-10)</h3>
         <div class="sections-grid">
@@ -1214,7 +1255,7 @@ patterns = Object.values(patternGroups);
 
         <div class="comments-section">
             <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">💬 Uwagi</h3>
-            <button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>
+            ${!isGuest ? '<button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>' : ''}
             <div style="margin-top: 1.5rem">
                 ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
                     patternComments.map((comment, index) => {
@@ -1419,9 +1460,12 @@ function verifyPassword(event, userName, correctPassword) {
     
     if (enteredPassword === correctPassword) {
         currentUser = userName;
+        isGuest = (userName === 'Gość'); // Ustaw flagę gościa
+        
         const loginTime = Date.now();
         sessionStorage.setItem('soma3_user', userName);
         sessionStorage.setItem('soma3_login_time', loginTime.toString());
+        sessionStorage.setItem('soma3_is_guest', isGuest.toString());
         
         closeModal();
         hideLoginScreen();
@@ -1445,24 +1489,29 @@ function closeModalAndReload() {
         
         // Dodawanie klienta
         function showAddClientModal() {
-            showModal(`
-                <div class="modal-header">Dodaj Klienta</div>
-                <form id="addClientForm" onsubmit="addClient(event)">
-                    <div class="form-group">
-                        <label>Numer Klienta *</label>
-                        <input type="text" name="numer" required placeholder="np. 1, 245">
-                    </div>
-                    <div class="form-group">
-                        <label>Nazwa Klienta *</label>
-                        <input type="text" name="nazwa" required placeholder="np. Pfeifer & Lange">
-                    </div>
-                    <div class="button-group">
-                        <button type="submit" class="btn">✅ Dodaj</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
-                    </div>
-                </form>
-            `);
-        }
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do dodawania klientów.');
+        return;
+    }
+    // ... reszta kodu bez zmian
+    showModal(`
+        <div class="modal-header">Dodaj Klienta</div>
+        <form id="addClientForm" onsubmit="addClient(event)">
+            <div class="form-group">
+                <label>Numer Klienta *</label>
+                <input type="text" name="numer" required placeholder="np. 1, 245">
+            </div>
+            <div class="form-group">
+                <label>Nazwa Klienta *</label>
+                <input type="text" name="nazwa" required placeholder="np. Pfeifer & Lange">
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn">✅ Dodaj</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+            </div>
+        </form>
+    `);
+}
 
         async function addClient(e) {
             e.preventDefault();
@@ -1518,6 +1567,10 @@ function closeModalAndReload() {
 
         // Dodawanie wzoru
         function showAddPatternModal() {
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do dodawania wzorów.');
+        return;
+    }
     const usedColors = [...new Set(sections.map(s => s.kolor).filter(k => k))].sort();
     // ZMIANA: tylko aniloxy z arkusza
     const allAnilox = [...aniloxy].sort();
@@ -1683,6 +1736,10 @@ await batchAppendToSheet('Sekcje', sectionsData);
         
         // Edycja wzoru
         function showEditPatternModal() {
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do edycji wzorów.');
+        return;
+    }
     const patternSections = [];
     for (let i = 1; i <= 10; i++) {
         const section = sections.find(s => s.wzor_id === currentPattern.id && s.nr_sekcji === i);
@@ -1874,6 +1931,10 @@ if (oldComments.length > 0) {
 }
         // Dodawanie uwagi
         function showAddCommentModal() {
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do dodawania uwag.');
+        return;
+    }
             showModal(`
                 <div class="modal-header">Dodaj Uwagę do: ${currentPattern.nazwa}</div>
                 <form onsubmit="addComment(event)">
@@ -1939,6 +2000,10 @@ if (oldComments.length > 0) {
 
         // Kopiowanie wzoru
         function showCopyPatternModal() {
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do kopiowania wzorów.');
+        return;
+    }
             const sortedClients = [...clients].sort((a, b) => {
                 return (parseInt(a.numer) || 0) - (parseInt(b.numer) || 0);
             });
@@ -2139,7 +2204,11 @@ await batchAppendToSheet('Sekcje', sectionsData);
         }
 
         // Usuwanie wzoru
-        async function deletePattern() {
+        function deletePattern() {
+    if (isGuest) {
+        alert('❌ Konto gościa nie ma uprawnień do usuwania wzorów.');
+        return;
+    }
             const password = prompt('🔒 Wprowadź hasło admina:');
             if (password !== ADMIN_PASSWORD) {
                 alert('❌ Nieprawidłowe hasło!');
