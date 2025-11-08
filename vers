@@ -3073,6 +3073,68 @@ function printBlankTemplate(event) {
     const copiesText = copies === 1 ? 'kopię' : (copies < 5 ? 'kopie' : 'kopii');
     showSuccessMessage(`Przygotowano ${copies} ${copiesText} (${sectionsCount} sekcji) do druku!`);
 }
+
+function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, sectionsCount) {
+    let html = addPageBreak ? '<div class="page-break"></div>' : '';
+    
+    html += '<h1>SENTREX - Pusta Receptura</h1>';
+    
+    if (includeHeader) {
+        html += `
+            <div class="header-info">
+                <div class="field">
+                    <strong>Klient:</strong>
+                    <span class="field-input"></span>
+                </div>
+                <div class="field">
+                    <strong>Data:</strong>
+                    <span class="field-input" style="min-width: 150px;"></span>
+                </div>
+                <br>
+                <div class="field">
+                    <strong>Wzór:</strong>
+                    <span class="field-input" style="min-width: 300px;"></span>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        <h2>Sekcje (1-${sectionsCount})</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Sekcja</th>
+                    <th style="width: 42.5%;">Kolor</th>
+                    <th style="width: 42.5%;">Anilox</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    for (let i = 1; i <= sectionsCount; i++) {
+        html += `
+            <tr>
+                <td style="text-align: center;"><strong>${i}</strong></td>
+                <td></td>
+                <td></td>
+            </tr>
+        `;
+    }
+    
+    html += '</tbody></table>';
+    
+    if (includeNotes) {
+        html += `
+            <div class="notes-section">
+                <h3>💬 Uwagi</h3>
+                <div style="min-height: 60px;"></div>
+            </div>
+        `;
+    }
+    
+    return html;
+}
         
         // Zmiana motywu
         function toggleTheme() {
