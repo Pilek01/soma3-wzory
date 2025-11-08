@@ -834,6 +834,7 @@
                 <div class="title" onclick="showClients()">SOMA 3 - Wzory</div>
             </div>
             <div class="header-controls">
+    <button class="btn btn-secondary" onclick="showBlankTemplateModal()" title="Wydrukuj pustą tabelkę">📋 Pusta tabelka</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
     <button class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID, '_blank')" id="googleSheetsBtn" style="display: none;">📊 Google Sheets</button>
     <button class="btn logout-btn" onclick="logout()" id="logoutBtn" style="display: none;">🚪 Wyloguj</button>
@@ -877,7 +878,7 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.21';
+        const APP_VERSION = '1.1.3';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         
@@ -2888,6 +2889,239 @@ function returnToCurrentVersion() {
     showSuccessMessage('Plik HTML został pobrany! Możesz go otworzyć i wydrukować jako PDF.');
 }
 
+
+
+        // Modal z pustą tabelką
+function showBlankTemplateModal() {
+    showModal(`
+        <div class="modal-header">📋 Drukuj pustą tabelkę SOMA 3</div>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            💡 Wydrukuj pustą tabelkę do ręcznego wypełniania długopisem
+        </p>
+        <form onsubmit="printBlankTemplate(event)">
+            <div class="form-group">
+                <label>Liczba kopii *</label>
+                <input type="number" name="copies" min="1" max="10" value="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" name="include_header" checked style="width: 20px; height: 20px;">
+                    <span>Dodaj pola: Klient / Wzór / Data</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" name="include_notes" checked style="width: 20px; height: 20px;">
+                    <span>Dodaj sekcję "Uwagi"</span>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn">🖨️ Drukuj</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+            </div>
+        </form>
+    `);
+}
+
+function printBlankTemplate(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const copies = parseInt(formData.get('copies'));
+    const includeHeader = formData.get('include_header') === 'on';
+    const includeNotes = formData.get('include_notes') === 'on';
+    
+    closeModal();
+    
+    // Generuj HTML dla każdej kopii
+    let pagesHTML = '';
+    for (let copy = 1; copy <= copies; copy++) {
+        pagesHTML += generateBlankTableHTML(includeHeader, includeNotes, copy > 1);
+    }
+    
+    // Utwórz iframe do drukowania
+    const printFrame = document.createElement('iframe');
+    printFrame.style.position = 'absolute';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = 'none';
+    document.body.appendChild(printFrame);
+    
+    const printDocument = printFrame.contentWindow.document;
+    printDocument.open();
+    printDocument.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>SENTREX - Pusta Tabelka</title>
+            <style>
+                @media print {
+                    @page {
+                        margin: 1.5cm;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .page-break {
+                        page-break-before: always;
+                    }
+                }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    padding: 10px;
+                    max-width: 100%;
+                    margin: 0 auto;
+                }
+                h1 { 
+                    color: #ff6b35; 
+                    border-bottom: 3px solid #ff6b35; 
+                    padding-bottom: 10px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    font-size: 24px;
+                }
+                .header-info { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 8px;
+                    margin-bottom: 20px; 
+                }
+                .field {
+                    display: inline-block;
+                    margin-right: 2rem;
+                    margin-bottom: 0.5rem;
+                }
+                .field strong {
+                    margin-right: 0.5rem;
+                }
+                .field-input {
+                    border-bottom: 2px solid #333;
+                    display: inline-block;
+                    min-width: 200px;
+                    height: 1.5em;
+                }
+                h2 { 
+                    color: #333; 
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    font-size: 18px;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 15px; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+                th, td { 
+                    border: 2px solid #333; 
+                    padding: 12px; 
+                    text-align: left;
+                    height: 40px;
+                }
+                th { 
+                    background-color: #ff6b35; 
+                    color: white; 
+                    font-weight: bold;
+                }
+                .notes-section {
+                    margin-top: 30px;
+                    padding: 15px;
+                    border: 2px solid #333;
+                    border-radius: 8px;
+                    min-height: 100px;
+                }
+                .notes-section h3 {
+                    margin: 0 0 10px 0;
+                    color: #ff6b35;
+                }
+            </style>
+        </head>
+        <body>
+            ${pagesHTML}
+        </body>
+        </html>
+    `);
+    printDocument.close();
+    
+    printFrame.contentWindow.onload = function() {
+        setTimeout(() => {
+            printFrame.contentWindow.print();
+            setTimeout(() => {
+                document.body.removeChild(printFrame);
+            }, 100);
+        }, 100);
+    };
+    
+    showSuccessMessage(`Przygotowano ${copies} ${copies === 1 ? 'kopię' : 'kopii'} do druku!`);
+}
+
+function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak) {
+    let html = addPageBreak ? '<div class="page-break"></div>' : '';
+    
+    html += '<h1>SENTREX - Pusta Receptura</h1>';
+    
+    if (includeHeader) {
+        html += `
+            <div class="header-info">
+                <div class="field">
+                    <strong>Klient:</strong>
+                    <span class="field-input"></span>
+                </div>
+                <div class="field">
+                    <strong>Data:</strong>
+                    <span class="field-input" style="min-width: 150px;"></span>
+                </div>
+                <br>
+                <div class="field">
+                    <strong>Wzór:</strong>
+                    <span class="field-input" style="min-width: 300px;"></span>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        <h2>Sekcje SOMA 3 (1-10)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Sekcja</th>
+                    <th style="width: 42.5%;">Kolor</th>
+                    <th style="width: 42.5%;">Anilox</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    for (let i = 1; i <= 10; i++) {
+        html += `
+            <tr>
+                <td style="text-align: center;"><strong>${i}</strong></td>
+                <td></td>
+                <td></td>
+            </tr>
+        `;
+    }
+    
+    html += '</tbody></table>';
+    
+    if (includeNotes) {
+        html += `
+            <div class="notes-section">
+                <h3>💬 Uwagi</h3>
+                <div style="min-height: 60px;"></div>
+            </div>
+        `;
+    }
+    
+    return html;
+}
+        
         // Zmiana motywu
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
