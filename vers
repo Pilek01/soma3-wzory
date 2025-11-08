@@ -878,7 +878,7 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.3';
+        const APP_VERSION = '1.1.31';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         
@@ -2892,16 +2892,28 @@ function returnToCurrentVersion() {
 
 
         // Modal z pustą tabelką
+// Modal z pustą tabelką
 function showBlankTemplateModal() {
     showModal(`
-        <div class="modal-header">📋 Drukuj pustą tabelkę SOMA 3</div>
+        <div class="modal-header">📋 Drukuj pustą tabelkę</div>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
             💡 Wydrukuj pustą tabelkę do ręcznego wypełniania długopisem
         </p>
         <form onsubmit="printBlankTemplate(event)">
             <div class="form-group">
+                <label>Liczba sekcji *</label>
+                <select name="sections_count" required style="padding: 0.75rem;">
+                    <option value="8">8 sekcji (maszyny 8-kolorowe)</option>
+                    <option value="10" selected>10 sekcji (standard)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label>Liczba kopii *</label>
-                <input type="number" name="copies" min="1" max="10" value="1" required>
+                <input type="number" name="copies" min="1" max="200" value="1" required>
+                <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                    Możesz wydrukować od 1 do 200 kopii
+                </small>
             </div>
             
             <div class="form-group">
@@ -2931,6 +2943,7 @@ function printBlankTemplate(event) {
     
     const formData = new FormData(event.target);
     const copies = parseInt(formData.get('copies'));
+    const sectionsCount = parseInt(formData.get('sections_count'));
     const includeHeader = formData.get('include_header') === 'on';
     const includeNotes = formData.get('include_notes') === 'on';
     
@@ -2939,7 +2952,7 @@ function printBlankTemplate(event) {
     // Generuj HTML dla każdej kopii
     let pagesHTML = '';
     for (let copy = 1; copy <= copies; copy++) {
-        pagesHTML += generateBlankTableHTML(includeHeader, includeNotes, copy > 1);
+        pagesHTML += generateBlankTableHTML(includeHeader, includeNotes, copy > 1, sectionsCount);
     }
     
     // Utwórz iframe do drukowania
@@ -3057,69 +3070,8 @@ function printBlankTemplate(event) {
         }, 100);
     };
     
-    showSuccessMessage(`Przygotowano ${copies} ${copies === 1 ? 'kopię' : 'kopii'} do druku!`);
-}
-
-function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak) {
-    let html = addPageBreak ? '<div class="page-break"></div>' : '';
-    
-    html += '<h1>SENTREX - Pusta Receptura</h1>';
-    
-    if (includeHeader) {
-        html += `
-            <div class="header-info">
-                <div class="field">
-                    <strong>Klient:</strong>
-                    <span class="field-input"></span>
-                </div>
-                <div class="field">
-                    <strong>Data:</strong>
-                    <span class="field-input" style="min-width: 150px;"></span>
-                </div>
-                <br>
-                <div class="field">
-                    <strong>Wzór:</strong>
-                    <span class="field-input" style="min-width: 300px;"></span>
-                </div>
-            </div>
-        `;
-    }
-    
-    html += `
-        <h2>Sekcje SOMA 3 (1-10)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 15%;">Sekcja</th>
-                    <th style="width: 42.5%;">Kolor</th>
-                    <th style="width: 42.5%;">Anilox</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    for (let i = 1; i <= 10; i++) {
-        html += `
-            <tr>
-                <td style="text-align: center;"><strong>${i}</strong></td>
-                <td></td>
-                <td></td>
-            </tr>
-        `;
-    }
-    
-    html += '</tbody></table>';
-    
-    if (includeNotes) {
-        html += `
-            <div class="notes-section">
-                <h3>💬 Uwagi</h3>
-                <div style="min-height: 60px;"></div>
-            </div>
-        `;
-    }
-    
-    return html;
+    const copiesText = copies === 1 ? 'kopię' : (copies < 5 ? 'kopie' : 'kopii');
+    showSuccessMessage(`Przygotowano ${copies} ${copiesText} (${sectionsCount} sekcji) do druku!`);
 }
         
         // Zmiana motywu
