@@ -499,6 +499,44 @@
         100% { transform: rotate(360deg); }
     }
 
+    /* Sync Indicator */
+    #syncIndicator {
+        animation: slideInRight 0.3s;
+        transition: all 0.3s;
+    }
+
+    #syncIndicator.syncing {
+        border-color: var(--accent);
+    }
+
+    #syncIndicator.synced {
+        border-color: var(--success);
+    }
+
+    #syncIcon {
+        font-size: 1.2rem;
+    }
+
+    #syncIndicator.syncing #syncIcon {
+        animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
     /* Login Screen */
     .login-screen {
         position: fixed;
@@ -853,7 +891,7 @@
         <div id="content">
             <div class="loading">
                 <div class="spinner"></div>
-                Ładowanie danych z Google Sheets...
+                <div id="loadingText">Ładowanie danych z Google Sheets...</div>
             </div>
         </div>
     </div>
@@ -875,10 +913,19 @@
         <div class="modal-content" id="modalContent"></div>
     </div>
 
+    <!-- Wskaźnik synchronizacji -->
+    <div id="syncIndicator" style="position: fixed; bottom: 20px; right: 20px;
+         background: var(--bg-secondary); padding: 0.75rem 1.5rem; border-radius: 25px;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: none; border: 2px solid var(--border);
+         align-items: center; gap: 0.75rem; z-index: 999;">
+        <span id="syncIcon">🔄</span>
+        <span id="syncText">Synchronizacja...</span>
+    </div>
+
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.41';
+        const APP_VERSION = '1.1.42';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         const CACHE_KEY = 'soma3_cache_v2';
@@ -1213,6 +1260,10 @@ async function batchAppendToSheet(sheetName, rows) {
                 if (!forceRefresh) {
                     const cached = loadFromCache();
                     if (cached) {
+                        // Zaktualizuj tekst ładowania
+                        const loadingText = document.getElementById('loadingText');
+                        if (loadingText) loadingText.textContent = 'Ładowanie z cache... ⚡';
+
                         // NATYCHMIAST załaduj z cache
                         clients = cached.clients || [];
                         sections = cached.sections || [];
@@ -3311,6 +3362,19 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
             if (isSyncing) return;
 
             isSyncing = true;
+
+            // Pokaż wskaźnik synchronizacji
+            const indicator = document.getElementById('syncIndicator');
+            const syncText = document.getElementById('syncText');
+            const syncIcon = document.getElementById('syncIcon');
+
+            if (indicator) {
+                indicator.style.display = 'flex';
+                indicator.className = 'syncing';
+                syncIcon.textContent = '🔄';
+                syncText.textContent = 'Sprawdzanie...';
+            }
+
             console.log('🔄 Sprawdzam aktualizacje...');
 
             try {
@@ -3327,13 +3391,43 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                                    ]);
 
                 if (needsUpdate) {
+                    if (syncText) syncText.textContent = 'Pobieranie...';
                     console.log('📥 Pobieranie zmian...');
                     await loadAllData(true);
+
+                    // Sukces - zaktualizowano
+                    if (indicator) {
+                        indicator.className = 'synced';
+                        syncIcon.textContent = '✅';
+                        syncText.textContent = 'Zaktualizowano';
+                    }
                     showSuccessMessage('Zaktualizowano dane');
                 } else {
+                    // Dane aktualne
+                    if (indicator) {
+                        indicator.className = 'synced';
+                        syncIcon.textContent = '✅';
+                        syncText.textContent = 'Dane aktualne';
+                    }
                     console.log('✅ Dane aktualne');
                 }
+
+                // Ukryj wskaźnik po 3 sekundach
+                setTimeout(() => {
+                    if (indicator) indicator.style.display = 'none';
+                }, 3000);
+
             } catch (error) {
+                // Błąd synchronizacji
+                if (indicator) {
+                    indicator.className = '';
+                    syncIcon.textContent = '❌';
+                    syncText.textContent = 'Błąd sync';
+
+                    setTimeout(() => {
+                        indicator.style.display = 'none';
+                    }, 3000);
+                }
                 console.error('❌ Błąd sync:', error);
             } finally {
                 isSyncing = false;
