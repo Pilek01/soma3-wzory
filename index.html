@@ -878,12 +878,12 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.4';
+        const APP_VERSION = '1.1.41';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         const CACHE_KEY = 'soma3_cache_v2';
         const CACHE_TIMESTAMP_KEY = 'soma3_cache_timestamp';
-        const CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24h
+        const CACHE_MAX_AGE = 72 * 60 * 60 * 1000; // 72h (3 dni)
 
 
         let clients = [];
@@ -913,17 +913,28 @@
         }
 
         async function loadUsers() {
+    // Spróbuj załadować użytkowników z cache
+    const cached = loadFromCache();
+    if (cached && cached.users && cached.users.length > 0) {
+        users = cached.users;
+        console.log('⚡ Użytkownicy z cache:', users.length);
+        return;
+    }
+
+    // Jeśli brak cache - pobierz z Google Sheets
     const usersData = await fetchSheetData('Użytkownicy');
     users = usersData.slice(1).filter(row => row[0]).map(row => ({
         name: String(row[0] || '').trim(),
         password: String(row[1] || '').trim()
     }));
-    
+
     // Dodaj konto gościa
     users.push({
         name: 'Gość',
         password: 'gosc'
     });
+
+    console.log('📥 Użytkownicy z Google Sheets:', users.length);
 }
 
         function showLoginScreen() {
