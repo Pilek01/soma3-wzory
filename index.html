@@ -878,12 +878,16 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.31';
+        const APP_VERSION = '1.1.4';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
-        
+        const CACHE_KEY = 'soma3_cache_v2';
+        const CACHE_TIMESTAMP_KEY = 'soma3_cache_timestamp';
+        const CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24h
+
 
         let clients = [];
+        let isSyncing = false;
         let patterns = [];
         let sections = [];
         let comments = [];
@@ -1137,10 +1141,103 @@ async function batchAppendToSheet(sheetName, rows) {
         throw error;
     }
 }
-        
-        // Ładowanie wszystkich danych
-        async function loadAllData() {
+
+        // Funkcje cache
+        function saveToCache(data) {
             try {
+                const cacheData = {
+                    clients: data.clients || clients,
+                    patterns: data.patterns || patterns,
+                    sections: data.sections || sections,
+                    comments: data.comments || comments,
+                    history: data.history || history,
+                    aniloxy: data.aniloxy || aniloxy,
+                    users: data.users || users,
+                    timestamp: Date.now()
+                };
+
+                localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+                localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+                console.log('✅ Cache zapisany');
+            } catch (error) {
+                console.error('❌ Błąd zapisu cache:', error);
+                if (error.name === 'QuotaExceededError') {
+                    localStorage.removeItem(CACHE_KEY);
+                    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+                }
+            }
+        }
+
+        function loadFromCache() {
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
+                if (!cached || !timestamp) {
+                    console.log('ℹ️ Brak cache');
+                    return null;
+                }
+
+                const age = Date.now() - parseInt(timestamp);
+                if (age > CACHE_MAX_AGE) {
+                    console.log('⏰ Cache przestarzały');
+                    localStorage.removeItem(CACHE_KEY);
+                    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+                    return null;
+                }
+
+                const data = JSON.parse(cached);
+                console.log(`✅ Cache (${Math.round(age/1000/60)} min)`);
+                return data;
+            } catch (error) {
+                console.error('❌ Błąd cache:', error);
+                return null;
+            }
+        }
+
+        // Ładowanie wszystkich danych
+        async function loadAllData(forceRefresh = false) {
+            try {
+                // Spróbuj z cache
+                if (!forceRefresh) {
+                    const cached = loadFromCache();
+                    if (cached) {
+                        // NATYCHMIAST załaduj z cache
+                        clients = cached.clients || [];
+                        sections = cached.sections || [];
+                        comments = cached.comments || [];
+                        history = cached.history || [];
+                        aniloxy = cached.aniloxy || [];
+                        users = cached.users || [];
+
+                        window.allPatternsWithParents = cached.patterns || [];
+
+                        // Zgrupuj wzory po numerze i kliencie, zostaw tylko najnowszy
+                        const patternGroups = {};
+                        (cached.patterns || []).forEach(pattern => {
+                            const key = `${pattern.klient_id}_${pattern.numer}`;
+
+                            if (!patternGroups[key]) {
+                                patternGroups[key] = pattern;
+                            } else {
+                                // Porównaj ID (większe = nowsze, bo używamy timestamp)
+                                if (parseInt(pattern.id) > parseInt(patternGroups[key].id)) {
+                                    patternGroups[key] = pattern;
+                                }
+                            }
+                        });
+                        patterns = Object.values(patternGroups);
+
+                        console.log('⚡ Cache loaded:', clients.length, 'klientów');
+                        renderView();
+
+                        // Synchronizuj w tle
+                        setTimeout(() => syncInBackground(), 1000);
+                        return;
+                    }
+                }
+
+                // Jeśli brak cache - pełne ładowanie
                 const [clientsData, patternsData, sectionsData, commentsData, historyData, aniloxyData] = await Promise.all([
                     fetchSheetData('Klienci'),
                     fetchSheetData('Wzory'),
@@ -1219,6 +1316,17 @@ patterns = Object.values(patternGroups);
                     aniloxy: aniloxy.length
                 });
 
+                // Zapisz do cache
+                saveToCache({
+                    clients,
+                    patterns: window.allPatternsWithParents,
+                    sections,
+                    comments,
+                    history,
+                    aniloxy,
+                    users
+                });
+
                 renderView();
             } catch (error) {
                 document.getElementById('content').innerHTML = `
@@ -1291,8 +1399,8 @@ patterns = Object.values(patternGroups);
             content.innerHTML = filteredClients.map(client => {
                 const clientPatterns = patterns.filter(p => p.klient_id === client.id);
                 return `
-                    <div class="card" onclick="showPatterns('${client.id}')">
-                        <div class="card-header">${client.numer} | ${client.nazwa}</div>
+                    <div class="card" onclick="showPatterns('${escapeHtml(client.id)}')">
+                        <div class="card-header">${escapeHtml(client.numer)} | ${escapeHtml(client.nazwa)}</div>
                         <div class="card-body">${clientPatterns.length} wzorów</div>
                     </div>
                 `;
@@ -1327,8 +1435,8 @@ patterns = Object.values(patternGroups);
                 '</div></div>';
     } else {
         html += filteredPatterns.map(pattern => `
-            <div class="card" onclick="showPatternDetail('${pattern.id}')">
-                <div class="card-header">${pattern.numer} | ${pattern.nazwa}</div>
+            <div class="card" onclick="showPatternDetail('${escapeHtml(pattern.id)}')">
+                <div class="card-header">${escapeHtml(pattern.numer)} | ${escapeHtml(pattern.nazwa)}</div>
                 ${pattern.zdjecie_url ? '<div class="card-body">📷 Ze zdjęciem</div>' : ''}
             </div>
         `).join('');
@@ -1374,10 +1482,10 @@ patterns = Object.values(patternGroups);
 
     let html = `
         <div class="card" style="cursor: default;">
-            <div class="card-header">${currentPattern.numer} | ${currentPattern.nazwa}</div>
+            <div class="card-header">${escapeHtml(currentPattern.numer)} | ${escapeHtml(currentPattern.nazwa)}</div>
             <div class="card-body">
-                <p><strong>Klient:</strong> ${currentClient.nazwa}</p>
-                ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" class="pattern-image" alt="Wzór">` : ''}
+                <p><strong>Klient:</strong> ${escapeHtml(currentClient.nazwa)}</p>
+                ${currentPattern.zdjecie_url ? `<img src="${escapeHtml(currentPattern.zdjecie_url)}" class="pattern-image" alt="Wzór">` : ''}
             </div>
         </div>
 
@@ -1388,8 +1496,8 @@ patterns = Object.values(patternGroups);
             ${patternSections.map(section => `
                 <div class="section-card ${!section.kolor && !section.anilox ? 'empty' : ''}">
                     <h4>Sekcja ${section.nr_sekcji}</h4>
-                    <p><strong>Kolor:</strong> ${section.kolor || '—'}</p>
-                    <p><strong>Anilox:</strong> ${section.anilox || '—'}</p>
+                    <p><strong>Kolor:</strong> ${escapeHtml(section.kolor) || '—'}</p>
+                    <p><strong>Anilox:</strong> ${escapeHtml(section.anilox) || '—'}</p>
                 </div>
             `).join('')}
         </div>
@@ -1398,7 +1506,7 @@ patterns = Object.values(patternGroups);
             <h3 style="color: var(--accent); font-size: 1.5rem; margin-bottom: 1rem;">💬 Uwagi</h3>
             ${!isGuest ? '<button class="btn" onclick="showAddCommentModal()">+ Dodaj Uwagę</button>' : ''}
             <div style="margin-top: 1.5rem">
-                ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' : 
+                ${patternComments.length === 0 ? '<p style="color: var(--text-secondary); font-style: italic;">Brak uwag dla tego wzoru</p>' :
                     patternComments.map((comment, index) => {
                         let displayDate = comment.data;
                         try {
@@ -1415,23 +1523,23 @@ patterns = Object.values(patternGroups);
                                 });
                             }
                         } catch (e) {}
-                        
+
                         return `
                         <div class="comment">
                             <div class="comment-header">
-                                <span><strong>${comment.autor}</strong></span>
+                                <span><strong>${escapeHtml(comment.autor)}</strong></span>
                                 <span style="display: flex; align-items: center; gap: 1rem;">
                                     <span>${displayDate}</span>
                                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                        <input type="checkbox" 
-                                               class="print-comment-checkbox" 
+                                        <input type="checkbox"
+                                               class="print-comment-checkbox"
                                                id="comment-${index}"
                                                style="width: 18px; height: 18px; cursor: pointer;">
                                         <span style="font-size: 1.2rem;">🖨️</span>
                                     </label>
                                 </span>
                             </div>
-                            <div style="white-space: pre-wrap;">${comment.tresc}</div>
+                            <div style="white-space: pre-wrap;">${escapeHtml(comment.tresc)}</div>
                         </div>
                     `}).join('')
                 }
@@ -1717,7 +1825,7 @@ function closeModalAndReload() {
     const allAnilox = [...aniloxy].sort();
 
     showModal(`
-        <div class="modal-header">Dodaj Wzór dla: ${currentClient.nazwa}</div>
+        <div class="modal-header">Dodaj Wzór dla: ${escapeHtml(currentClient.nazwa)}</div>
         <form id="addPatternForm" onsubmit="addPattern(event)">
                     <div class="form-group">
                         <label>Numer Wzoru *</label>
@@ -1896,18 +2004,18 @@ await batchAppendToSheet('Sekcje', sectionsData);
                 `<button type="button" class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}', '_blank')">📊 Otwórz w Google Sheets</button>` : '';
 
             showModal(`
-                <div class="modal-header">Edytuj Wzór: ${currentPattern.nazwa}</div>
+                <div class="modal-header">Edytuj Wzór: ${escapeHtml(currentPattern.nazwa)}</div>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
                     ℹ️ Edycja utworzy nową wersję wzoru. Numer i nazwa pozostaną bez zmian.
                 </p>
                 <form id="editPatternForm" onsubmit="saveEditedPattern(event)">
                     <div class="form-group">
                         <label>Numer Wzoru</label>
-                        <input type="text" value="${currentPattern.numer}" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        <input type="text" value="${escapeHtml(currentPattern.numer)}" readonly style="opacity: 0.6; cursor: not-allowed;">
                     </div>
                     <div class="form-group">
                         <label>Nazwa Wzoru</label>
-                        <input type="text" value="${currentPattern.nazwa}" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        <input type="text" value="${escapeHtml(currentPattern.nazwa)}" readonly style="opacity: 0.6; cursor: not-allowed;">
                     </div>
                     
                     <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
@@ -2077,7 +2185,7 @@ if (oldComments.length > 0) {
         return;
     }
             showModal(`
-                <div class="modal-header">Dodaj Uwagę do: ${currentPattern.nazwa}</div>
+                <div class="modal-header">Dodaj Uwagę do: ${escapeHtml(currentPattern.nazwa)}</div>
                 <form onsubmit="addComment(event)">
                     <div class="form-group">
                         <label>Uwaga *</label>
@@ -2150,7 +2258,7 @@ if (oldComments.length > 0) {
             });
 
             showModal(`
-                <div class="modal-header">Kopiuj Wzór: ${currentPattern.nazwa}</div>
+                <div class="modal-header">Kopiuj Wzór: ${escapeHtml(currentPattern.nazwa)}</div>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
                     💡 Wybierz klienta, dla którego chcesz stworzyć kopię tego wzoru.<br>
                     Następnie będziesz mógł edytować dane przed zapisaniem.
@@ -2160,8 +2268,8 @@ if (oldComments.length > 0) {
                         <label>Wybierz klienta docelowego *</label>
                         <select name="target_client" required>
                             <option value="">-- Wybierz --</option>
-                            ${sortedClients.map(c => 
-                                `<option value="${c.id}" ${c.id === currentClient.id ? 'selected' : ''}>${c.numer} | ${c.nazwa}</option>`
+                            ${sortedClients.map(c =>
+                                `<option value="${escapeHtml(c.id)}" ${c.id === currentClient.id ? 'selected' : ''}>${escapeHtml(c.numer)} | ${escapeHtml(c.nazwa)}</option>`
                             ).join('')}
                         </select>
                     </div>
@@ -2202,19 +2310,19 @@ if (oldComments.length > 0) {
     const allAnilox = [...aniloxy].sort();
 
     showModal(`
-                <div class="modal-header">Nowy wzór na podstawie: ${currentPattern.nazwa}</div>
+                <div class="modal-header">Nowy wzór na podstawie: ${escapeHtml(currentPattern.nazwa)}</div>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                    🎯 Klient docelowy: <strong>${currentClient.numer} | ${currentClient.nazwa}</strong><br>
-                    📋 Kopiujesz z: ${originalClient.numer} | ${originalClient.nazwa}
+                    🎯 Klient docelowy: <strong>${escapeHtml(currentClient.numer)} | ${escapeHtml(currentClient.nazwa)}</strong><br>
+                    📋 Kopiujesz z: ${escapeHtml(originalClient.numer)} | ${escapeHtml(originalClient.nazwa)}
                 </p>
                 <form id="copyPatternForm" onsubmit="saveCopiedPattern(event)">
                     <div class="form-group">
                         <label>Numer Wzoru *</label>
-                        <input type="text" name="numer" required placeholder="np. 1, 003" value="${currentPattern.numer}">
+                        <input type="text" name="numer" required placeholder="np. 1, 003" value="${escapeHtml(currentPattern.numer)}">
                     </div>
                     <div class="form-group">
                         <label>Nazwa Wzoru *</label>
-                        <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${currentPattern.nazwa}">
+                        <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg" value="${escapeHtml(currentPattern.nazwa)}">
                     </div>
                     
                     <h3 style="margin: 2rem 0 1rem 0; color: var(--accent);">Sekcje 1-10 (SOMA 3)</h3>
@@ -2375,7 +2483,7 @@ function showPatternHistory() {
     }
     
     let historyHTML = `
-        <div class="modal-header">Historia zmian: ${currentPattern.nazwa}</div>
+        <div class="modal-header">Historia zmian: ${escapeHtml(currentPattern.nazwa)}</div>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
             Wzór ma ${versions.length} wersji. Najnowsza na górze.
         </p>
@@ -2611,7 +2719,7 @@ function returnToCurrentVersion() {
     // Zbierz zaznaczone uwagi
     const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
     const selectedComments = [];
-    
+
     document.querySelectorAll('.print-comment-checkbox').forEach((checkbox, index) => {
         if (checkbox.checked && patternComments[index]) {
             selectedComments.push(patternComments[index]);
@@ -2625,7 +2733,7 @@ function returnToCurrentVersion() {
             <h2 style="margin-top: 30px;">💬 Uwagi</h2>
             ${selectedComments.map(comment => `
                 <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
-                    <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                    <div style="white-space: pre-wrap; color: #333;">${escapeHtml(comment.tresc)}</div>
                 </div>
             `).join('')}
         `;
@@ -2715,10 +2823,10 @@ function returnToCurrentVersion() {
         <body>
             <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
             <div class="header-info">
-                <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
-                <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+                <p><strong>Klient:</strong> ${escapeHtml(currentClient.numer)} | ${escapeHtml(currentClient.nazwa)}</p>
+                <p><strong>Wzór:</strong> ${escapeHtml(currentPattern.numer)} | ${escapeHtml(currentPattern.nazwa)}</p>
             </div>
-            ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
+            ${currentPattern.zdjecie_url ? `<img src="${escapeHtml(currentPattern.zdjecie_url)}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
             <h2>Sekcje SOMA 3 (1-10)</h2>
             <table>
                 <thead>
@@ -2732,8 +2840,8 @@ function returnToCurrentVersion() {
                     ${patternSections.map(section => `
                         <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
                             <td><strong>${section.nr_sekcji}</strong></td>
-                            <td>${section.kolor || '—'}</td>
-                            <td>${section.anilox || '—'}</td>
+                            <td>${escapeHtml(section.kolor) || '—'}</td>
+                            <td>${escapeHtml(section.anilox) || '—'}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -2765,7 +2873,7 @@ function returnToCurrentVersion() {
     // Zbierz zaznaczone uwagi
     const patternComments = comments.filter(c => c.wzor_id === currentPattern.id);
     const selectedComments = [];
-    
+
     document.querySelectorAll('.print-comment-checkbox').forEach((checkbox, index) => {
         if (checkbox.checked && patternComments[index]) {
             selectedComments.push(patternComments[index]);
@@ -2779,7 +2887,7 @@ function returnToCurrentVersion() {
             <h2 style="margin-top: 30px;">💬 Uwagi</h2>
             ${selectedComments.map(comment => `
                 <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
-                    <div style="white-space: pre-wrap; color: #333;">${comment.tresc}</div>
+                    <div style="white-space: pre-wrap; color: #333;">${escapeHtml(comment.tresc)}</div>
                 </div>
             `).join('')}
         `;
@@ -2790,7 +2898,7 @@ function returnToCurrentVersion() {
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>Wzór ${currentPattern.numer} - ${currentPattern.nazwa}</title>
+            <title>Wzór ${escapeHtml(currentPattern.numer)} - ${escapeHtml(currentPattern.nazwa)}</title>
             <style>
                 body { 
                     font-family: Arial, sans-serif; 
@@ -2850,10 +2958,10 @@ function returnToCurrentVersion() {
         <body>
             <h1>SENTREX SOMA 3 - Receptura Wzoru</h1>
             <div class="header-info">
-                <p><strong>Klient:</strong> ${currentClient.numer} | ${currentClient.nazwa}</p>
-                <p><strong>Wzór:</strong> ${currentPattern.numer} | ${currentPattern.nazwa}</p>
+                <p><strong>Klient:</strong> ${escapeHtml(currentClient.numer)} | ${escapeHtml(currentClient.nazwa)}</p>
+                <p><strong>Wzór:</strong> ${escapeHtml(currentPattern.numer)} | ${escapeHtml(currentPattern.nazwa)}</p>
             </div>
-            ${currentPattern.zdjecie_url ? `<img src="${currentPattern.zdjecie_url}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
+            ${currentPattern.zdjecie_url ? `<img src="${escapeHtml(currentPattern.zdjecie_url)}" style="max-width: 100%; margin: 15px 0; border-radius: 8px;">` : ''}
             <h2>Sekcje SOMA 3 (1-10)</h2>
             <table>
                 <thead>
@@ -2867,8 +2975,8 @@ function returnToCurrentVersion() {
                     ${patternSections.map(section => `
                         <tr class="${!section.kolor || section.kolor === '—' ? 'empty' : ''}">
                             <td><strong>${section.nr_sekcji}</strong></td>
-                            <td>${section.kolor || '—'}</td>
-                            <td>${section.anilox || '—'}</td>
+                            <td>${escapeHtml(section.kolor) || '—'}</td>
+                            <td>${escapeHtml(section.anilox) || '—'}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -2882,7 +2990,7 @@ function returnToCurrentVersion() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `SENTREX_SOMA3_${currentPattern.numer}_${currentPattern.nazwa.replace(/[^a-z0-9]/gi, '_')}.html`;
+    a.download = `SENTREX_SOMA3_${escapeHtml(currentPattern.numer)}_${escapeHtml(currentPattern.nazwa).replace(/[^a-z0-9]/gi, '_')}.html`;
     a.click();
     URL.revokeObjectURL(url);
     
@@ -3178,6 +3286,55 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                 closeModal();
             }
         });
+
+        // Funkcja do escapowania HTML (bezpieczeństwo)
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Synchronizacja w tle
+        async function syncInBackground() {
+            if (isSyncing) return;
+
+            isSyncing = true;
+            console.log('🔄 Sprawdzam aktualizacje...');
+
+            try {
+                const historyData = await fetchSheetData('Historia');
+                const latestEntry = historyData[historyData.length - 1];
+                const cachedEntry = history[history.length - 1];
+
+                const needsUpdate = !cachedEntry ||
+                                   JSON.stringify(latestEntry) !== JSON.stringify([
+                                       cachedEntry.data,
+                                       cachedEntry.kto,
+                                       cachedEntry.akcja,
+                                       cachedEntry.szczegoly
+                                   ]);
+
+                if (needsUpdate) {
+                    console.log('📥 Pobieranie zmian...');
+                    await loadAllData(true);
+                    showSuccessMessage('Zaktualizowano dane');
+                } else {
+                    console.log('✅ Dane aktualne');
+                }
+            } catch (error) {
+                console.error('❌ Błąd sync:', error);
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        // Auto-sync co 5 minut
+        setInterval(() => {
+            if (currentUser && !isSyncing) {
+                syncInBackground();
+            }
+        }, 5 * 60 * 1000);
 
         // Inicjalizacja
         initApp();
