@@ -860,6 +860,1036 @@
             font-size: 1.5rem;
         }
     }
+    /* Flexo PRO treatment for SOMA 3 Wzory v2.0.0 */
+    :root {
+        --bg-primary: #08111c;
+        --bg-secondary: #111d2b;
+        --bg-tertiary: #182637;
+        --surface: #121f2f;
+        --surface-soft: #17283a;
+        --text-primary: #f6f8fb;
+        --text-secondary: #aebed1;
+        --accent: #ff7a3d;
+        --accent-hover: #ff9b66;
+        --cyan: #00d8ff;
+        --magenta: #ff3fb4;
+        --yellow: #ffd84d;
+        --black: #111318;
+        --border: rgba(219, 231, 244, 0.16);
+        --success: #3ecf8e;
+        --danger: #ff5a6e;
+        --shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+    }
+
+    body {
+        background:
+            radial-gradient(circle at 14% 0%, rgba(0, 216, 255, 0.12), transparent 28%),
+            radial-gradient(circle at 86% 0%, rgba(255, 63, 180, 0.10), transparent 26%),
+            linear-gradient(180deg, #08111c 0%, #0a141f 45%, #07101a 100%);
+        letter-spacing: 0;
+    }
+
+    body.light-mode {
+        --bg-primary: #eef3f8;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #e8eef6;
+        --surface: #ffffff;
+        --surface-soft: #f4f7fb;
+        --text-primary: #172033;
+        --text-secondary: #66758a;
+        --border: rgba(23, 32, 51, 0.14);
+        background: #eef3f8;
+    }
+
+    .header {
+        padding: 0.95rem 1.25rem;
+        border-bottom: 1px solid rgba(255, 122, 61, 0.32);
+        background: rgba(9, 18, 29, 0.86);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.34);
+    }
+
+    .header-content,
+    .container {
+        max-width: 1480px;
+    }
+
+    .logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.16), 0 10px 26px rgba(0,0,0,0.32);
+    }
+
+    .title {
+        color: #ffd2b6;
+        font-size: 1.35rem;
+        text-shadow: 0 2px 12px rgba(255, 122, 61, 0.22);
+    }
+
+    .header-controls {
+        gap: 0.65rem;
+    }
+
+    .patterns-count-badge {
+        display: none;
+        align-items: center;
+        gap: 0.55rem;
+        min-height: 42px;
+        padding: 0.58rem 0.85rem;
+        border: 1px solid rgba(219, 231, 244, 0.16);
+        border-radius: 8px;
+        background:
+            linear-gradient(180deg, rgba(31, 46, 65, 0.62), rgba(14, 24, 37, 0.62));
+        color: #dbe7f4;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+        white-space: nowrap;
+    }
+
+    .patterns-count-badge strong {
+        color: #ffd2b6;
+        font-size: 1.05rem;
+        line-height: 1;
+        text-shadow: 0 2px 10px rgba(255, 122, 61, 0.20);
+    }
+
+    .patterns-count-badge span:last-child {
+        color: #aebed1;
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+        .patterns-count-badge {
+            order: 3;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .btn,
+    .theme-toggle {
+        border-radius: 8px;
+        border: 1px solid rgba(255, 210, 182, 0.20);
+        box-shadow: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .btn {
+        background:
+            linear-gradient(180deg, rgba(255, 142, 85, 0.96), rgba(214, 88, 34, 0.96));
+        color: #fff;
+        border-color: rgba(255, 178, 130, 0.42);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 22px rgba(214, 88, 34, 0.18);
+        font-weight: 850;
+    }
+
+    .btn-secondary,
+    .theme-toggle {
+        background:
+            linear-gradient(180deg, rgba(31, 46, 65, 0.76), rgba(14, 24, 37, 0.76));
+        color: #dbe7f4;
+        border-color: rgba(219, 231, 244, 0.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .btn-success {
+        background:
+            linear-gradient(180deg, rgba(255, 142, 85, 0.96), rgba(214, 88, 34, 0.96));
+        border-color: rgba(255, 178, 130, 0.42);
+    }
+
+    .btn-danger {
+        background: linear-gradient(180deg, #ff6b7c, #d9344c);
+        border-color: rgba(255, 143, 157, 0.46);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 22px rgba(217, 52, 76, 0.20);
+    }
+
+    .btn:hover,
+    .theme-toggle:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 122, 61, 0.42);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.24);
+    }
+
+    .btn-secondary:hover,
+    .theme-toggle:hover {
+        background:
+            linear-gradient(180deg, rgba(42, 59, 82, 0.88), rgba(18, 31, 47, 0.88));
+        border-color: rgba(219, 231, 244, 0.30);
+    }
+
+    .btn:not(.btn-secondary):not(.btn-danger):hover {
+        background:
+            linear-gradient(180deg, rgba(255, 153, 100, 1), rgba(224, 96, 42, 1));
+        box-shadow: 0 14px 34px rgba(224, 96, 42, 0.26);
+    }
+
+    .container {
+        margin-top: 1.25rem;
+    }
+
+    .soma-clients-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin: 2.2rem 0 1.15rem;
+    }
+
+    .soma-clients-toolbar .section-title {
+        margin: 0;
+    }
+
+    .soma-clients-toolbar .btn {
+        min-width: 160px;
+    }
+
+    .pattern-detail-pro {
+        display: grid;
+        gap: 1.15rem;
+    }
+
+    .pattern-hero-pro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: start;
+        padding: 1.35rem;
+        border: 1px solid rgba(91, 179, 217, 0.28);
+        border-left: 4px solid var(--cyan);
+        border-radius: 8px;
+        background:
+            radial-gradient(circle at 0% 0%, rgba(91, 179, 217, 0.14), transparent 38%),
+            linear-gradient(145deg, rgba(27, 42, 60, 0.96), rgba(13, 24, 37, 0.96));
+        box-shadow: var(--shadow);
+    }
+
+    .pattern-eyebrow {
+        margin-bottom: 0.4rem;
+        color: #aebed1;
+        font-size: 0.84rem;
+        font-weight: 850;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .pattern-title-pro {
+        margin: 0;
+        color: #ffd2b6;
+        font-size: clamp(1.35rem, 2vw, 2rem);
+        line-height: 1.18;
+        text-shadow: 0 2px 12px rgba(255, 122, 61, 0.22);
+    }
+
+    .pattern-client-pro {
+        margin-top: 0.7rem;
+        color: #c9d7e8;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .pattern-image-mini {
+        width: 132px;
+        max-height: 96px;
+        object-fit: cover;
+        border: 1px solid rgba(219, 231, 244, 0.20);
+        border-radius: 8px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+    }
+
+    .pattern-action-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+    }
+
+    .pattern-action-bar .btn {
+        min-height: 40px;
+        padding: 0.62rem 0.9rem;
+    }
+
+    .pattern-workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+        gap: 1.15rem;
+        align-items: start;
+    }
+
+    .recipe-panel,
+    .notes-panel {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background:
+            linear-gradient(145deg, rgba(27, 42, 60, 0.94), rgba(13, 24, 37, 0.94)),
+            var(--surface);
+        box-shadow: var(--shadow);
+    }
+
+    .recipe-panel {
+        padding: 1.15rem;
+    }
+
+    .panel-heading-pro {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .panel-heading-pro h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: 1.35rem;
+    }
+
+    .sections-list-pro {
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .section-row-pro {
+        display: grid;
+        grid-template-columns: 74px minmax(0, 1.4fr) minmax(120px, 0.8fr);
+        gap: 0.75rem;
+        align-items: center;
+        min-height: 54px;
+        padding: 0.72rem 0.85rem;
+        border: 1px solid rgba(219, 231, 244, 0.10);
+        border-radius: 8px;
+        background: rgba(7, 16, 27, 0.30);
+    }
+
+    .section-row-pro.empty {
+        opacity: 0.54;
+        border-style: dashed;
+    }
+
+    .section-number-pro {
+        color: var(--yellow);
+        font-weight: 950;
+    }
+
+    .section-value-pro {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 0.55rem;
+        color: #e8f1fb;
+        font-weight: 850;
+    }
+
+    .section-label-pro {
+        display: block;
+        margin-bottom: 0.16rem;
+        color: #8fa1b7;
+        font-size: 0.72rem;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .ink-dot-pro {
+        width: 12px;
+        height: 12px;
+        flex: 0 0 12px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.36);
+        background: linear-gradient(135deg, #f6a23f, #d75a22);
+        box-shadow: 0 0 18px rgba(255,122,61,0.22);
+    }
+
+    .ink-dot-pro.yellow { background: #ffe14d; box-shadow: 0 0 18px rgba(255,225,77,0.22); }
+    .ink-dot-pro.magenta { background: #ff4fb0; box-shadow: 0 0 18px rgba(255,79,176,0.22); }
+    .ink-dot-pro.cyan { background: #31c8ff; box-shadow: 0 0 18px rgba(49,200,255,0.22); }
+    .ink-dot-pro.black { background: #d7dde7; box-shadow: 0 0 18px rgba(215,221,231,0.18); }
+    .ink-dot-pro.empty { background: transparent; border-color: rgba(143,161,183,0.32); box-shadow: none; }
+
+    .notes-panel {
+        position: sticky;
+        top: 112px;
+        overflow: hidden;
+    }
+
+    .notes-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding: 1rem 1rem 0.75rem;
+        border-bottom: 1px solid rgba(219, 231, 244, 0.10);
+    }
+
+    .notes-panel-header h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: 1.25rem;
+    }
+
+    .notes-count {
+        color: #aebed1;
+        font-size: 0.84rem;
+        font-weight: 850;
+    }
+
+    .notes-panel-body {
+        display: grid;
+        gap: 0.72rem;
+        max-height: min(62vh, 620px);
+        overflow: auto;
+        padding: 0.9rem 1rem 1rem;
+    }
+
+    .note-card-pro {
+        border: 1px solid rgba(219, 231, 244, 0.12);
+        border-radius: 8px;
+        background: rgba(7, 16, 27, 0.38);
+        padding: 0.85rem;
+    }
+
+    .note-card-pro:first-child {
+        border-color: rgba(255, 122, 61, 0.32);
+        box-shadow: inset 3px 0 0 rgba(255, 122, 61, 0.78);
+    }
+
+    .note-meta-pro {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.55rem;
+        color: #aebed1;
+        font-size: 0.78rem;
+        font-weight: 850;
+    }
+
+    .note-text-pro {
+        color: #e8f1fb;
+        line-height: 1.45;
+        white-space: pre-wrap;
+    }
+
+    .note-print-pro {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.7rem;
+        color: #c9d7e8;
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
+    .note-print-pro input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+    }
+
+    .notes-empty-pro {
+        color: #aebed1;
+        font-style: italic;
+    }
+
+    @media (max-width: 720px) {
+        .soma-clients-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .soma-clients-toolbar .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 980px) {
+        .pattern-hero-pro,
+        .pattern-workspace {
+            grid-template-columns: 1fr;
+        }
+
+        .notes-panel {
+            position: static;
+        }
+
+        .section-row-pro {
+            grid-template-columns: 58px minmax(0, 1fr);
+        }
+
+        .section-row-pro > div:last-child {
+            grid-column: 2;
+        }
+    }
+
+    .search-bar,
+    .card,
+    .modal-content,
+    .section-card,
+    .section-form,
+    .comment {
+        border: 1px solid var(--border);
+        background:
+            linear-gradient(145deg, rgba(27, 42, 60, 0.94), rgba(13, 24, 37, 0.94)),
+            var(--surface);
+        box-shadow: var(--shadow);
+    }
+
+    body.light-mode .search-bar,
+    body.light-mode .card,
+    body.light-mode .modal-content,
+    body.light-mode .section-card,
+    body.light-mode .section-form,
+    body.light-mode .comment {
+        background: var(--surface);
+    }
+
+    .search-bar {
+        position: sticky;
+        top: 86px;
+        z-index: 60;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .search-input,
+    input,
+    textarea,
+    select {
+        border-radius: 8px;
+        border: 1px solid rgba(219, 231, 244, 0.18);
+        background: rgba(7, 13, 22, 0.58);
+        color: var(--text-primary);
+    }
+
+    .search-input {
+        padding: 0.95rem 1.05rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .search-input:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: rgba(255, 122, 61, 0.72);
+        box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
+    }
+
+    .breadcrumb {
+        color: var(--text-secondary);
+        font-weight: 800;
+    }
+
+    .card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        padding: 1.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--cyan), var(--magenta), var(--yellow));
+        opacity: 0.65;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 122, 61, 0.42);
+        box-shadow: 0 20px 48px rgba(0,0,0,0.42);
+    }
+
+    .card-header {
+        color: #ffd2b6;
+        font-size: 1.16rem;
+        font-weight: 900;
+    }
+
+    .card-body {
+        color: var(--text-secondary);
+        font-weight: 650;
+    }
+
+    .sections-grid {
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .section-card {
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .section-card h4 {
+        color: var(--yellow);
+    }
+
+    .section-card.empty {
+        opacity: 0.52;
+        background: rgba(15, 25, 38, 0.62);
+    }
+
+    .button-group {
+        gap: 0.65rem;
+    }
+
+    .modal {
+        backdrop-filter: blur(10px);
+        background: rgba(0,0,0,0.72);
+    }
+
+    .modal-content {
+        max-width: 980px;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        color: #ffd2b6;
+        border-bottom-color: rgba(255, 122, 61, 0.28);
+    }
+
+    .login-screen {
+        overflow-y: auto;
+        padding: clamp(1.25rem, 3vh, 2.4rem) 1rem 5rem;
+        background:
+            radial-gradient(circle at 16% 14%, rgba(0, 216, 255, 0.34), transparent 24%),
+            radial-gradient(circle at 84% 16%, rgba(255, 63, 180, 0.30), transparent 24%),
+            radial-gradient(circle at 50% 86%, rgba(255, 216, 77, 0.24), transparent 26%),
+            linear-gradient(135deg, #050912 0%, #0c1522 54%, #06080d 100%);
+    }
+
+    .login-screen::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(0,216,255,0.12), transparent 22%, rgba(255,63,180,0.12) 48%, transparent 70%, rgba(255,216,77,0.12)),
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 5px);
+        pointer-events: none;
+    }
+
+    .login-screen::after {
+        content: "";
+        position: absolute;
+        width: min(760px, 86vw);
+        height: min(760px, 86vw);
+        left: 50%;
+        top: 52%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background:
+            conic-gradient(from 210deg, rgba(0,216,255,0.24), rgba(255,63,180,0.20), rgba(255,216,77,0.20), rgba(15,17,24,0.22), rgba(0,216,255,0.24));
+        filter: blur(28px);
+        opacity: 0.72;
+        pointer-events: none;
+    }
+
+    .login-title {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        justify-items: center;
+        gap: 0.45rem;
+        margin: 0 0 1.25rem;
+        color: #fff;
+        text-align: center;
+        text-shadow: 0 18px 46px rgba(0,0,0,0.46);
+    }
+
+    .login-title-main {
+        color: #f3f7fb;
+        font-size: clamp(2.1rem, 4vw, 4rem);
+        font-weight: 950;
+        letter-spacing: 0;
+        line-height: 1;
+        text-shadow: 0 2px 0 rgba(255, 122, 61, 0.30), 0 18px 48px rgba(0,0,0,0.42);
+    }
+
+    .login-title-sub {
+        color: #dbe7f4;
+        font-size: clamp(0.95rem, 1.35vw, 1.28rem);
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .login-title::after {
+        content: "";
+        display: block;
+        width: min(240px, 48vw);
+        height: 3px;
+        margin-top: 0.55rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #00d8ff 0 25%, #ff3fb4 25% 50%, #ffd84d 50% 75%, #05070b 75% 100%);
+        box-shadow: 0 10px 26px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.16);
+    }
+
+    .login-subtitle {
+        position: relative;
+        z-index: 1;
+        color: #dbe7f4;
+        font-weight: 800;
+        margin-bottom: 1.65rem;
+    }
+
+    .users-grid {
+        position: relative;
+        z-index: 1;
+        width: min(700px, 94vw);
+        padding: 1rem;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(5, 10, 18, 0.42);
+        box-shadow: 0 28px 90px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+    }
+
+    .regular-users-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+        gap: 0.85rem;
+        max-width: 560px;
+        margin: 0 auto;
+    }
+
+    .user-card,
+    .guest-card {
+        border-radius: 12px;
+        background:
+            linear-gradient(145deg, rgba(22, 34, 51, 0.92), rgba(7, 13, 22, 0.92));
+        border: 1px solid rgba(255,255,255,0.18);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.30);
+    }
+
+    .user-card {
+        min-height: 150px;
+        padding: 1.35rem 1rem;
+        display: grid;
+        place-items: center;
+        gap: 0.35rem;
+        isolation: isolate;
+        position: relative;
+    }
+
+    .user-card::after {
+        content: "";
+        position: absolute;
+        inset: 1px;
+        border-radius: 11px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 44%);
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .user-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255,255,255,0.32);
+        box-shadow: 0 24px 68px rgba(0,0,0,0.42);
+    }
+
+    .user-card.cyan { border-top: 4px solid var(--cyan); }
+    .user-card.magenta { border-top: 4px solid var(--magenta); }
+    .user-card.yellow { border-top: 4px solid var(--yellow); }
+    .user-card.black { border-top: 4px solid #e7edf6; }
+
+    .user-card.cyan .user-icon { color: var(--cyan); text-shadow: 0 0 22px rgba(0,216,255,0.58); }
+    .user-card.magenta .user-icon { color: var(--magenta); text-shadow: 0 0 22px rgba(255,63,180,0.58); }
+    .user-card.yellow .user-icon { color: var(--yellow); text-shadow: 0 0 22px rgba(255,216,77,0.48); }
+    .user-card.black .user-icon { color: #eef4ff; text-shadow: 0 0 20px rgba(255,255,255,0.32); }
+
+    .user-icon {
+        font-size: 2.55rem;
+        line-height: 1;
+    }
+
+    .user-name {
+        font-size: 1.28rem;
+        font-weight: 950;
+        color: #fff;
+    }
+
+    .user-role {
+        color: rgba(219, 231, 244, 0.72);
+        font-weight: 800;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .guest-card {
+        margin-top: 0.85rem;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .guest-login-card {
+        grid-column: 1 / -1;
+        min-height: 78px;
+        padding: 0.75rem 1.2rem;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        place-items: center stretch;
+        text-align: left;
+    }
+
+    .guest-login-card .user-icon {
+        font-size: 2rem;
+    }
+
+    .guest-login-card .user-name {
+        font-size: 1.1rem;
+    }
+
+    .guest-login-card .user-role {
+        font-size: 0.78rem;
+    }
+
+    .app-version {
+        margin-top: 1.1rem;
+        margin-bottom: 1.75rem;
+        color: rgba(255,255,255,0.62);
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .success-message,
+    .error-message {
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: var(--shadow);
+    }
+
+    #syncIndicator {
+        backdrop-filter: blur(10px);
+    }
+
+    .soma-empty-state,
+    .soma-results-title {
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        background: rgba(18, 31, 47, 0.72);
+        color: var(--text-secondary);
+        font-weight: 750;
+        margin-bottom: 1rem;
+    }
+
+    .soma-results-title {
+        color: #ffd2b6;
+        font-size: 1.05rem;
+    }
+
+    .pattern-form-shell {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .pattern-form-panel {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(7, 13, 22, 0.38);
+        padding: 1rem;
+    }
+
+    .pattern-form-panel-title {
+        color: #ffd2b6;
+        font-size: 1.05rem;
+        font-weight: 950;
+        margin-bottom: 0.85rem;
+    }
+
+    .pattern-meta-grid {
+        display: grid;
+        grid-template-columns: minmax(160px, 0.55fr) minmax(240px, 1fr);
+        gap: 0.85rem;
+    }
+
+    .field-help {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--text-secondary);
+        font-size: 0.84rem;
+        line-height: 1.35;
+    }
+
+    .sections-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(0,0,0,0.18);
+    }
+
+    .pattern-sections-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 820px;
+    }
+
+    .pattern-sections-table th,
+    .pattern-sections-table td {
+        padding: 0.65rem;
+        border-bottom: 1px solid rgba(219, 231, 244, 0.10);
+        vertical-align: top;
+    }
+
+    .pattern-sections-table th {
+        color: #ffd2b6;
+        text-align: left;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(255, 122, 61, 0.08);
+    }
+
+    .section-number-cell {
+        width: 72px;
+        color: var(--yellow);
+        font-weight: 950;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .pattern-sections-table input {
+        min-height: 22px;
+        padding-left: 0.85rem;
+        padding-top: 0.35rem;
+        padding-bottom: 0.35rem;
+    }
+
+    .section-input-stack {
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .mini-preset-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+        max-height: 58px;
+        overflow-y: auto;
+        padding-right: 0.2rem;
+    }
+
+    .mini-preset-btn {
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.07);
+        color: #dbe7f4;
+        cursor: pointer;
+        font-size: 0.72rem;
+        font-weight: 850;
+        line-height: 1;
+        padding: 0.35rem 0.5rem;
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .mini-preset-btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 122, 61, 0.58);
+        background: rgba(255, 122, 61, 0.16);
+    }
+
+    .mini-preset-btn.cyan { color: var(--cyan); }
+    .mini-preset-btn.magenta { color: var(--magenta); }
+    .mini-preset-btn.yellow { color: var(--yellow); }
+    .mini-preset-btn.black { color: #eef4ff; }
+
+    .save-steps {
+        display: none;
+        gap: 0.45rem;
+        margin-top: 0.8rem;
+    }
+
+    .save-steps.active {
+        display: grid;
+    }
+
+    .save-step {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--text-secondary);
+        font-weight: 800;
+        font-size: 0.9rem;
+    }
+
+    .save-step::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.22);
+    }
+
+    .save-step.active { color: #ffd2b6; }
+    .save-step.done { color: var(--success); }
+    .save-step.active::before { background: var(--accent); box-shadow: 0 0 0 4px rgba(255,122,61,0.14); }
+    .save-step.done::before { background: var(--success); }
+
+    .client-number-preview {
+        display: none;
+        margin-top: 0.55rem;
+        padding: 0.65rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 216, 77, 0.32);
+        background: rgba(255, 216, 77, 0.08);
+        color: #ffe08a;
+        font-weight: 850;
+        line-height: 1.35;
+    }
+
+    .client-number-preview.active {
+        display: block;
+    }
+
+    @media (max-width: 760px) {
+        .header {
+            position: static;
+        }
+
+        .search-bar {
+            position: static;
+        }
+
+        .header-content,
+        .header-controls {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .btn,
+        .theme-toggle {
+            width: 100%;
+        }
+
+        .users-grid {
+            padding: 0.75rem;
+        }
+
+        .regular-users-grid {
+            grid-template-columns: repeat(2, minmax(130px, 1fr));
+            gap: 0.65rem;
+        }
+
+        .user-card {
+            min-height: 132px;
+            padding: 1rem 0.7rem;
+        }
+
+        .guest-login-card {
+            min-height: 74px;
+            padding: 0.7rem 0.9rem;
+        }
+
+        .pattern-meta-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 </head>
 <body>
@@ -873,17 +1903,20 @@
             </div>
             <div class="header-controls">
     <button class="btn btn-secondary" onclick="showBlankTemplateModal()" title="Wydrukuj pustą tabelkę">📋 Pusta tabelka</button>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Zmień motyw">🌓</button>
+    <div class="patterns-count-badge" id="patternsCountBadge" title="Liczba aktualnych wzorów zapisanych w aplikacji">
+        <span>📚</span>
+        <strong id="patternsCountValue">0</strong>
+        <span id="patternsCountLabel">wzorów</span>
+    </div>
     <button class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID, '_blank')" id="googleSheetsBtn" style="display: none;">📊 Google Sheets</button>
     <button class="btn logout-btn" onclick="logout()" id="logoutBtn" style="display: none;">🚪 Wyloguj</button>
-    <button class="btn" onclick="showAddClientModal()">+ Klient</button>
 </div>
         </div>
     </div>
 
     <div class="container">
         <div class="search-bar">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj klientów lub wzorów..." oninput="handleSearch()">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj wzorów..." oninput="handleSearch()">
         </div>
 
         <div class="breadcrumb" id="breadcrumb"></div>
@@ -897,8 +1930,10 @@
     </div>
 
     <div id="loginScreen" class="login-screen">
-        <h1 class="login-title">WZORY SOMA 3</h1>
-        <p class="login-subtitle">Wybierz użytkownika aby kontynuować</p>
+        <h1 class="login-title">
+            <span class="login-title-main">SOMA 3</span>
+            <span class="login-title-sub">Wzory</span>
+        </h1>
         <div class="users-grid" id="usersGrid"
          style="display: flex; justify-content: center; align-items: center;">
         
@@ -925,7 +1960,7 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '1.1.42';
+        const APP_VERSION = '2.0.0';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         const CACHE_KEY = 'soma3_cache_v2';
@@ -1065,17 +2100,36 @@ function loginAsGuest() {
 function hideLoginScreen() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'block';
-    
-    // Ukryj przycisk dodawania klienta dla gościa
-    const addClientBtn = document.querySelector('.header-controls .btn:last-child');
-    if (addClientBtn && isGuest) {
-        addClientBtn.style.display = 'none';
-    }
+    updatePatternCountBadge();
     
     // Pokaż przycisk Google Sheets tylko dla Kamila
     if (currentUser === 'Kamil') {
         document.getElementById('googleSheetsBtn').style.display = 'block';
     }
+}
+
+function getPatternCountLabel(count) {
+    if (count === 1) return 'wzór';
+    const lastTwo = count % 100;
+    const last = count % 10;
+    if (last >= 2 && last <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) return 'wzory';
+    return 'wzorów';
+}
+
+function formatPatternCount(count) {
+    return `${count.toLocaleString('pl-PL')} ${getPatternCountLabel(count)}`;
+}
+
+function updatePatternCountBadge() {
+    const badge = document.getElementById('patternsCountBadge');
+    const value = document.getElementById('patternsCountValue');
+    const label = document.getElementById('patternsCountLabel');
+    if (!badge || !value || !label || !currentUser) return;
+
+    const count = Array.isArray(patterns) ? patterns.length : 0;
+    value.textContent = count.toLocaleString('pl-PL');
+    label.textContent = getPatternCountLabel(count);
+    badge.style.display = 'flex';
 }
 
 async function attemptLogin(userName) {
@@ -1419,7 +2473,7 @@ patterns = Object.values(patternGroups);
     }
     
     if (currentView === 'clients') {
-        renderBreadcrumb(['Klienci']);
+        renderBreadcrumb([]);
         renderClients();
     } else if (currentView === 'patterns') {
         renderBreadcrumb(['Klienci', currentClient.nazwa]);
@@ -1532,7 +2586,7 @@ patterns = Object.values(patternGroups);
         // Przyciski dla zalogowanych użytkowników
         buttonsHTML = `
             <div class="button-group">
-                <button class="btn" onclick="showEditPatternModal()">✏️ Edytuj</button>
+                <button class="btn btn-secondary" onclick="showEditPatternModal()">✏️ Edytuj</button>
                 <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
                 <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
                 <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
@@ -2336,7 +3390,7 @@ if (oldComments.length > 0) {
                         </select>
                     </div>
                     <div class="button-group">
-                        <button type="submit" class="btn">➡️ Dalej</button>
+                        <button type="submit" class="btn btn-secondary">➡️ Dalej</button>
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
                     </div>
                 </form>
@@ -3088,20 +4142,20 @@ function showBlankTemplateModal() {
             
             <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="checkbox" name="include_header" checked style="width: 20px; height: 20px;">
+                    <input type="checkbox" name="include_header" style="width: 20px; height: 20px;">
                     <span>Dodaj pola: Klient / Wzór / Data</span>
                 </label>
             </div>
             
             <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                    <input type="checkbox" name="include_notes" checked style="width: 20px; height: 20px;">
+                    <input type="checkbox" name="include_notes" style="width: 20px; height: 20px;">
                     <span>Dodaj sekcję "Uwagi"</span>
                 </label>
             </div>
             
             <div class="button-group">
-                <button type="submit" class="btn">🖨️ Drukuj</button>
+                <button type="submit" class="btn btn-secondary">🖨️ Drukuj</button>
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
             </div>
         </form>
@@ -3440,6 +4494,992 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                 syncInBackground();
             }
         }, 5 * 60 * 1000);
+
+        // SOMA 3 Wzory v2.0.0 - UX, performance and safety layer
+        const somaState = {
+            indexesDirty: true,
+            clientById: new Map(),
+            patternsByClient: new Map(),
+            sectionsByPattern: new Map(),
+            commentsByPattern: new Map(),
+            searchTimer: null
+        };
+
+        function somaMarkIndexesDirty() {
+            somaState.indexesDirty = true;
+        }
+
+        function somaBuildIndexes() {
+            somaState.clientById = new Map(clients.map(client => [client.id, client]));
+            somaState.patternsByClient = new Map();
+            somaState.sectionsByPattern = new Map();
+            somaState.commentsByPattern = new Map();
+
+            patterns.forEach(pattern => {
+                const list = somaState.patternsByClient.get(pattern.klient_id) || [];
+                list.push(pattern);
+                somaState.patternsByClient.set(pattern.klient_id, list);
+            });
+
+            sections.forEach(section => {
+                const list = somaState.sectionsByPattern.get(section.wzor_id) || [];
+                list.push(section);
+                somaState.sectionsByPattern.set(section.wzor_id, list);
+            });
+
+            comments.forEach(comment => {
+                const list = somaState.commentsByPattern.get(comment.wzor_id) || [];
+                list.push(comment);
+                somaState.commentsByPattern.set(comment.wzor_id, list);
+            });
+
+            somaState.indexesDirty = false;
+        }
+
+        function somaEnsureIndexes() {
+            if (somaState.indexesDirty) somaBuildIndexes();
+        }
+
+        function somaJsString(value) {
+            return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+        }
+
+        function somaSortByNumberThenName(a, b) {
+            const numA = parseInt(a.numer, 10);
+            const numB = parseInt(b.numer, 10);
+            if (!Number.isNaN(numA) || !Number.isNaN(numB)) {
+                const diff = (numA || 0) - (numB || 0);
+                if (diff !== 0) return diff;
+            }
+            return String(a.nazwa || '').localeCompare(String(b.nazwa || ''), 'pl');
+        }
+
+        async function somaFetchJson(url, options = {}, timeout = 22000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        function somaInvalidateCache() {
+            localStorage.removeItem(CACHE_KEY);
+            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        }
+
+        fetchSheetData = async function(sheetName) {
+            try {
+                const url = `${APPS_SCRIPT_URL}?action=read&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+                return await somaFetchJson(url) || [];
+            } catch (error) {
+                console.error(`Błąd pobierania danych z ${sheetName}:`, error);
+                return [];
+            }
+        };
+
+        appendToSheet = async function(sheetName, values) {
+            const params = new URLSearchParams();
+            params.append('action', 'append');
+            params.append('sheet', sheetName);
+            values.forEach((value, index) => params.append(`col${index}`, value || ''));
+
+            try {
+                const result = await somaFetchJson(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET' }, 26000);
+                if (result.error) throw new Error(result.error);
+                somaInvalidateCache();
+                somaMarkIndexesDirty();
+                return result;
+            } catch (error) {
+                console.error(`Błąd zapisywania do ${sheetName}:`, error);
+                throw error;
+            }
+        };
+
+        batchAppendToSheet = async function(sheetName, rows) {
+            const params = new URLSearchParams();
+            params.append('action', 'batchAppend');
+            params.append('sheet', sheetName);
+            params.append('rows', JSON.stringify(rows));
+
+            try {
+                const result = await somaFetchJson(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET' }, 32000);
+                if (result.error) throw new Error(result.error);
+                somaInvalidateCache();
+                somaMarkIndexesDirty();
+                return result;
+            } catch (error) {
+                console.error(`Błąd batch zapisywania do ${sheetName}:`, error);
+                throw error;
+            }
+        };
+
+        const somaOriginalLoadAllData = loadAllData;
+        loadAllData = async function(forceRefresh = false) {
+            somaMarkIndexesDirty();
+            const result = await somaOriginalLoadAllData(forceRefresh);
+            updatePatternCountBadge();
+            return result;
+        };
+
+        const somaOriginalLoadUsers = loadUsers;
+        loadUsers = async function() {
+            try {
+                await somaOriginalLoadUsers();
+            } catch (error) {
+                console.error('Nie udało się pobrać użytkowników:', error);
+            }
+
+            if (!users.some(user => user.name === 'Gość')) {
+                users.push({ name: 'Gość', password: 'gosc' });
+            }
+        };
+
+        showLoginScreen = function() {
+            const loginScreen = document.getElementById('loginScreen');
+            const usersGrid = document.getElementById('usersGrid');
+            const colors = ['cyan', 'magenta', 'yellow', 'black'];
+            const regularUsers = users.filter(user => user.name !== 'Gość');
+            const guestUser = users.find(user => user.name === 'Gość');
+
+            if (!users.length) {
+                usersGrid.innerHTML = '<div class="loading"><div class="spinner"></div>Ładowanie użytkowników...</div>';
+                loginScreen.style.display = 'flex';
+                return;
+            }
+
+            let html = '<div class="regular-users-grid">';
+            html += regularUsers.map((user, index) => `
+                <div class="user-card ${colors[index % 4]}" onclick="attemptLogin('${somaJsString(user.name)}')">
+                    <div class="user-icon">👤</div>
+                    <div class="user-name">${escapeHtml(user.name)}</div>
+                    <div class="user-role">Operator</div>
+                </div>
+            `).join('');
+            if (guestUser) {
+                html += `
+                    <div class="user-card black guest-login-card" onclick="loginAsGuest()">
+                        <div class="user-icon">🔓</div>
+                        <div>
+                            <div class="user-name">Gość</div>
+                            <div class="user-role">Podgląd bez edycji</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+
+            html += `<div class="app-version">v${APP_VERSION}</div>`;
+            usersGrid.style.display = 'block';
+            usersGrid.innerHTML = html;
+            loginScreen.style.display = 'flex';
+        };
+
+        handleSearch = function() {
+            clearTimeout(somaState.searchTimer);
+            somaState.searchTimer = setTimeout(() => {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+                if (!searchTerm) {
+                    renderView();
+                    return;
+                }
+                if (currentView === 'clients') searchGlobalPatterns(searchTerm);
+                else renderView();
+            }, 120);
+        };
+
+        renderClients = function() {
+            somaEnsureIndexes();
+            const content = document.getElementById('content');
+            const filteredClients = filterData(clients, ['nazwa', 'numer']).slice().sort(somaSortByNumberThenName);
+            const clientsToolbar = `
+                <div class="soma-clients-toolbar">
+                    <h2 class="section-title">Klienci</h2>
+                    ${!isGuest ? '<button class="btn" onclick="showAddClientModal()">+ Klient</button>' : ''}
+                </div>
+            `;
+
+            if (!filteredClients.length) {
+                content.innerHTML = `${clientsToolbar}<div class="soma-empty-state">Brak klientów.${!isGuest ? ' Kliknij "+ Klient", aby dodać pierwszego klienta.' : ''}</div>`;
+                return;
+            }
+
+            content.innerHTML = clientsToolbar + filteredClients.map(client => {
+                const clientPatterns = somaState.patternsByClient.get(client.id) || [];
+                return `
+                    <div class="card" onclick="showPatterns('${somaJsString(client.id)}')">
+                        <div class="card-header">${escapeHtml(client.numer)} | ${escapeHtml(client.nazwa)}</div>
+                        <div class="card-body">${formatPatternCount(clientPatterns.length)}</div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        renderPatterns = function() {
+            somaEnsureIndexes();
+            const content = document.getElementById('content');
+            const clientPatterns = (somaState.patternsByClient.get(currentClient.id) || []).slice();
+            const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']).slice().sort(somaSortByNumberThenName);
+            let html = '';
+
+            if (!isGuest) {
+                html += '<div class="button-group"><button class="btn" onclick="showAddPatternModal()">+ Dodaj wzór</button></div>';
+            }
+
+            if (!filteredPatterns.length) {
+                html += `<div class="soma-empty-state">Brak wzorów dla tego klienta.${!isGuest ? ' Kliknij "+ Dodaj wzór", aby dodać pierwszy.' : ''}</div>`;
+            } else {
+                html += filteredPatterns.map(pattern => `
+                    <div class="card" onclick="showPatternDetail('${somaJsString(pattern.id)}')">
+                        <div class="card-header">${escapeHtml(pattern.numer)} | ${escapeHtml(pattern.nazwa)}</div>
+                        <div class="card-body">${pattern.zdjecie_url ? '📷 Ze zdjęciem • ' : ''}Szczegóły receptury</div>
+                    </div>
+                `).join('');
+            }
+
+            content.innerHTML = html;
+        };
+
+        searchGlobalPatterns = function(searchTerm) {
+            somaEnsureIndexes();
+            const matchingPatterns = patterns.filter(pattern =>
+                String(pattern.nazwa || '').toLowerCase().includes(searchTerm) ||
+                String(pattern.numer || '').toLowerCase().includes(searchTerm)
+            );
+            const content = document.getElementById('content');
+
+            if (!matchingPatterns.length) {
+                content.innerHTML = `<div class="soma-empty-state">Nie znaleziono wzorów pasujących do: "${escapeHtml(searchTerm)}"</div>`;
+                return;
+            }
+
+            matchingPatterns.sort((a, b) => {
+                const clientA = somaState.clientById.get(a.klient_id);
+                const clientB = somaState.clientById.get(b.klient_id);
+                const clientCompare = String(clientA?.nazwa || '').localeCompare(String(clientB?.nazwa || ''), 'pl');
+                return clientCompare || somaSortByNumberThenName(a, b);
+            });
+
+            let html = `<div class="soma-results-title">Wyniki wyszukiwania: "${escapeHtml(searchTerm)}" (${matchingPatterns.length})</div>`;
+            html += matchingPatterns.map(pattern => {
+                const client = somaState.clientById.get(pattern.klient_id);
+                if (!client) return '';
+                return `
+                    <div class="card" onclick="showPatternDetailFromSearch('${somaJsString(pattern.id)}', '${somaJsString(client.id)}')">
+                        <div class="card-header">${escapeHtml(pattern.numer)} | ${escapeHtml(pattern.nazwa)}</div>
+                        <div class="card-body">Klient: ${escapeHtml(client.numer)} | ${escapeHtml(client.nazwa)}</div>
+                    </div>
+                `;
+            }).join('');
+            content.innerHTML = html;
+        };
+
+        const somaOriginalShowPatternDetail = showPatternDetail;
+        showPatternDetail = function(patternId) {
+            somaEnsureIndexes();
+            somaOriginalShowPatternDetail(patternId);
+        };
+
+        renderPatternDetail = function() {
+            somaEnsureIndexes();
+            somaRenderPatternDetailForVersion(currentPattern);
+        };
+
+        const somaOriginalShowSuccessMessage = showSuccessMessage;
+        showSuccessMessage = function(message) {
+            somaOriginalShowSuccessMessage(message);
+            const msg = document.querySelector('.success-message');
+            if (msg) msg.setAttribute('role', 'status');
+        };
+
+        loadTheme = function() {
+            document.body.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        };
+
+        toggleTheme = function() {
+            document.body.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+            showSuccessMessage('Jasny motyw został wyłączony. Aplikacja zostaje w trybie ciemnym.');
+        };
+
+        function somaGetPatternSections(patternId) {
+            const key = String(patternId || '').trim();
+            return sections.filter(section => String(section.wzor_id || '').trim() === key);
+        }
+
+        function somaGetPatternComments(patternId) {
+            const key = String(patternId || '').trim();
+            return comments.filter(comment => String(comment.wzor_id || '').trim() === key);
+        }
+
+        function somaPatternCommentDate(value) {
+            try {
+                const parsedDate = new Date(value);
+                if (!isNaN(parsedDate.getTime())) {
+                    return parsedDate.toLocaleString('pl-PL', {
+                        timeZone: 'Europe/Warsaw',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            } catch (error) {}
+            return value || '';
+        }
+
+        function somaInkClass(color) {
+            const value = String(color || '').toLowerCase();
+            if (!value) return 'empty';
+            if (value.includes('yellow')) return 'yellow';
+            if (value.includes('magenta')) return 'magenta';
+            if (value.includes('cyan')) return 'cyan';
+            if (value.includes('black')) return 'black';
+            return 'spot';
+        }
+
+        function somaCommentCountText(count) {
+            if (count === 1) return '1 uwaga';
+            const lastTwo = count % 100;
+            const last = count % 10;
+            if (last >= 2 && last <= 4 && !(lastTwo >= 12 && lastTwo <= 14)) return `${count} uwagi`;
+            return `${count} uwag`;
+        }
+
+        function somaPatternActionsHTML(options = {}) {
+            if (options.preview) {
+                return `
+                    <div class="pattern-action-bar">
+                        <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+                    </div>
+                `;
+            }
+
+            if (isGuest) {
+                return `
+                    <div class="pattern-action-bar">
+                        <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+                        <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+                        <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="pattern-action-bar">
+                    <button class="btn btn-secondary" onclick="showEditPatternModal()">✏️ Edytuj</button>
+                    <button class="btn btn-secondary" onclick="printPattern()">🖨️ Drukuj</button>
+                    <button class="btn btn-secondary" onclick="showPatternHistory()">📜 Historia</button>
+                    <button class="btn btn-secondary" onclick="exportToPDF()">📄 Eksport PDF</button>
+                    <button class="btn btn-secondary" onclick="showCopyPatternModal()">📋 Kopiuj</button>
+                    <button class="btn btn-danger" onclick="deletePattern()">🗑️ Usuń</button>
+                </div>
+            `;
+        }
+
+        function somaPatternSectionsHTML(patternSections) {
+            return patternSections.map(section => {
+                const isEmpty = !section.kolor && !section.anilox;
+                const inkClass = somaInkClass(section.kolor);
+                return `
+                    <div class="section-row-pro ${isEmpty ? 'empty' : ''}">
+                        <div class="section-number-pro">Sekcja ${escapeHtml(section.nr_sekcji)}</div>
+                        <div>
+                            <span class="section-label-pro">Kolor</span>
+                            <span class="section-value-pro">
+                                <span class="ink-dot-pro ${inkClass}"></span>
+                                <span>${escapeHtml(section.kolor) || '—'}</span>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="section-label-pro">Anilox</span>
+                            <span class="section-value-pro">${escapeHtml(section.anilox) || '—'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function somaPatternCommentsHTML(patternComments, options = {}) {
+            const count = patternComments.length;
+            const countText = somaCommentCountText(count);
+
+            return `
+                <aside class="notes-panel">
+                    <div class="notes-panel-header">
+                        <div>
+                            <h3>💬 Uwagi</h3>
+                            <div class="notes-count">${countText}</div>
+                        </div>
+                        ${!isGuest && !options.preview ? '<button class="btn" onclick="showAddCommentModal()">+ Dodaj</button>' : ''}
+                    </div>
+                    <div class="notes-panel-body">
+                        ${count === 0 ? '<div class="notes-empty-pro">Brak uwag dla tego wzoru</div>' :
+                            patternComments.map((comment, index) => `
+                                <div class="note-card-pro">
+                                    <div class="note-meta-pro">
+                                        <span>${escapeHtml(comment.autor || '')}</span>
+                                        <span>${escapeHtml(somaPatternCommentDate(comment.data))}</span>
+                                    </div>
+                                    <div class="note-text-pro">${escapeHtml(comment.tresc || '')}</div>
+                                    ${options.preview ? '' : `
+                                        <label class="note-print-pro">
+                                            <input type="checkbox" class="print-comment-checkbox" id="comment-${index}">
+                                            <span>Do wydruku</span>
+                                        </label>
+                                    `}
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </aside>
+            `;
+        }
+
+        function somaGetPatternVersions(pattern) {
+            const allPatterns = window.allPatternsWithParents || patterns;
+            const byId = new Map(allPatterns.map(item => [item.id, item]));
+            const versions = [];
+            const visited = new Set();
+            let cursor = pattern;
+
+            while (cursor && !visited.has(cursor.id)) {
+                versions.push(cursor);
+                visited.add(cursor.id);
+                cursor = cursor.parent_id ? byId.get(cursor.parent_id) : null;
+            }
+
+            return versions;
+        }
+
+        getPatternVersions = somaGetPatternVersions;
+
+        compareVersions = function(newVersion, oldVersion) {
+            const changes = [];
+            const newSections = somaGetPatternSections(newVersion.id);
+            const oldSections = somaGetPatternSections(oldVersion.id);
+
+            for (let i = 1; i <= 10; i++) {
+                const newSec = newSections.find(section => section.nr_sekcji === i) || { kolor: '', anilox: '' };
+                const oldSec = oldSections.find(section => section.nr_sekcji === i) || { kolor: '', anilox: '' };
+                if (newSec.kolor !== oldSec.kolor || newSec.anilox !== oldSec.anilox) {
+                    const parts = [];
+                    if (newSec.kolor !== oldSec.kolor) parts.push(`kolor: "${oldSec.kolor || '—'}" → "${newSec.kolor || '—'}"`);
+                    if (newSec.anilox !== oldSec.anilox) parts.push(`anilox: "${oldSec.anilox || '—'}" → "${newSec.anilox || '—'}"`);
+                    changes.push(`Sekcja ${i}: ${parts.join(', ')}`);
+                }
+            }
+
+            return changes;
+        };
+
+        showPatternHistory = function() {
+            const basePattern = window.somaVersionPreviewState?.currentPattern || currentPattern;
+            const versions = somaGetPatternVersions(basePattern);
+
+            if (versions.length === 1) {
+                alert('Ten wzór nie ma jeszcze historii zmian.');
+                return;
+            }
+
+            let historyHTML = `
+                <div class="modal-header">Historia zmian: ${escapeHtml(basePattern.nazwa)}</div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Wzór ma ${versions.length} wersji. Najnowsza na górze.
+                </p>
+                <div style="max-height: 60vh; overflow-y: auto;">
+            `;
+
+            versions.forEach((version, index) => {
+                const isCurrentVersion = version.id === basePattern.id;
+                const versionDate = getVersionDate(version.id);
+                const versionAuthor = getVersionAuthor(version.id);
+                const versionNumber = versions.length - index;
+                let changesHTML = '';
+
+                if (index < versions.length - 1) {
+                    const changes = compareVersions(version, versions[index + 1]);
+                    if (changes.length > 0) {
+                        changesHTML = '<ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">';
+                        changes.forEach(change => changesHTML += `<li>${change}</li>`);
+                        changesHTML += '</ul>';
+                    }
+                }
+
+                const actionHTML = isCurrentVersion
+                    ? '<span style="color: var(--success); font-weight: 900;">Aktualnie otwarta</span>'
+                    : `<button class="btn btn-secondary" onclick="viewOldVersion('${somaJsString(version.id)}')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">👁️ Podgląd</button>`;
+
+                historyHTML += `
+                    <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${isCurrentVersion ? 'var(--accent)' : 'var(--border)'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                            <h4 style="color: var(--accent); margin: 0;">Wersja ${versionNumber} ${isCurrentVersion ? '(Aktualna)' : ''}</h4>
+                            ${actionHTML}
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 0.3rem 0;">
+                            <strong>Data:</strong> ${versionDate}<br>
+                            <strong>Autor:</strong> ${versionAuthor}
+                        </p>
+                        ${changesHTML}
+                    </div>
+                `;
+            });
+
+            historyHTML += `
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
+                </div>
+            `;
+
+            showModal(historyHTML);
+        };
+
+        function somaRenderPatternDetailForVersion(pattern, options = {}) {
+            const content = document.getElementById('content');
+            const patternSections = Array.from({ length: 10 }, (_, index) => {
+                const nr = index + 1;
+                return somaGetPatternSections(pattern.id).find(section => section.nr_sekcji === nr) || {
+                    nr_sekcji: nr,
+                    kolor: '',
+                    anilox: ''
+                };
+            });
+            const patternComments = somaGetPatternComments(pattern.id);
+            const client = clients.find(item => item.id === pattern.klient_id) || currentClient;
+            const previewBanner = options.preview ? `
+                <div style="background: linear-gradient(135deg, rgba(255,90,110,0.95), rgba(255,122,61,0.92)); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 800;">
+                    ⚠️ Przeglądasz starą wersję wzoru.
+                    <button class="btn btn-secondary" onclick="returnToCurrentVersion()" style="margin-left: 1rem;">
+                        Powrót do aktualnej wersji
+                    </button>
+                </div>
+            ` : '';
+
+            content.innerHTML = `
+                ${previewBanner}
+                <div class="pattern-detail-pro">
+                    <section class="pattern-hero-pro">
+                        <div>
+                            <div class="pattern-eyebrow">Wzór ${escapeHtml(pattern.numer)}</div>
+                            <h2 class="pattern-title-pro">${escapeHtml(pattern.nazwa)}</h2>
+                            <div class="pattern-client-pro">Klient: ${escapeHtml(client?.nazwa || '')}</div>
+                        </div>
+                        ${pattern.zdjecie_url ? `<img src="${escapeHtml(pattern.zdjecie_url)}" class="pattern-image-mini" alt="Wzór">` : ''}
+                    </section>
+
+                    ${somaPatternActionsHTML(options)}
+
+                    <div class="pattern-workspace">
+                        <section class="recipe-panel">
+                            <div class="panel-heading-pro">
+                                <h3>Sekcje 1-10</h3>
+                            </div>
+                            <div class="sections-list-pro">
+                                ${somaPatternSectionsHTML(patternSections)}
+                            </div>
+                        </section>
+
+                        ${somaPatternCommentsHTML(patternComments, options)}
+                    </div>
+                </div>
+            `;
+        }
+
+        viewOldVersion = function(versionId) {
+            const allPatterns = window.allPatternsWithParents || patterns;
+            const basePattern = window.somaVersionPreviewState?.currentPattern || currentPattern;
+            if (String(versionId) === String(basePattern?.id || '')) {
+                closeModal();
+                currentPattern = basePattern;
+                currentView = 'pattern-detail';
+                renderView();
+                return;
+            }
+            const oldPattern = allPatterns.find(pattern => String(pattern.id) === String(versionId));
+            if (!oldPattern) {
+                alert('Nie można załadować tej wersji');
+                return;
+            }
+
+            closeModal();
+            window.somaVersionPreviewState = {
+                currentClient,
+                currentPattern,
+                currentView
+            };
+
+            currentClient = clients.find(client => client.id === oldPattern.klient_id) || currentClient;
+            currentPattern = oldPattern;
+            currentView = 'pattern-detail';
+            renderBreadcrumb(['Klienci', currentClient?.nazwa || '', currentPattern.nazwa]);
+            somaRenderPatternDetailForVersion(oldPattern, { preview: true });
+        };
+
+        returnToCurrentVersion = function() {
+            const saved = window.somaVersionPreviewState;
+            if (saved) {
+                currentClient = saved.currentClient;
+                currentPattern = saved.currentPattern;
+                currentView = saved.currentView || 'pattern-detail';
+                window.somaVersionPreviewState = null;
+            } else if (currentPattern) {
+                currentPattern = patterns.find(pattern =>
+                    pattern.numer === currentPattern.numer &&
+                    pattern.klient_id === currentPattern.klient_id
+                ) || currentPattern;
+            }
+
+            renderView();
+        };
+
+        function setPatternSectionColor(sectionNumber, color) {
+            const input = document.querySelector(`[name="kolor_${sectionNumber}"]`);
+            if (input) {
+                input.value = color;
+                input.focus();
+            }
+        }
+
+        function setPatternSectionAniloxFromButton(button) {
+            const sectionNumber = button.dataset.section;
+            const value = button.dataset.value;
+            const input = document.querySelector(`[name="anilox_${sectionNumber}"]`);
+            if (input) {
+                input.value = value;
+                input.focus();
+            }
+        }
+
+        function setAddPatternSaveStep(stepName) {
+            const steps = document.getElementById('addPatternSaveSteps');
+            if (!steps) return;
+            steps.classList.add('active');
+            steps.querySelectorAll('.save-step').forEach(step => {
+                const order = ['pattern', 'sections', 'history', 'refresh'];
+                const currentIndex = order.indexOf(stepName);
+                const stepIndex = order.indexOf(step.dataset.step);
+                step.classList.toggle('done', stepIndex < currentIndex);
+                step.classList.toggle('active', stepIndex === currentIndex);
+            });
+        }
+
+        showAddPatternModal = function() {
+            if (isGuest) {
+                alert('❌ Konto gościa nie ma uprawnień do dodawania wzorów.');
+                return;
+            }
+
+            const usedColors = [...new Set(sections.map(section => section.kolor).filter(Boolean))].sort();
+            const allAnilox = [...new Set(aniloxy.filter(Boolean))].sort();
+            const colorOptions = usedColors.map(color => `<option value="${escapeHtml(color)}">`).join('');
+            const aniloxOptions = allAnilox.map(item => `<option value="${escapeHtml(item)}">`).join('');
+            const aniloxButtons = sectionNumber => allAnilox.map(item => `
+                <button class="mini-preset-btn" type="button" data-section="${sectionNumber}" data-value="${escapeHtml(item)}" onclick="setPatternSectionAniloxFromButton(this)">
+                    ${escapeHtml(item)}
+                </button>
+            `).join('');
+
+            showModal(`
+                <div class="modal-header">Dodaj wzór dla: ${escapeHtml(currentClient.nazwa)}</div>
+                <form id="addPatternForm" class="pattern-form-shell" onsubmit="addPattern(event)">
+                    <div class="pattern-form-panel">
+                        <div class="pattern-form-panel-title">Dane wzoru</div>
+                        <div class="pattern-meta-grid">
+                            <div class="form-group">
+                                <label>Numer wzoru z karty produkcyjnej *</label>
+                                <input type="text" name="numer" required placeholder="np. 186">
+                                <small class="field-help">
+                                    Jeśli na karcie masz zapis typu <strong>26/186</strong>, wpisz tutaj tylko drugą część, czyli <strong>186</strong>. Pierwsza liczba to numer klienta.
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>Nazwa wzoru *</label>
+                                <input type="text" name="nazwa" required placeholder="np. Diamant cukier biały 1kg">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Uwagi przy dodaniu (opcjonalnie)</label>
+                            <textarea name="uwagi_tresc" placeholder="Dodaj uwagi do tego wzoru..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pattern-form-panel">
+                        <div class="pattern-form-panel-title">Sekcje 1-10</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 0.85rem;">
+                            Wpisz kolor i anilox albo użyj małych presetów. Przyciski C/M/Y/K uzupełniają kolor tylko w wybranej sekcji.
+                        </p>
+                        <div class="sections-table-wrap">
+                            <table class="pattern-sections-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sekcja</th>
+                                        <th>Kolor</th>
+                                        <th>Anilox</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Array.from({ length: 10 }, (_, index) => {
+                                        const sectionNumber = index + 1;
+                                        return `
+                                            <tr>
+                                                <td class="section-number-cell">${sectionNumber}</td>
+                                                <td>
+                                                    <div class="section-input-stack">
+                                                        <input type="text"
+                                                               list="colors-list"
+                                                               name="kolor_${sectionNumber}"
+                                                               placeholder="np. Yellow"
+                                                               autocomplete="off">
+                                                        <div class="mini-preset-strip">
+                                                            <button class="mini-preset-btn cyan" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Cyan')">C</button>
+                                                            <button class="mini-preset-btn magenta" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Magenta')">M</button>
+                                                            <button class="mini-preset-btn yellow" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Yellow')">Y</button>
+                                                            <button class="mini-preset-btn black" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Black')">K</button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="section-input-stack">
+                                                        <input type="text"
+                                                               list="anilox-list"
+                                                               name="anilox_${sectionNumber}"
+                                                               placeholder="np. 280/5.5"
+                                                               autocomplete="off">
+                                                        <div class="mini-preset-strip">
+                                                            ${aniloxButtons(sectionNumber)}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <datalist id="colors-list">${colorOptions}</datalist>
+                    <datalist id="anilox-list">${aniloxOptions}</datalist>
+
+                    <div id="addPatternSaveSteps" class="save-steps">
+                        <div class="save-step" data-step="pattern">Zapisuję wzór</div>
+                        <div class="save-step" data-step="sections">Zapisuję sekcje</div>
+                        <div class="save-step" data-step="history">Zapisuję historię</div>
+                        <div class="save-step" data-step="refresh">Odświeżam dane</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj wzór</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        };
+
+        addPattern = async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const patternId = Date.now().toString();
+            const numer = formData.get('numer').trim();
+            const nazwa = formData.get('nazwa').trim();
+            const uwagiTresc = formData.get('uwagi_tresc')?.trim() || '';
+            const validationErrors = [];
+
+            for (let i = 1; i <= 10; i++) {
+                const kolor = formData.get(`kolor_${i}`)?.trim() || '';
+                const anilox = formData.get(`anilox_${i}`)?.trim() || '';
+                if (kolor && !anilox) validationErrors.push(`Sekcja ${i}: wybrano kolor "${kolor}", ale brakuje aniloxa.`);
+                if (!kolor && anilox) validationErrors.push(`Sekcja ${i}: wybrano anilox "${anilox}", ale brakuje koloru.`);
+            }
+
+            if (validationErrors.length > 0) {
+                alert('⚠️ Błędy walidacji:\n\n' + validationErrors.join('\n'));
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                setAddPatternSaveStep('pattern');
+                await appendToSheet('Wzory', [patternId, numer, nazwa, currentClient.id, '', '']);
+
+                setAddPatternSaveStep('sections');
+                const sectionsData = [];
+                for (let i = 1; i <= 10; i++) {
+                    sectionsData.push([
+                        patternId,
+                        i,
+                        formData.get(`kolor_${i}`)?.trim() || '',
+                        formData.get(`anilox_${i}`)?.trim() || ''
+                    ]);
+                }
+                await batchAppendToSheet('Sekcje', sectionsData);
+
+                setAddPatternSaveStep('history');
+                const timestamp = new Date().toLocaleString('pl-PL', {
+                    timeZone: 'Europe/Warsaw',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                await appendToSheet('Historia', [
+                    timestamp,
+                    currentUser || 'System',
+                    'Dodano wzór',
+                    `${nazwa} (${numer}) dla ${currentClient.nazwa}`
+                ]);
+
+                if (uwagiTresc) {
+                    await appendToSheet('Uwagi', [
+                        patternId,
+                        currentUser || 'System',
+                        timestamp,
+                        uwagiTresc
+                    ]);
+                }
+
+                setAddPatternSaveStep('refresh');
+                closeModal();
+                showSuccessMessage('Wzór dodany pomyślnie!');
+                await loadAllData(true);
+                showPatterns(currentClient.id);
+            } catch (error) {
+                alert('Błąd podczas dodawania wzoru: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        };
+
+        function extractClientNumber(rawValue) {
+            const raw = String(rawValue || '').trim();
+            const match = raw.match(/^\s*(\d+)/);
+            return match ? match[1] : raw;
+        }
+
+        function updateClientNumberPreview() {
+            const input = document.querySelector('[name="numer"]');
+            const preview = document.getElementById('clientNumberPreview');
+            if (!input || !preview) return;
+            const raw = input.value.trim();
+            const clean = extractClientNumber(raw);
+            const hasProductionCardFormat = raw.includes('/') && clean && clean !== raw;
+            preview.classList.toggle('active', hasProductionCardFormat);
+            preview.innerHTML = hasProductionCardFormat
+                ? `Wykryłem format z karty produkcyjnej. Jako numer klienta zapiszę tylko <strong>${escapeHtml(clean)}</strong>.`
+                : '';
+        }
+
+        showAddClientModal = function() {
+            if (isGuest) {
+                alert('❌ Konto gościa nie ma uprawnień do dodawania klientów.');
+                return;
+            }
+
+            showModal(`
+                <div class="modal-header">Dodaj klienta</div>
+                <form id="addClientForm" class="pattern-form-shell" onsubmit="addClient(event)">
+                    <div class="pattern-form-panel">
+                        <div class="pattern-form-panel-title">Dane klienta</div>
+                        <div class="pattern-meta-grid">
+                            <div class="form-group">
+                                <label>Numer klienta z karty produkcyjnej *</label>
+                                <input type="text" name="numer" required placeholder="np. 26" oninput="updateClientNumberPreview()">
+                                <small class="field-help">
+                                    Jeśli na karcie widzisz zapis typu <strong>26/186</strong>, wpisz tutaj tylko pierwszą część, czyli <strong>26</strong>. Druga liczba to numer wzoru.
+                                </small>
+                                <div id="clientNumberPreview" class="client-number-preview"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Nazwa klienta *</label>
+                                <input type="text" name="nazwa" required placeholder="np. GoodMills DE">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Dodaj klienta</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        };
+
+        addClient = async function(event) {
+            event.preventDefault();
+            const fd = new FormData(event.target);
+            const rawNum = fd.get('numer').trim();
+            const num = extractClientNumber(rawNum);
+            const name = fd.get('nazwa').trim();
+
+            if (!num || !/^\d+$/.test(num)) {
+                alert('⚠️ Numer klienta powinien być samą liczbą, np. 26.');
+                return;
+            }
+
+            const duplicate = clients.find(client => String(client.numer).trim() === num);
+            if (duplicate && !confirm(`Klient o numerze ${num} już istnieje: ${duplicate.nazwa}.\n\nCzy mimo to dodać nowego klienta?`)) {
+                return;
+            }
+
+            let maxNum = 0;
+            clients.forEach(client => {
+                const match = client.id.match(/^CL(\d+)$/);
+                if (match) maxNum = Math.max(maxNum, parseInt(match[1], 10));
+            });
+
+            const clientId = 'CL' + String(maxNum + 1).padStart(3, '0');
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Zapisywanie...';
+
+            try {
+                await appendToSheet('Klienci', [clientId, num, name]);
+                await appendToSheet('Historia', [
+                    new Date().toLocaleString('pl-PL', {
+                        timeZone: 'Europe/Warsaw',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }),
+                    currentUser || 'System',
+                    'Dodano klienta',
+                    rawNum !== num ? `${name} (${num}) - wpis z formularza: ${rawNum}` : `${name} (${num})`
+                ]);
+
+                closeModal();
+                showSuccessMessage(rawNum !== num
+                    ? `Klient dodany. Zapisano numer ${num} zamiast ${rawNum}.`
+                    : 'Klient dodany pomyślnie!');
+                await loadAllData(true);
+            } catch (error) {
+                alert('Błąd podczas dodawania klienta: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        };
 
         // Inicjalizacja
         initApp();
