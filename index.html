@@ -860,7 +860,7 @@
             font-size: 1.5rem;
         }
     }
-    /* Flexo PRO treatment for SOMA 3 Wzory v2.0.0 */
+    /* Flexo PRO treatment for SOMA 3 Wzory v2.0.1 */
     :root {
         --bg-primary: #08111c;
         --bg-secondary: #111d2b;
@@ -1029,7 +1029,8 @@
         margin-top: 1.25rem;
     }
 
-    .soma-clients-toolbar {
+    .soma-clients-toolbar,
+    .soma-patterns-toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -1037,11 +1038,13 @@
         margin: 2.2rem 0 1.15rem;
     }
 
-    .soma-clients-toolbar .section-title {
+    .soma-clients-toolbar .section-title,
+    .soma-patterns-toolbar .section-title {
         margin: 0;
     }
 
-    .soma-clients-toolbar .btn {
+    .soma-clients-toolbar .btn,
+    .soma-patterns-toolbar .btn {
         min-width: 160px;
     }
 
@@ -1162,6 +1165,18 @@
         background: rgba(7, 16, 27, 0.30);
     }
 
+    .sections-header-pro {
+        min-height: auto;
+        padding-top: 0.25rem;
+        padding-bottom: 0.35rem;
+        border: 0;
+        background: transparent;
+        color: #8fa1b7;
+        font-size: 0.72rem;
+        font-weight: 950;
+        text-transform: uppercase;
+    }
+
     .section-row-pro.empty {
         opacity: 0.54;
         border-style: dashed;
@@ -1182,7 +1197,7 @@
     }
 
     .section-label-pro {
-        display: block;
+        display: none;
         margin-bottom: 0.16rem;
         color: #8fa1b7;
         font-size: 0.72rem;
@@ -1203,7 +1218,7 @@
     .ink-dot-pro.yellow { background: #ffe14d; box-shadow: 0 0 18px rgba(255,225,77,0.22); }
     .ink-dot-pro.magenta { background: #ff4fb0; box-shadow: 0 0 18px rgba(255,79,176,0.22); }
     .ink-dot-pro.cyan { background: #31c8ff; box-shadow: 0 0 18px rgba(49,200,255,0.22); }
-    .ink-dot-pro.black { background: #d7dde7; box-shadow: 0 0 18px rgba(215,221,231,0.18); }
+    .ink-dot-pro.black { background: #05070b; border-color: rgba(255,255,255,0.72); box-shadow: 0 0 0 1px rgba(255,255,255,0.18), 0 0 18px rgba(0,0,0,0.35); }
     .ink-dot-pro.empty { background: transparent; border-color: rgba(143,161,183,0.32); box-shadow: none; }
 
     .notes-panel {
@@ -1291,12 +1306,14 @@
     }
 
     @media (max-width: 720px) {
-        .soma-clients-toolbar {
+        .soma-clients-toolbar,
+        .soma-patterns-toolbar {
             align-items: stretch;
             flex-direction: column;
         }
 
-        .soma-clients-toolbar .btn {
+        .soma-clients-toolbar .btn,
+        .soma-patterns-toolbar .btn {
             width: 100%;
         }
     }
@@ -1797,7 +1814,52 @@
     .mini-preset-btn.cyan { color: var(--cyan); }
     .mini-preset-btn.magenta { color: var(--magenta); }
     .mini-preset-btn.yellow { color: var(--yellow); }
-    .mini-preset-btn.black { color: #eef4ff; }
+    .mini-preset-btn.black {
+        background: #05070b;
+        border-color: rgba(255,255,255,0.70);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10);
+    }
+
+    .mini-color-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.22rem;
+        padding: 0.12rem 0.16rem;
+        border: 1px dashed rgba(219, 231, 244, 0.34);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+    }
+
+    .mini-color-input {
+        width: 24px;
+        min-width: 24px;
+        height: 22px;
+        min-height: 22px;
+        padding: 0;
+        border: 1px solid rgba(255,255,255,0.28);
+        border-radius: 999px;
+        background: transparent;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .mini-color-input::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+
+    .mini-color-input::-webkit-color-swatch {
+        border: 0;
+        border-radius: 999px;
+    }
+
+    .mini-color-apply {
+        min-width: 22px;
+        height: 22px;
+        padding: 0;
+        border-radius: 999px;
+        font-size: 0.72rem;
+    }
 
     .save-steps {
         display: none;
@@ -1960,7 +2022,7 @@
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS21_bzM4vzYQ6UG2znS2LRk9qIrigU5pCzs-Hd-tNpFMQhzNuFdXM-K6HR6MUBEQ/exec';
         const SHEET_ID = '1fuZNtN2mIgGg-DrXg_QiflrikCcceiAqJx4QdRVP8K4';
-        const APP_VERSION = '2.0.0';
+        const APP_VERSION = '2.0.1';
         const ADMIN_PASSWORD = 'admin123';
         const SESSION_DURATION = 60 * 60 * 1000; // 1 godzina w milisekundach
         const CACHE_KEY = 'soma3_cache_v2';
@@ -4495,7 +4557,7 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
             }
         }, 5 * 60 * 1000);
 
-        // SOMA 3 Wzory v2.0.0 - UX, performance and safety layer
+        // SOMA 3 Wzory v2.0.1 - UX, performance and safety layer
         const somaState = {
             indexesDirty: true,
             clientById: new Map(),
@@ -4728,11 +4790,12 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
             const content = document.getElementById('content');
             const clientPatterns = (somaState.patternsByClient.get(currentClient.id) || []).slice();
             const filteredPatterns = filterData(clientPatterns, ['nazwa', 'numer']).slice().sort(somaSortByNumberThenName);
-            let html = '';
-
-            if (!isGuest) {
-                html += '<div class="button-group"><button class="btn" onclick="showAddPatternModal()">+ Dodaj wzór</button></div>';
-            }
+            let html = `
+                <div class="soma-patterns-toolbar">
+                    <h2 class="section-title">Wzory</h2>
+                    ${!isGuest ? '<button class="btn" onclick="showAddPatternModal()">+ Dodaj wzór</button>' : ''}
+                </div>
+            `;
 
             if (!filteredPatterns.length) {
                 html += `<div class="soma-empty-state">Brak wzorów dla tego klienta.${!isGuest ? ' Kliknij "+ Dodaj wzór", aby dodać pierwszy.' : ''}</div>`;
@@ -4848,6 +4911,30 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
             return 'spot';
         }
 
+        function somaLoadCustomInkColors() {
+            try {
+                return JSON.parse(localStorage.getItem('soma_custom_ink_colors') || '{}') || {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function somaSaveCustomInkColor(colorName, hexColor) {
+            const name = String(colorName || '').trim();
+            const hex = String(hexColor || '').trim();
+            if (!name || !/^#[0-9a-f]{6}$/i.test(hex)) return;
+            const customColors = somaLoadCustomInkColors();
+            customColors[name.toLowerCase()] = hex;
+            localStorage.setItem('soma_custom_ink_colors', JSON.stringify(customColors));
+        }
+
+        function somaCustomInkStyle(colorName) {
+            const name = String(colorName || '').trim().toLowerCase();
+            const customColor = somaLoadCustomInkColors()[name];
+            if (!customColor) return '';
+            return ` style="background: ${customColor}; box-shadow: 0 0 18px ${customColor}55;"`;
+        }
+
         function somaCommentCountText(count) {
             if (count === 1) return '1 uwaga';
             const lastTwo = count % 100;
@@ -4888,7 +4975,7 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
         }
 
         function somaPatternSectionsHTML(patternSections) {
-            return patternSections.map(section => {
+            const rows = patternSections.map(section => {
                 const isEmpty = !section.kolor && !section.anilox;
                 const inkClass = somaInkClass(section.kolor);
                 return `
@@ -4897,7 +4984,7 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                         <div>
                             <span class="section-label-pro">Kolor</span>
                             <span class="section-value-pro">
-                                <span class="ink-dot-pro ${inkClass}"></span>
+                                <span class="ink-dot-pro ${inkClass}"${somaCustomInkStyle(section.kolor)}></span>
                                 <span>${escapeHtml(section.kolor) || '—'}</span>
                             </span>
                         </div>
@@ -4908,6 +4995,15 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                     </div>
                 `;
             }).join('');
+
+            return `
+                <div class="section-row-pro sections-header-pro">
+                    <div>Sekcja</div>
+                    <div>Kolor</div>
+                    <div>Anilox</div>
+                </div>
+                ${rows}
+            `;
         }
 
         function somaPatternCommentsHTML(patternComments, options = {}) {
@@ -5161,6 +5257,82 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
             }
         }
 
+        function setPatternSectionCustomColor(sectionNumber, hexColor) {
+            const input = document.querySelector(`[name="kolor_${sectionNumber}"]`);
+            if (!input) return;
+
+            let colorName = input.value.trim();
+            if (!colorName) {
+                colorName = prompt('Podaj nazwę farby dla tego koloru:')?.trim() || '';
+                if (!colorName) return;
+                input.value = colorName;
+            }
+
+            somaSaveCustomInkColor(colorName, hexColor);
+            input.focus();
+            showSuccessMessage(`Kolor farby "${colorName}" zapisany.`);
+        }
+
+        function applyPatternSectionCustomColor(sectionNumber) {
+            const colorInput = document.getElementById(`custom_color_${sectionNumber}`);
+            if (!colorInput) return;
+            setPatternSectionCustomColor(sectionNumber, colorInput.value);
+        }
+
+        function buildPatternSectionRows(existingSections = [], options = {}) {
+            const colorListId = options.colorListId || 'colors-list';
+            const aniloxListId = options.aniloxListId || 'anilox-list';
+            const allAnilox = [...new Set(aniloxy.filter(Boolean))].sort();
+            const aniloxButtons = sectionNumber => allAnilox.map(item => `
+                <button class="mini-preset-btn" type="button" data-section="${sectionNumber}" data-value="${escapeHtml(item)}" onclick="setPatternSectionAniloxFromButton(this)">
+                    ${escapeHtml(item)}
+                </button>
+            `).join('');
+
+            return Array.from({ length: 10 }, (_, index) => {
+                const sectionNumber = index + 1;
+                const section = existingSections.find(item => Number(item.nr_sekcji) === sectionNumber) || { kolor: '', anilox: '' };
+                return `
+                    <tr>
+                        <td class="section-number-cell">${sectionNumber}</td>
+                        <td>
+                            <div class="section-input-stack">
+                                <input type="text"
+                                       list="${colorListId}"
+                                       name="kolor_${sectionNumber}"
+                                       placeholder="np. Yellow"
+                                       autocomplete="off"
+                                       value="${escapeHtml(section.kolor || '')}">
+                                <div class="mini-preset-strip">
+                                    <button class="mini-preset-btn cyan" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Cyan')">C</button>
+                                    <button class="mini-preset-btn magenta" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Magenta')">M</button>
+                                    <button class="mini-preset-btn yellow" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Yellow')">Y</button>
+                                    <button class="mini-preset-btn black" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Black')">K</button>
+                                    <span class="mini-color-control" title="Wybierz własny kolor farby i zatwierdź">
+                                        <input class="mini-color-input" id="custom_color_${sectionNumber}" type="color" value="#f68b3a">
+                                        <button class="mini-preset-btn mini-color-apply" type="button" onclick="applyPatternSectionCustomColor(${sectionNumber})">✓</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="section-input-stack">
+                                <input type="text"
+                                       list="${aniloxListId}"
+                                       name="anilox_${sectionNumber}"
+                                       placeholder="np. 280/5.5"
+                                       autocomplete="off"
+                                       value="${escapeHtml(section.anilox || '')}">
+                                <div class="mini-preset-strip">
+                                    ${aniloxButtons(sectionNumber)}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function setAddPatternSaveStep(stepName) {
             const steps = document.getElementById('addPatternSaveSteps');
             if (!steps) return;
@@ -5229,41 +5401,7 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${Array.from({ length: 10 }, (_, index) => {
-                                        const sectionNumber = index + 1;
-                                        return `
-                                            <tr>
-                                                <td class="section-number-cell">${sectionNumber}</td>
-                                                <td>
-                                                    <div class="section-input-stack">
-                                                        <input type="text"
-                                                               list="colors-list"
-                                                               name="kolor_${sectionNumber}"
-                                                               placeholder="np. Yellow"
-                                                               autocomplete="off">
-                                                        <div class="mini-preset-strip">
-                                                            <button class="mini-preset-btn cyan" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Cyan')">C</button>
-                                                            <button class="mini-preset-btn magenta" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Magenta')">M</button>
-                                                            <button class="mini-preset-btn yellow" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Yellow')">Y</button>
-                                                            <button class="mini-preset-btn black" type="button" onclick="setPatternSectionColor(${sectionNumber}, 'Black')">K</button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="section-input-stack">
-                                                        <input type="text"
-                                                               list="anilox-list"
-                                                               name="anilox_${sectionNumber}"
-                                                               placeholder="np. 280/5.5"
-                                                               autocomplete="off">
-                                                        <div class="mini-preset-strip">
-                                                            ${aniloxButtons(sectionNumber)}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
+                                    ${buildPatternSectionRows([], { colorListId: 'colors-list', aniloxListId: 'anilox-list' })}
                                 </tbody>
                             </table>
                         </div>
@@ -5282,6 +5420,72 @@ function generateBlankTableHTML(includeHeader, includeNotes, addPageBreak, secti
                     <div class="button-group">
                         <button type="submit" class="btn">✅ Dodaj wzór</button>
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Anuluj</button>
+                    </div>
+                </form>
+            `);
+        };
+
+        showEditPatternModal = function() {
+            if (isGuest) {
+                alert('❌ Konto gościa nie ma uprawnień do edycji wzorów.');
+                return;
+            }
+
+            const patternSections = somaGetPatternSections(currentPattern.id);
+            const usedColors = [...new Set(sections.map(section => section.kolor).filter(Boolean))].sort();
+            const allAnilox = [...new Set(aniloxy.filter(Boolean))].sort();
+            const colorOptions = usedColors.map(color => `<option value="${escapeHtml(color)}">`).join('');
+            const aniloxOptions = allAnilox.map(item => `<option value="${escapeHtml(item)}">`).join('');
+            const googleSheetsButton = currentUser === 'Kamil'
+                ? `<button type="button" class="btn btn-secondary" onclick="window.open('https://docs.google.com/spreadsheets/d/${SHEET_ID}', '_blank')">📊 Google Sheets</button>`
+                : '';
+
+            showModal(`
+                <div class="modal-header">Edytuj wzór: ${escapeHtml(currentPattern.nazwa)}</div>
+                <form id="editPatternForm" class="pattern-form-shell" onsubmit="saveEditedPattern(event)">
+                    <div class="pattern-form-panel">
+                        <div class="pattern-form-panel-title">Dane wzoru</div>
+                        <div class="pattern-meta-grid">
+                            <div class="form-group">
+                                <label>Numer wzoru</label>
+                                <input type="text" value="${escapeHtml(currentPattern.numer)}" readonly style="opacity: 0.72; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Nazwa wzoru</label>
+                                <input type="text" value="${escapeHtml(currentPattern.nazwa)}" readonly style="opacity: 0.72; cursor: not-allowed;">
+                            </div>
+                        </div>
+                        <small class="field-help">Edycja zapisze nową wersję wzoru. Poprzednia wersja zostaje w historii.</small>
+                    </div>
+
+                    <div class="pattern-form-panel">
+                        <div class="pattern-form-panel-title">Sekcje 1-10</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 0.85rem;">
+                            Edytuj kolor i anilox albo użyj tych samych presetów co przy dodawaniu wzoru.
+                        </p>
+                        <div class="sections-table-wrap">
+                            <table class="pattern-sections-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sekcja</th>
+                                        <th>Kolor</th>
+                                        <th>Anilox</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${buildPatternSectionRows(patternSections, { colorListId: 'colors-list-edit', aniloxListId: 'anilox-list-edit' })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <datalist id="colors-list-edit">${colorOptions}</datalist>
+                    <datalist id="anilox-list-edit">${aniloxOptions}</datalist>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn">✅ Zapisz zmiany</button>
+                        ${googleSheetsButton}
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
                     </div>
                 </form>
             `);
